@@ -286,3 +286,316 @@ $$\mathbf{p} = \mathbf{P} \mathbf{b} \quad (\text{the shadow})$$
 $$\mathbf{e} = (\mathbf{I} - \mathbf{P}) \mathbf{b} = \mathbf{b} - \mathbf{P}\mathbf{b} \quad (\text{the perpendicular drop line})$$
 
 $$\text{Total Vector} = \mathbf{p} + \mathbf{e} = \mathbf{P}\mathbf{b} + (\mathbf{I} - \mathbf{P})\mathbf{b} = \mathbf{b}$$
+
+---
+
+# Part 2: The Geometry of Eigenvalues and Eigenvectors
+
+In Part 1, we learned how to project vectors onto a subspace once the direction was already given to us. But in real-world data, **who chooses the direction?**
+
+To find the natural axes of our data, we must understand how matrices deform space.
+
+---
+
+## 2.1 What is a Linear Transformation? (The Axiomatic View)
+
+For absolute visual clarity, we focus on **$2 \times 2$ matrices** acting on 2-dimensional space ($\mathbb{R}^2 \to \mathbb{R}^2$).
+
+A matrix $\mathbf{M}$ is not just a table of numbers—it is a **transformation machine**. You feed it an input vector $\mathbf{v} \in \mathbb{R}^2$, and it outputs a transformed vector $\mathbf{M}\mathbf{v} \in \mathbb{R}^2$.
+
+To be a **linear transformation**, the operation must satisfy two strict axioms:
+
+1. **Additivity:**
+   $$T(\mathbf{u} + \mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})$$
+   *(Transforming the sum of two vectors is the same as transforming them individually and then adding).*
+
+2. **Homogeneity (Scaling):**
+   $$T(c\mathbf{v}) = cT(\mathbf{v})$$
+   *(Scaling a vector by $c$ scales its output by $c$).*
+
+### The Axiomatic Consequence: $T(\mathbf{0}) = \mathbf{0}$
+From homogeneity, setting scalar $c = 0$:
+
+$$T(\mathbf{0}) = T(0 \cdot \mathbf{v}) = 0 \cdot T(\mathbf{v}) = \mathbf{0}$$
+
+> **Key Geometric Rule:** Under any linear transformation, **the origin $(0, 0)$ is permanently anchored**. It can never move, shift, or translate!
+
+Furthermore, grid lines must remain straight and evenly spaced; space can be stretched, sheared, or rotated, but it can never be bent or curved.
+
+---
+
+## 2.2 Visualizing Transformations: The 4-Quadrant Benchmark Grid in $\mathbb{R}^2$
+
+To observe how different matrices deform space, we establish a **standard benchmark**: a symmetric lattice of 25 points spanning **all 4 quadrants**:
+
+$$(x, y) \in \{-2, -1, 0, 1, 2\} \times \{-2, -1, 0, 1, 2\}$$
+
+This forms a neat $2 \times 2$ cluster in each of the 4 quadrants, plus the axes and the origin.
+
+### The Side-by-Side Visual Setup:
+Every transformation figure below is laid out as two matching panels:
+- **Left Panel (Input Space $\mathbb{R}^2$):** Shows the original benchmark grid and 5 specifically tracked test vectors.
+- **Right Panel (Output Space $\mathbb{R}^2$):** Shows the deformed grid and where those exact 5 vectors land after transformation $\mathbf{M}\mathbf{v}$.
+
+### The 5 Specifically Tracked Vectors:
+In every chart, we track the exact same 5 vectors using **identical colors** on both the Left and Right panels so you can visually verify which vectors changed direction and which vectors maintained their span:
+
+1. 🔵 **$\mathbf{e}_1 = [1, 0]^T$ (Medium Blue):** Standard basis vector along the X-axis.
+2. 🔷 **$\mathbf{e}_2 = [0, 1]^T$ (Light Blue):** Standard basis vector along the Y-axis.
+3. 🟦 **$\mathbf{d} = [1, 1]^T$ (Dark Navy Blue):** Diagonal benchmark vector.
+4. 🔴 **Eigenvector 1 (Red):** The first invariant vector (corresponding to $\lambda_1$).
+5. 🟢 **Eigenvector 2 (Green):** The second invariant vector (corresponding to $\lambda_2$).
+
+---
+
+## 2.3 The Origin of "Eigen": Invariant Lines and Eigenspaces
+
+Consider the simplest transformation: the **diagonal matrix** $\mathbf{D}$:
+
+$$\mathbf{D} = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}$$
+
+Multiplying any point $\begin{bmatrix} x \\ y \end{bmatrix}$ by $\mathbf{D}$ scales the horizontal coordinate by $3\times$ and the vertical coordinate by $2\times$:
+
+$$\mathbf{D} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 3x \\ 2y \end{bmatrix}$$
+
+<div align="center">
+
+![Figure 2.3 Diagonal Transformation](./assets/2_3_fig_diagonal_transform.png)
+
+*Figure 2.3: Side-by-side transformation by diagonal matrix $\mathbf{D} = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}$. Left: Input Space. Right: Transformed Output Space. Both panels feature the neutral grey benchmark grid and tick intervals of 1. Notice how $\mathbf{e}_1$ (Medium Blue) and $\mathbf{e}_2$ (Light Blue) maintain their direction along the red and green eigenspaces, while the diagonal vector $\mathbf{d}$ (Dark Navy Blue) tilts.*
+
+👉 **[Open Interactive Figure 2.3 in Browser](https://thisispk48.github.io/workshops/20260926_sju_26bda_pca/assets/2_3_fig_diagonal_transform.html)**
+
+</div>
+
+### Tracking our 5 vectors under $\mathbf{D}$:
+1. 🔵 $\mathbf{e}_1 = [1, 0]^T$ (Medium Blue) $\to \mathbf{D}\mathbf{e}_1 = [3, 0]^T$: **Direction strictly preserved!** Stretched by $3\times$ along the X-axis (Eigenspace 1 line $y = 0$, $\lambda_1 = 3$).
+2. 🔷 $\mathbf{e}_2 = [0, 1]^T$ (Light Blue) $\to \mathbf{D}\mathbf{e}_2 = [0, 2]^T$: **Direction strictly preserved!** Stretched by $2\times$ along the Y-axis (Eigenspace 2 line $x = 0$, $\lambda_2 = 2$).
+3. 🟦 $\mathbf{d} = [1, 1]^T$ (Dark Navy Blue) $\to \mathbf{D}\mathbf{d} = [3, 2]^T$: **Direction changed!** Slope changed from $1$ to $\frac{2}{3}$.
+
+### The Big Lesson:
+> An **Eigenvector** is a vector that **retains its directional span (line of action)** under a linear transformation:
+> 
+> $$\mathbf{M} \mathbf{v} = \lambda \mathbf{v}$$
+> 
+> When transformed by $\mathbf{M}$, the vector **does not change its direction**—it is purely scaled by the scalar factor $\lambda$ (the **Eigenvalue**).
+> 
+> An eigenvalue does not belong to just one isolated vector. It defines an **entire 1-dimensional subspace (an infinite straight line through the origin)** called an **Eigenspace**. Every vector on that line scales by the exact same $\lambda$.
+
+---
+
+## 2.4 Tilted Eigenvectors: The Non-Diagonal Matrix
+
+In the diagonal matrix above, the eigenvectors conveniently coincided with the familiar X and Y axes. But what happens in a general **non-diagonal matrix**?
+
+To explore this, consider the matrix $\mathbf{A}$:
+
+$$\mathbf{A} = \begin{bmatrix} 1 & 1 \\ -2 & 4 \end{bmatrix}$$
+
+Here, the eigenvalues and eigenvectors are not obvious just by looking at the numbers. We need a general method to discover them.
+
+---
+
+### Step 1: Setting up the Equation (The "How")
+
+By definition, we are searching for a non-zero vector $\mathbf{v}$ and a scalar $\lambda$ such that:
+
+$$\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$$
+
+Move everything to the left side:
+
+$$\mathbf{A}\mathbf{v} - \lambda\mathbf{v} = \mathbf{0}$$
+
+We want to factor out vector $\mathbf{v}$. However, we cannot directly subtract a scalar number $\lambda$ from a matrix $\mathbf{A}$. To fix this, we insert the Identity matrix $\mathbf{I}$ (since $\lambda\mathbf{v} = \lambda\mathbf{I}\mathbf{v}$):
+
+$$(\mathbf{A} - \lambda\mathbf{I})\mathbf{v} = \mathbf{0}$$
+
+---
+
+### Step 2: Why Must the Determinant Equal Zero? (The "Why")
+
+Let $\mathbf{B} = (\mathbf{A} - \lambda\mathbf{I})$. Our equation is now:
+
+$$\mathbf{B}\mathbf{v} = \mathbf{0}$$
+
+Notice the fundamental dilemma:
+- If $\mathbf{v} = \mathbf{0}$, the equation is trivially true ($\mathbf{B}\mathbf{0} = \mathbf{0}$). But the zero vector has no direction—it tells us nothing about space (the **trivial solution**).
+- We demand a **real, non-zero vector** ($\mathbf{v} \ne \mathbf{0}$) that satisfies the equation.
+
+**What does it mean geometrically when a matrix squashes a non-zero vector down into $(0, 0)$?**
+It means the matrix **collapses space!** It squashes 2-dimensional area down into a 1-dimensional line (or point).
+
+- The **determinant** measures how much a matrix scales area. If 2D space is crushed into a 1D line, its 2D area becomes **zero**!
+- If $\det(\mathbf{B}) \ne 0$, the matrix $\mathbf{B}$ would be invertible, which would force $\mathbf{v} = \mathbf{B}^{-1}\mathbf{0} = \mathbf{0}$ (only the useless zero solution would exist).
+- Therefore, for a non-zero eigenvector to exist, the matrix **must collapse space**:
+
+$$\det(\mathbf{A} - \lambda\mathbf{I}) = 0 \quad \text{(The Characteristic Equation)}$$
+
+---
+
+### Step 3: The General $2 \times 2$ Characteristic Equation
+
+For any general $2 \times 2$ matrix $\mathbf{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$:
+
+$$\det\begin{bmatrix} a - \lambda & b \\ c & d - \lambda \end{bmatrix} = (a - \lambda)(d - \lambda) - bc = 0$$
+
+$$\lambda^2 - (a + d)\lambda + (ad - bc) = 0$$
+
+Notice the two fundamental properties of matrices that appear naturally in this equation:
+1. **The Trace:** $\text{Tr}(\mathbf{A}) = a + d$ (sum of diagonal entries)
+2. **The Determinant:** $\det(\mathbf{A}) = ad - bc$
+
+This gives the universal $2 \times 2$ characteristic formula:
+
+$$\lambda^2 - \text{Tr}(\mathbf{A})\lambda + \det(\mathbf{A}) = 0$$
+
+> **Student Quick Check:**  
+> The sum of the eigenvalues is always the trace: $\lambda_1 + \lambda_2 = \text{Tr}(\mathbf{A})$.  
+> The product of the eigenvalues is always the determinant: $\lambda_1 \lambda_2 = \det(\mathbf{A})$.
+
+---
+
+### Step 4: Applying the Machinery to Our Example
+
+Now we can solve our non-diagonal matrix $\mathbf{A} = \begin{bmatrix} 1 & 1 \\ -2 & 4 \end{bmatrix}$:
+
+1. **Calculate Trace & Determinant:**
+   - $\text{Tr}(\mathbf{A}) = 1 + 4 = 5$
+   - $\det(\mathbf{A}) = (1)(4) - (1)(-2) = 4 + 2 = 6$
+
+2. **Characteristic Equation:**
+   $$\lambda^2 - 5\lambda + 6 = 0$$
+   $$(\lambda - 3)(\lambda - 2) = 0 \implies \lambda_1 = 3, \quad \lambda_2 = 2$$
+
+3. **Finding the Direction Lines (Eigenvectors):**  
+   Substitute each $\lambda$ back into $(\mathbf{A} - \lambda\mathbf{I})\mathbf{v} = \mathbf{0}$. Because the matrix collapsed space, the two row equations are redundant multiples of each other—they reduce to a single invariant line:
+
+   - **For $\lambda_1 = 3$:**
+     $$\begin{bmatrix} 1 - 3 & 1 \\ -2 & 4 - 3 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} -2 & 1 \\ -2 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+     Both rows state: $-2x + y = 0 \implies y = 2x$.  
+     Any vector along the line $y = 2x$ is an eigenvector! We choose the simple integer representative:
+     $$\mathbf{v}_1 = \begin{bmatrix} 1 \\ 2 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_1 = 3)$$
+
+   - **For $\lambda_2 = 2$:**
+     $$\begin{bmatrix} 1 - 2 & 1 \\ -2 & 4 - 2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} -1 & 1 \\ -2 & 2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+     Both rows state: $-x + y = 0 \implies y = x$.  
+     Any vector along the line $y = x$ is an eigenvector:
+     $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_2 = 2)$$
+
+<div align="center">
+
+![Figure 2.4 Non-Diagonal Transformation](./assets/2_4_fig_nondiagonal_transform.png)
+
+*Figure 2.4: Side-by-side transformation by non-diagonal matrix $\mathbf{A} = \begin{bmatrix} 1 & 1 \\ -2 & 4 \end{bmatrix}$. Notice where each of the 5 vectors land. Eigenvectors $\mathbf{v}_1$ (Red) and $\mathbf{v}_2$ (Green) strictly preserve their directional lines, but are NOT perpendicular ($\theta \approx 18.4^\circ$).*
+
+👉 **[Open Interactive Figure 2.4 in Browser](https://thisispk48.github.io/workshops/20260926_sju_26bda_pca/assets/2_4_fig_nondiagonal_transform.html)**
+
+</div>
+
+### Tracking our 5 vectors under $\mathbf{A}$:
+1. 🔵 $\mathbf{e}_1 = [1, 0]^T$ (Medium Blue) $\to \mathbf{A}\mathbf{e}_1 = [1, -2]^T$: **Direction changed!**
+2. 🔷 $\mathbf{e}_2 = [0, 1]^T$ (Light Blue) $\to \mathbf{A}\mathbf{e}_2 = [1, 4]^T$: **Direction changed!**
+3. 🟦 $\mathbf{d} = [1, 1]^T$ (Dark Navy Blue) $\to \mathbf{A}\mathbf{d} = [2, 2]^T$: Lands on line $y = x$ (coincides with $\mathbf{v}_2$).
+4. 🔴 $\mathbf{v}_1 = [1, 2]^T$ (Red) $\to \mathbf{A}\mathbf{v}_1 = [3, 6]^T$: **Direction strictly preserved on line $y = 2x$!** Stretched by $\lambda_1 = 3\times$.
+5. 🟢 $\mathbf{v}_2 = [1, 1]^T$ (Green) $\to \mathbf{A}\mathbf{v}_2 = [2, 2]^T$: **Direction strictly preserved on line $y = x$!** Stretched by $\lambda_2 = 2\times$.
+
+### The Critical Eye-Opener:
+Look at the angle between the two eigenvectors:
+
+$$\mathbf{v}_1 \cdot \mathbf{v}_2 = (1)(1) + (2)(1) = 3 \ne 0$$
+
+$$\cos(\theta) = \frac{\mathbf{v}_1 \cdot \mathbf{v}_2}{\|\mathbf{v}_1\| \|\mathbf{v}_2\|} = \frac{3}{\sqrt{5}\sqrt{2}} = \frac{3}{\sqrt{10}} \approx 0.9487 \implies \theta \approx 18.4^\circ$$
+
+> **Key Insight:** In general non-diagonal matrices, eigenvectors are **tilted** away from the standard axes, but they are **NOT orthogonal ($90^\circ$)**. The transformation shears space along non-perpendicular directions.
+
+---
+
+## 2.5 The Power of Symmetry: Strictly Orthogonal Eigenvectors
+
+Now consider a **symmetric matrix** $\mathbf{S}$ (where $\mathbf{S}^T = \mathbf{S}$):
+
+$$\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$$
+
+### Step 1: Characteristic Equation (Using Trace & Determinant)
+For $\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$:
+- $\text{Tr}(\mathbf{S}) = 3 + 3 = 6$
+- $\det(\mathbf{S}) = (3)(3) - (1)(1) = 8$
+
+Using our formula $\lambda^2 - \text{Tr}(\mathbf{S})\lambda + \det(\mathbf{S}) = 0$:
+
+$$\lambda^2 - 6\lambda + 8 = 0 \implies (\lambda - 4)(\lambda - 2) = 0 \implies \lambda_1 = 4, \quad \lambda_2 = 2$$
+
+### Step 2: Finding the Eigenvectors
+- **For $\lambda_1 = 4$:**
+  $$(\mathbf{S} - 4\mathbf{I})\mathbf{q}_1 = \begin{bmatrix} -1 & 1 \\ 1 & -1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies y = x \implies \mathbf{q}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$
+
+- **For $\lambda_2 = 2$:**
+  $$(\mathbf{S} - 2\mathbf{I})\mathbf{q}_2 = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies y = -x \implies \mathbf{q}_2 = \begin{bmatrix} -1 \\ 1 \end{bmatrix}$$
+
+<div align="center">
+
+![Figure 2.5 Symmetric Transformation](./assets/2_5_fig_symmetric_transform.png)
+
+*Figure 2.5: Side-by-side transformation by symmetric matrix $\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$. Notice the $90^\circ$ right-angle marker in both panels: Eigenvectors $\mathbf{q}_1$ (Red) and $\mathbf{q}_2$ (Green) are STRICTLY PERPENDICULAR ($\mathbf{q}_1 \cdot \mathbf{q}_2 = 0$).*
+
+👉 **[Open Interactive Figure 2.5 in Browser](https://thisispk48.github.io/workshops/20260926_sju_26bda_pca/assets/2_5_fig_symmetric_transform.html)**
+
+</div>
+
+### Tracking our 5 vectors under $\mathbf{S}$:
+1. 🔵 $\mathbf{e}_1 = [1, 0]^T$ (Medium Blue) $\to \mathbf{S}\mathbf{e}_1 = [3, 1]^T$: **Direction changed!**
+2. 🔷 $\mathbf{e}_2 = [0, 1]^T$ (Light Blue) $\to \mathbf{S}\mathbf{e}_2 = [1, 3]^T$: **Direction changed!**
+3. 🟦 $\mathbf{d} = [1, 1]^T$ (Dark Navy Blue) $\to \mathbf{S}\mathbf{d} = [4, 4]^T$: Diagonal benchmark vector (coincides with $\mathbf{q}_1$).
+4. 🔴 $\mathbf{q}_1 = [1, 1]^T$ (Red) $\to \mathbf{S}\mathbf{q}_1 = [4, 4]^T$: **Direction strictly preserved on line $y = x$!** Stretched by $\lambda_1 = 4\times$.
+5. 🟢 $\mathbf{q}_2 = [-1, 1]^T$ (Green) $\to \mathbf{S}\mathbf{q}_2 = [-2, 2]^T$: **Direction strictly preserved on line $y = -x$!** Stretched by $\lambda_2 = 2\times$.
+
+### The Miracle of Symmetry:
+Look at the dot product between the eigenvectors:
+
+$$\mathbf{q}_1 \cdot \mathbf{q}_2 = (1)(-1) + (1)(1) = 0$$
+
+The angle between them is **exactly $90^\circ$** on both the input and output sides!
+
+> **The Fundamental Discovery:**  
+> While non-diagonal matrices have skewed eigenvectors, a **symmetric matrix always stretches space along mutually perpendicular ($90^\circ$) axes**. It produces a rigid, rotated orthogonal coordinate frame.
+
+---
+
+## 2.6 The Bridge to PCA: The Four Special Properties of Symmetric Matrices
+
+Why is this linear algebra so vital to Data Science and PCA?
+
+Because in modern machine learning, the core object that captures data variation is the **Covariance Matrix**:
+
+$$\mathbf{\Sigma} = \frac{1}{N} \mathbf{X}^T \mathbf{X}$$
+
+Because $(\mathbf{X}^T\mathbf{X})^T = \mathbf{X}^T (\mathbf{X}^T)^T = \mathbf{X}^T\mathbf{X}$, **the Covariance Matrix is ALWAYS symmetric!**
+
+Every symmetric matrix enjoys four mathematical properties that make PCA possible:
+
+### 1. All Eigenvalues are Real Numbers
+Symmetric matrices can never produce imaginary or complex eigenvalues. The variance along each direction is always a real, measurable quantity.
+
+### 2. Eigenvectors are Strictly Orthogonal
+By the **Spectral Theorem**, eigenvectors corresponding to distinct eigenvalues of a symmetric matrix are **guaranteed to be orthogonal ($90^\circ$)**. This ensures that principal components represent completely independent, uncorrelated axes of information.
+
+### 3. The Spectral Decomposition (Connecting Directly to Part 1!)
+Any symmetric matrix $\mathbf{S}$ can be factored as:
+
+$$\mathbf{S} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T$$
+
+where $\mathbf{Q} = [\mathbf{q}_1 \quad \mathbf{q}_2]$ is an orthonormal matrix of eigenvectors, and $\mathbf{\Lambda} = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix}$.
+
+Multiplying this out reveals a breathtaking mathematical insight:
+
+$$\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T) + \lambda_2 (\mathbf{q}_2 \mathbf{q}_2^T)$$
+
+Look closely at the terms $(\mathbf{q}_1 \mathbf{q}_1^T)$ and $(\mathbf{q}_2 \mathbf{q}_2^T)$:
+**These are the EXACT 1D projection matrices we derived in Section 1.2!**
+
+> **The Big Connection:**  
+> A symmetric matrix is nothing more than a **weighted sum of orthogonal projection matrices**, where the weights are its eigenvalues!
+
+### 4. Positive Semi-Definiteness ($\lambda_i \ge 0$)
+Because covariance is computed as $\mathbf{v}^T \mathbf{\Sigma} \mathbf{v} = \frac{1}{N}\|\mathbf{X}\mathbf{v}\|^2 \ge 0$, all eigenvalues of a covariance matrix are non-negative ($\lambda_i \ge 0$). Variances can never be negative.
+
