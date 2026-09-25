@@ -1497,7 +1497,7 @@ $$\text{Storage Savings Ratio} = 1 - \frac{(H \cdot k) + (k \cdot W) + W}{H \cdo
 
 Multiplying this ratio by $100$ yields the percentage of storage space saved:
 
-$$\text{Storage Savings (\%)} = \text{Storage Savings Ratio} \times 100$$
+$$\text{Storage Savings Percentage} = \text{Storage Savings Ratio} \times 100$$
 
 #### The Compression vs. Information Retention Table (Mona Lisa, $512 \times 512$):
 
