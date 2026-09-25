@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Example 1.2.1: 2D Diagonal Projection</title>
+  <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-top: 0;
+      color: #0f172a;
+    }
+    p {
+      line-height: 1.6;
+      color: #475569;
+      font-size: 14px;
+    }
+    #plot {
+      width: 100%;
+      height: 550px;
+    }
+    .legend-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 15px;
+      padding: 12px 16px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .badge {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Example 1.2.1: Projecting Vector v [2, 4] onto Line x [1, 1]</h1>
+    <p>
+      Notice the perpendicular drop: line <i>y = x</i> has slope +1, and drop line <i>e</i> has slope -1. 
+      Their product is -1, confirming the 90° angle. Hover over points to inspect coordinates.
+    </p>
+
+    <div id="plot"></div>
+
+    <div class="legend-box">
+      <div><span class="badge" style="background:#8e24aa;"></span><b>Vector v:</b> [2, 4] (Original)</div>
+      <div><span class="badge" style="background:#1e88e5;"></span><b>Vector x:</b> [1, 1] (Diagonal line)</div>
+      <div><span class="badge" style="background:#2e7d32;"></span><b>Projection p:</b> [3, 3] (Shadow)</div>
+      <div><span class="badge" style="background:#e53935;"></span><b>Error e:</b> [-1, 1] (Slope = -1, Orthogonal drop)</div>
+    </div>
+  </div>
+
+  <script>
+    const traceSubspace = {
+      x: [-0.5, 4.5],
+      y: [-0.5, 4.5],
+      mode: 'lines',
+      line: { color: '#90a4ae', width: 2, dash: 'dash' },
+      name: 'Subspace Line y = x (slope = +1)',
+      hoverinfo: 'skip'
+    };
+
+    const traceV = {
+      x: [0, 2],
+      y: [0, 4],
+      mode: 'lines+markers',
+      line: { color: '#8e24aa', width: 5 },
+      marker: { size: [0, 9], color: '#8e24aa' },
+      name: 'Vector v [2, 4]'
+    };
+
+    const traceX = {
+      x: [0, 1],
+      y: [0, 1],
+      mode: 'lines+markers',
+      line: { color: '#1e88e5', width: 4 },
+      marker: { size: [0, 8], color: '#1e88e5' },
+      name: 'Vector x [1, 1]'
+    };
+
+    const traceP = {
+      x: [0, 3],
+      y: [0, 3],
+      mode: 'lines+markers',
+      line: { color: '#2e7d32', width: 6 },
+      marker: { size: [0, 10], color: '#2e7d32' },
+      name: 'Projection p [3, 3]'
+    };
+
+    const traceE = {
+      x: [3, 2],
+      y: [3, 4],
+      mode: 'lines+markers',
+      line: { color: '#e53935', width: 3, dash: 'dot' },
+      marker: { size: [0, 6], color: '#e53935' },
+      name: 'Error e = [-1, 1] (slope = -1)'
+    };
+
+    const layout = {
+      xaxis: { title: 'X axis', range: [-0.5, 4.5], scaleanchor: 'y', scaleratio: 1, zeroline: true },
+      yaxis: { title: 'Y axis', range: [-0.5, 4.8], zeroline: true },
+      margin: { l: 40, r: 20, b: 40, t: 20 },
+      legend: {
+        x: 0.55,
+        y: 0.15,
+        bgcolor: 'rgba(255, 255, 255, 0.9)'
+      }
+    };
+
+    Plotly.newPlot('plot', [traceSubspace, traceX, traceV, traceP, traceE], layout, {responsive: true});
+  </script>
+</body>
+</html>

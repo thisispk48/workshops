@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive 2D Vector Projection</title>
+  <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-top: 0;
+      color: #0f172a;
+    }
+    p {
+      line-height: 1.6;
+      color: #475569;
+      font-size: 14px;
+    }
+    #plot {
+      width: 100%;
+      height: 550px;
+    }
+    .legend-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 15px;
+      padding: 12px 16px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .badge {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Interactive 2D Projection: Vector v onto Vector x</h1>
+    <p>
+      Hover over the vectors to see their coordinates. Click and drag to pan, scroll to zoom.
+    </p>
+
+    <div id="plot"></div>
+
+    <div class="legend-box">
+      <div><span class="badge" style="background:#8e24aa;"></span><b>Vector v:</b> [2.0, 4.0] (Original vector)</div>
+      <div><span class="badge" style="background:#1e88e5;"></span><b>Vector x:</b> [5.0, 2.0] (Direction line)</div>
+      <div><span class="badge" style="background:#2e7d32;"></span><b>Projection p:</b> [3.10, 1.24] (Shadow)</div>
+      <div><span class="badge" style="background:#e53935;"></span><b>Error e:</b> [-1.10, 2.76] (Perpendicular drop)</div>
+    </div>
+  </div>
+
+  <script>
+    const traceSubspace = {
+      x: [-2.5, 7.5],
+      y: [-1.0, 3.0],
+      mode: 'lines',
+      line: { color: '#b0bec5', width: 2, dash: 'dash' },
+      name: 'Subspace Line (spanned by x)',
+      hoverinfo: 'skip'
+    };
+
+    const traceV = {
+      x: [0, 2.0],
+      y: [0, 4.0],
+      mode: 'lines+markers',
+      line: { color: '#8e24aa', width: 5 },
+      marker: { size: [0, 8], color: '#8e24aa' },
+      name: 'Vector v [2.0, 4.0]'
+    };
+
+    const traceX = {
+      x: [0, 5.0],
+      y: [0, 2.0],
+      mode: 'lines+markers',
+      line: { color: '#1e88e5', width: 4 },
+      marker: { size: [0, 8], color: '#1e88e5' },
+      name: 'Vector x [5.0, 2.0]'
+    };
+
+    const traceP = {
+      x: [0, 3.103448275862069],
+      y: [0, 1.2413793103448276],
+      mode: 'lines+markers',
+      line: { color: '#2e7d32', width: 6 },
+      marker: { size: [0, 9], color: '#2e7d32' },
+      name: 'Projection p [3.10, 1.24]'
+    };
+
+    const traceE = {
+      x: [3.103448275862069, 2.0],
+      y: [1.2413793103448276, 4.0],
+      mode: 'lines',
+      line: { color: '#e53935', width: 3, dash: 'dot' },
+      name: 'Error e = v - p (Drop line)'
+    };
+
+    const layout = {
+      xaxis: { title: 'X axis', range: [-1, 7], scaleanchor: 'y', scaleratio: 1, zeroline: true },
+      yaxis: { title: 'Y axis', range: [-1, 6], zeroline: true },
+      margin: { l: 40, r: 20, b: 40, t: 20 },
+      legend: {
+        x: 0.02,
+        y: 0.98,
+        bgcolor: 'rgba(255, 255, 255, 0.9)'
+      }
+    };
+
+    Plotly.newPlot('plot', [traceSubspace, traceX, traceV, traceP, traceE], layout, {responsive: true});
+  </script>
+</body>
+</html>

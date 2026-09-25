@@ -1,6 +1,6 @@
 # How to Crack Data Science Jobs for Math Students?
 
-> **Audience:** MSc Mathematics Students  
+> **Audience:** MSc Mathematics Students (1st & 2nd Year)  
 > **Core Theme:** Why your mathematical foundation is your biggest unfair advantage in the AI & Data industry.
 
 ---
