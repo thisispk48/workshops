@@ -98,27 +98,27 @@ $$\mathbf{P} = \mathbf{u} \mathbf{u}^T$$
 
 ### Example 1.2.1: Projecting $\mathbf{v} = [2, 4]^T$ onto the $45^\circ$ Diagonal Line
 
-Let the direction line be $\mathbf{a} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$ (the $45^\circ$ diagonal line $y = x$).
+Let the direction line be $\mathbf{a} = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix}$ (the $45^\circ$ diagonal line $y = x$).
 
 1. **Outer product matrix ($\mathbf{a}\mathbf{a}^T$):**
 
-   $$\mathbf{a} \mathbf{a}^T = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}$$
+$$\mathbf{a} \mathbf{a}^T = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\\\ 1 & 1 \end{bmatrix}$$
 
 2. **Squared length ($\mathbf{a}^T\mathbf{a}$):**
 
-   $$\mathbf{a}^T \mathbf{a} = 1^2 + 1^2 = 2$$
+$$\mathbf{a}^T \mathbf{a} = 1^2 + 1^2 = 2$$
 
 3. **Projection Matrix $\mathbf{P}$:**
 
-   $$\mathbf{P} = \frac{1}{2} \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} = \begin{bmatrix} 0.5 & 0.5 \\ 0.5 & 0.5 \end{bmatrix}$$
+$$\mathbf{P} = \frac{1}{2} \begin{bmatrix} 1 & 1 \\\\ 1 & 1 \end{bmatrix} = \begin{bmatrix} 0.5 & 0.5 \\\\ 0.5 & 0.5 \end{bmatrix}$$
 
 4. **Calculate the Shadow Vector $\mathbf{p}$:**
 
-   $$\mathbf{p} = \mathbf{P} \mathbf{v} = \begin{bmatrix} 0.5 & 0.5 \\ 0.5 & 0.5 \end{bmatrix} \begin{bmatrix} 2 \\ 4 \end{bmatrix} = \begin{bmatrix} 0.5(2) + 0.5(4) \\ 0.5(2) + 0.5(4) \end{bmatrix} = \begin{bmatrix} 3 \\ 3 \end{bmatrix}$$
+$$\mathbf{p} = \mathbf{P} \mathbf{v} = \begin{bmatrix} 0.5 & 0.5 \\\\ 0.5 & 0.5 \end{bmatrix} \begin{bmatrix} 2 \\\\ 4 \end{bmatrix} = \begin{bmatrix} 0.5(2) + 0.5(4) \\\\ 0.5(2) + 0.5(4) \end{bmatrix} = \begin{bmatrix} 3 \\\\ 3 \end{bmatrix}$$
 
 5. **Calculate the Error Drop Line $\mathbf{e}$:**
 
-   $$\mathbf{e} = \mathbf{v} - \mathbf{p} = \begin{bmatrix} 2 \\ 4 \end{bmatrix} - \begin{bmatrix} 3 \\ 3 \end{bmatrix} = \begin{bmatrix} -1 \\ 1 \end{bmatrix}$$
+$$\mathbf{e} = \mathbf{v} - \mathbf{p} = \begin{bmatrix} 2 \\\\ 4 \end{bmatrix} - \begin{bmatrix} 3 \\\\ 3 \end{bmatrix} = \begin{bmatrix} -1 \\\\ 1 \end{bmatrix}$$
 
 6. **Orthogonality Check:**
    - **Dot product check:** $\mathbf{a}^T \mathbf{e} = (1)(-1) + (1)(1) = 0$.
@@ -146,9 +146,9 @@ In any vector space, all valid linear subspaces must pass through the origin $(0
 
 | Dimension | Geometry | Description | Projection Matrix $\mathbf{P}$ |
 | :--- | :--- | :--- | :--- |
-| **0D** | **The Origin** | The single point $(0, 0)$ | $\mathbf{0} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}$ *(total loss of info)* |
+| **0D** | **The Origin** | The single point $(0, 0)$ | $\mathbf{0}_{2 \times 2}$ (Zero Matrix) *(total loss of info)* |
 | **1D** | **Any Line through Origin** | Line spanned by direction $\mathbf{a}$ (unit $\mathbf{u}$) | $\mathbf{P} = \frac{\mathbf{a}\mathbf{a}^T}{\mathbf{a}^T\mathbf{a}} = \mathbf{u}\mathbf{u}^T$ *(Rank 1 matrix)* |
-| **2D** | **The Entire Plane** | The whole space $\mathbb{R}^2$ | $\mathbf{I} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$ *(zero loss of info)* |
+| **2D** | **The Entire Plane** | The whole space $\mathbb{R}^2$ | $\mathbf{I}_{2 \times 2}$ (Identity Matrix) *(zero loss of info)* |
 
 In 2D, the only non-trivial projection is onto a 1D line. To see how multiple directions work together, we must step up into **3D space**.
 
@@ -178,7 +178,7 @@ Because the projection $\mathbf{p}$ lives on the plane, it must be some linear c
 
 $$\mathbf{p} = \hat{w}_1 \mathbf{a}_1 + \hat{w}_2 \mathbf{a}_2 = \mathbf{A} \mathbf{\hat{w}}$$
 
-where $\mathbf{\hat{w}} = \begin{bmatrix} \hat{w}_1 \\ \hat{w}_2 \end{bmatrix}$ is the coordinate weight vector we must determine (representing how much of each basis direction makes up the shadow).
+where $\mathbf{\hat{w}} = \begin{bmatrix} \hat{w}_1 \\\\ \hat{w}_2 \end{bmatrix}$ is the coordinate weight vector we must determine (representing how much of each basis direction makes up the shadow).
 
 ---
 
@@ -198,7 +198,7 @@ $$\mathbf{a}_2 \cdot \mathbf{e} = 0 \implies \mathbf{a}_2^T \mathbf{e} = 0$$
 
 Stack these two equations together:
 
-$$\begin{bmatrix} \mathbf{a}_1^T \\ \mathbf{a}_2^T \end{bmatrix} \mathbf{e} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+$$\begin{bmatrix} \mathbf{a}_1^T \\\\ \mathbf{a}_2^T \end{bmatrix} \mathbf{e} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix}$$
 
 Notice that the stacked matrix is simply $\mathbf{A}^T$! This yields the **fundamental orthogonality condition**:
 
@@ -322,13 +322,13 @@ To be a **linear transformation**, the operation must satisfy two strict axioms:
 
 1. **Additivity:**
 
-   $$T(\mathbf{u} + \mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})$$
+$$T(\mathbf{u} + \mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})$$
 
    *(Transforming the sum of two vectors is the same as transforming them individually and then adding).*
 
 2. **Homogeneity (Scaling):**
 
-   $$T(c\mathbf{v}) = cT(\mathbf{v})$$
+$$T(c\mathbf{v}) = cT(\mathbf{v})$$
 
    *(Scaling a vector by $c$ scales its output by $c$).*
 
@@ -342,14 +342,14 @@ $$T(\mathbf{0}) = T(0 \cdot \mathbf{v}) = 0 \cdot T(\mathbf{v}) = \mathbf{0}$$
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   For complete visual intuition, we explore $2 \times 2$ matrices transforming points in the 2D plane:
 
-  $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix}$$
+$$\begin{bmatrix} x' \\\\ y' \end{bmatrix} = \begin{bmatrix} a & b \\\\ c & d \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix}$$
 
   The 2D origin $(0, 0)$ remains anchored at $(0, 0)$. Grid lines remain straight and parallel.
 
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   Any square matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ defines an operator $T: \mathbb{R}^n \to \mathbb{R}^n$ via matrix-vector multiplication $\mathbf{w} = \mathbf{M}\mathbf{v}$ (transforming input vector $\mathbf{v} \in \mathbb{R}^n$ into output vector $\mathbf{w} \in \mathbb{R}^n$). The $n$-dimensional zero vector is permanently anchored:
 
-  $$T(\mathbf{0}_n) = \mathbf{M}\mathbf{0}_n = \mathbf{0}_n$$
+$$T(\mathbf{0}_n) = \mathbf{M}\mathbf{0}_n = \mathbf{0}_n$$
 
   Lines, planes, and flat hyperplanes in $\mathbb{R}^n$ remain straight and evenly spaced under any linear transformation; space is never bent or curved.
 
@@ -383,17 +383,17 @@ In every chart, we track the exact same 5 vectors using **identical colors** on 
 
 Consider the simplest transformation: the **diagonal matrix** $\mathbf{D}$:
 
-$$\mathbf{D} = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}$$
+$$\mathbf{D} = \text{diag}(3, 2)$$
 
-Multiplying any point $\begin{bmatrix} x \\ y \end{bmatrix}$ by $\mathbf{D}$ scales the horizontal coordinate by $3\times$ and the vertical coordinate by $2\times$:
+Multiplying any point $\begin{bmatrix} x \\\\ y \end{bmatrix}$ by $\mathbf{D}$ scales the horizontal coordinate by $3\times$ and the vertical coordinate by $2\times$:
 
-$$\mathbf{D} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 3x \\ 2y \end{bmatrix}$$
+$$\mathbf{D} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 3x \\\\ 2y \end{bmatrix}$$
 
 <div align="center">
 
 ![Figure 2.3 Diagonal Transformation](./assets/2_3_fig_diagonal_transform.png)
 
-*Figure 2.3: Side-by-side transformation by diagonal matrix $\mathbf{D} = \begin{bmatrix} 3 & 0 \\ 0 & 2 \end{bmatrix}$. Left: Input Space. Right: Transformed Output Space. Both panels feature the neutral grey benchmark grid and tick intervals of 1. Notice how $\mathbf{e}_1$ (Medium Blue) and $\mathbf{e}_2$ (Light Blue) maintain their direction along the red and green eigenspaces, while the diagonal vector $\mathbf{d}$ (Dark Navy Blue) tilts.*
+*Figure 2.3: Side-by-side transformation by diagonal matrix $\mathbf{D} = \text{diag}(3, 2)$. Left: Input Space. Right: Transformed Output Space. Both panels feature the neutral grey benchmark grid and tick intervals of 1. Notice how $\mathbf{e}_1$ (Medium Blue) and $\mathbf{e}_2$ (Light Blue) maintain their direction along the red and green eigenspaces, while the diagonal vector $\mathbf{d}$ (Dark Navy Blue) tilts.*
 
 👉 **[Open Interactive Figure 2.3 in Browser](https://thisispk48.github.io/workshops/20260926_sju_26bda_pca/assets/2_3_fig_diagonal_transform.html)**
 
@@ -418,7 +418,7 @@ $$\mathbf{D} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 3x \\ 2y \en
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any operator $\mathbf{M} \in \mathbb{R}^{n \times n}$, an eigenvalue $\lambda$ corresponds to an entire **Eigenspace** $E_\lambda$, defined as the null space of $(\mathbf{M} - \lambda\mathbf{I})$:
 
-  $$E_\lambda = \text{null}(\mathbf{M} - \lambda\mathbf{I}) = \{\mathbf{v} \in \mathbb{R}^n : \mathbf{M}\mathbf{v} = \lambda\mathbf{v}\}$$
+$$E_\lambda = \text{null}(\mathbf{M} - \lambda\mathbf{I}) = \{\mathbf{v} \in \mathbb{R}^n : \mathbf{M}\mathbf{v} = \lambda\mathbf{v}\}$$
 
   This is a linear subspace of dimension $1 \le k \le n$ (the geometric multiplicity). In $\mathbb{R}^3$, an eigenspace can be an invariant line or an invariant plane; in $\mathbb{R}^n$, it is an invariant $k$-dimensional hyperplane. Every vector in $E_\lambda$ scales by the exact same factor $\lambda$.
 
@@ -430,7 +430,7 @@ In the diagonal matrix above, the eigenvectors conveniently coincided with the f
 
 To explore this, consider the matrix $\mathbf{A}$:
 
-$$\mathbf{A} = \begin{bmatrix} 1 & 1 \\ -2 & 4 \end{bmatrix}$$
+$$\mathbf{A}$$
 
 Here, the eigenvalues and eigenvectors are not obvious just by looking at the numbers. We need a general method to discover them.
 
@@ -476,11 +476,13 @@ $$\det(\mathbf{A} - \lambda\mathbf{I}) = 0 \quad \text{(The Characteristic Equat
 ### Step 3: The Characteristic Equation
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
-  For any general $2 \times 2$ matrix $\mathbf{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$:
+  For any general $2 \times 2$ matrix $\mathbf{A}$:
 
-  $$\det\begin{bmatrix} a - \lambda & b \\ c & d - \lambda \end{bmatrix} = (a - \lambda)(d - \lambda) - bc = 0$$
+$$\mathbf{A} = \begin{bmatrix} a & b \\\\ c & d \end{bmatrix}$$
 
-  $$\lambda^2 - (a + d)\lambda + (ad - bc) = 0$$
+$$\det\begin{bmatrix} a - \lambda & b \\\\ c & d - \lambda \end{bmatrix} = (a - \lambda)(d - \lambda) - bc = 0$$
+
+$$\lambda^2 - (a + d)\lambda + (ad - bc) = 0$$
 
   Notice the two fundamental matrix invariants that appear naturally:
   1. **The Trace:** $\text{Tr}(\mathbf{A}) = a + d$ (sum of diagonal entries)
@@ -488,24 +490,24 @@ $$\det(\mathbf{A} - \lambda\mathbf{I}) = 0 \quad \text{(The Characteristic Equat
   
   This yields the universal $2 \times 2$ characteristic formula:
 
-  $$\lambda^2 - \text{Tr}(\mathbf{A})\lambda + \det(\mathbf{A}) = 0$$
+$$\lambda^2 - \text{Tr}(\mathbf{A})\lambda + \det(\mathbf{A}) = 0$$
 
   where $\lambda_1 + \lambda_2 = \text{Tr}(\mathbf{A})$ and $\lambda_1 \lambda_2 = \det(\mathbf{A})$.
 
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any $n \times n$ matrix $\mathbf{A} \in \mathbb{R}^{n \times n}$, expanding $\det(\mathbf{A} - \lambda\mathbf{I}) = 0$ yields an **$n$-th degree characteristic polynomial** in $\lambda$:
 
-  $$p(\lambda) = (-1)^n \lambda^n + (-1)^{n-1}\text{Tr}(\mathbf{A})\lambda^{n-1} + \dots + \det(\mathbf{A}) = 0$$
+$$p(\lambda) = (-1)^n \lambda^n + (-1)^{n-1}\text{Tr}(\mathbf{A})\lambda^{n-1} + \dots + \det(\mathbf{A}) = 0$$
 
   By the Fundamental Theorem of Algebra, it has exactly $n$ roots (eigenvalues $\lambda_1, \lambda_2, \dots, \lambda_n$, counted with algebraic multiplicity). The trace and determinant invariant identities generalize universally to $\mathbb{R}^n$:
 
-  $$\sum_{i=1}^n \lambda_i = \text{Tr}(\mathbf{A}) = \sum_{i=1}^n A_{ii}, \qquad \prod_{i=1}^n \lambda_i = \det(\mathbf{A})$$
+$$\sum_{i=1}^n \lambda_i = \text{Tr}(\mathbf{A}) = \sum_{i=1}^n A_{ii}, \qquad \prod_{i=1}^n \lambda_i = \det(\mathbf{A})$$
 
 ---
 
 ### Step 4: Applying the Machinery to Our Example
 
-Now we can solve our non-diagonal matrix $\mathbf{A} = \begin{bmatrix} 1 & 1 \\ -2 & 4 \end{bmatrix}$:
+Now we can solve our non-diagonal matrix $\mathbf{A}$:
 
 1. **Calculate Trace & Determinant:**
    - $\text{Tr}(\mathbf{A}) = 1 + 4 = 5$
@@ -513,36 +515,36 @@ Now we can solve our non-diagonal matrix $\mathbf{A} = \begin{bmatrix} 1 & 1 \\ 
 
 2. **Characteristic Equation:**
 
-   $$\lambda^2 - 5\lambda + 6 = 0$$
+$$\lambda^2 - 5\lambda + 6 = 0$$
 
-   $$(\lambda - 3)(\lambda - 2) = 0 \implies \lambda_1 = 3, \quad \lambda_2 = 2$$
+$$(\lambda - 3)(\lambda - 2) = 0 \implies \lambda_1 = 3, \quad \lambda_2 = 2$$
 
 3. **Finding the Direction Lines (Eigenvectors):**  
    Substitute each $\lambda$ back into $(\mathbf{A} - \lambda\mathbf{I})\mathbf{v} = \mathbf{0}$. Because the matrix collapsed space, the two row equations are redundant multiples of each other—they reduce to a single invariant line:
 
    - **For $\lambda_1 = 3$:**
 
-     $$\begin{bmatrix} 1 - 3 & 1 \\ -2 & 4 - 3 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} -2 & 1 \\ -2 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+$$\begin{bmatrix} 1 - 3 & 1 \\\\ -2 & 4 - 3 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} -2 & 1 \\\\ -2 & 1 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix}$$
 
      Both rows state: $-2x + y = 0 \implies y = 2x$.  
      Any vector along the line $y = 2x$ is an eigenvector! We choose the simple integer representative:
 
-     $$\mathbf{v}_1 = \begin{bmatrix} 1 \\ 2 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_1 = 3)$$
+$$\mathbf{v}_1 = \begin{bmatrix} 1 \\\\ 2 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_1 = 3)$$
 
    - **For $\lambda_2 = 2$:**
 
-     $$\begin{bmatrix} 1 - 2 & 1 \\ -2 & 4 - 2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} -1 & 1 \\ -2 & 2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+$$\begin{bmatrix} 1 - 2 & 1 \\\\ -2 & 4 - 2 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} -1 & 1 \\\\ -2 & 2 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix}$$
 
      Both rows state: $-x + y = 0 \implies y = x$.  
      Any vector along the line $y = x$ is an eigenvector:
 
-     $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_2 = 2)$$
+$$\mathbf{v}_2 = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_2 = 2)$$
 
 <div align="center">
 
 ![Figure 2.4 Non-Diagonal Transformation](./assets/2_4_fig_nondiagonal_transform.png)
 
-*Figure 2.4: Side-by-side transformation by non-diagonal matrix $\mathbf{A} = \begin{bmatrix} 1 & 1 \\ -2 & 4 \end{bmatrix}$. Notice where each of the 5 vectors land. Eigenvectors $\mathbf{v}_1$ (Red) and $\mathbf{v}_2$ (Green) strictly preserve their directional lines, but are NOT perpendicular ($\theta \approx 18.4^\circ$).*
+*Figure 2.4: Side-by-side transformation by non-diagonal matrix $\mathbf{A}$. Notice where each of the 5 vectors land. Eigenvectors $\mathbf{v}_1$ (Red) and $\mathbf{v}_2$ (Green) strictly preserve their directional lines, but are NOT perpendicular ($\theta \approx 18.4^\circ$).*
 
 👉 **[Open Interactive Figure 2.4 in Browser](https://thisispk48.github.io/workshops/20260926_sju_26bda_pca/assets/2_4_fig_nondiagonal_transform.html)**
 
@@ -570,13 +572,13 @@ $$\cos(\theta) = \frac{\mathbf{v}_1 \cdot \mathbf{v}_2}{\|\mathbf{v}_1\| \|\math
 
 Now consider a **symmetric matrix** $\mathbf{S}$ (where $\mathbf{S}^T = \mathbf{S}$):
 
-$$\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$$
+$$\mathbf{S}$$
 
 > **Pedagogical Notation Note:**  
 > In Section 2.4, we denoted the eigenvectors of general matrices by $\mathbf{v}_1, \mathbf{v}_2$. For symmetric matrices, we transition to the symbol $\mathbf{q}_1, \mathbf{q}_2$—the universal mathematical convention reserving the letter $\mathbf{q}$ for strictly **orthogonal/orthonormal** vectors (as in the orthogonal matrix $\mathbf{Q}$).
 
 ### Step 1: Characteristic Equation (Using Trace & Determinant)
-For $\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$:
+For $\mathbf{S}$:
 - $\text{Tr}(\mathbf{S}) = 3 + 3 = 6$
 - $\det(\mathbf{S}) = (3)(3) - (1)(1) = 8$
 
@@ -587,17 +589,17 @@ $$\lambda^2 - 6\lambda + 8 = 0 \implies (\lambda - 4)(\lambda - 2) = 0 \implies 
 ### Step 2: Finding the Eigenvectors
 - **For $\lambda_1 = 4$:**
 
-  $$(\mathbf{S} - 4\mathbf{I})\mathbf{q}_1 = \begin{bmatrix} -1 & 1 \\ 1 & -1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies y = x \implies \mathbf{q}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$
+$$(\mathbf{S} - 4\mathbf{I})\mathbf{q}_1 = \begin{bmatrix} -1 & 1 \\\\ 1 & -1 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix} \implies y = x \implies \mathbf{q}_1 = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix}$$
 
 - **For $\lambda_2 = 2$:**
 
-  $$(\mathbf{S} - 2\mathbf{I})\mathbf{q}_2 = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies y = -x \implies \mathbf{q}_2 = \begin{bmatrix} -1 \\ 1 \end{bmatrix}$$
+$$(\mathbf{S} - 2\mathbf{I})\mathbf{q}_2 = \begin{bmatrix} 1 & 1 \\\\ 1 & 1 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix} \implies y = -x \implies \mathbf{q}_2 = \begin{bmatrix} -1 \\\\ 1 \end{bmatrix}$$
 
 <div align="center">
 
 ![Figure 2.5 Symmetric Transformation](./assets/2_5_fig_symmetric_transform.png)
 
-*Figure 2.5: Side-by-side transformation by symmetric matrix $\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$. Notice the $90^\circ$ right-angle marker in both panels: Eigenvectors $\mathbf{q}_1$ (Red) and $\mathbf{q}_2$ (Green) are STRICTLY PERPENDICULAR ($\mathbf{q}_1 \cdot \mathbf{q}_2 = 0$).*
+*Figure 2.5: Side-by-side transformation by symmetric matrix $\mathbf{S}$. Notice the $90^\circ$ right-angle marker in both panels: Eigenvectors $\mathbf{q}_1$ (Red) and $\mathbf{q}_2$ (Green) are STRICTLY PERPENDICULAR ($\mathbf{q}_1 \cdot \mathbf{q}_2 = 0$).*
 
 👉 **[Open Interactive Figure 2.5 in Browser](https://thisispk48.github.io/workshops/20260926_sju_26bda_pca/assets/2_5_fig_symmetric_transform.html)**
 
@@ -628,15 +630,19 @@ Symmetric matrices ($\mathbf{S}^T = \mathbf{S}$) possess fundamental mathematica
 
 ### 1. All Eigenvalues are Real Numbers
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
-  For any $2 \times 2$ symmetric matrix $\mathbf{S} = \begin{bmatrix} a & b \\ b & c \end{bmatrix}$, the characteristic equation is $\lambda^2 - (a + c)\lambda + (ac - b^2) = 0$. Its discriminant is:
+  For any $2 \times 2$ symmetric matrix $\mathbf{S}$ with entries $a, b, c$:
 
-  $$\Delta = (a + c)^2 - 4(ac - b^2) = (a - c)^2 + 4b^2 \ge 0$$
+$$\mathbf{S} = \begin{bmatrix} a & b \\\\ b & c \end{bmatrix}$$
+
+  The characteristic equation is $\lambda^2 - (a + c)\lambda + (ac - b^2) = 0$. Its discriminant is:
+
+$$\Delta = (a + c)^2 - 4(ac - b^2) = (a - c)^2 + 4b^2 \ge 0$$
 
   Because $\Delta$ is the sum of two squares, it is never negative. A $2 \times 2$ symmetric matrix can never yield complex or imaginary eigenvalues.
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any real symmetric matrix $\mathbf{S} \in \mathbb{R}^{n \times n}$, every eigenvalue is guaranteed to be a real number:
 
-  $$\lambda_i \in \mathbb{R} \quad \forall i \in \{1, 2, \dots, n\}$$
+$$\lambda_i \in \mathbb{R} \quad \forall i \in \{1, 2, \dots, n\}$$
 
 ---
 
@@ -644,13 +650,13 @@ Symmetric matrices ($\mathbf{S}^T = \mathbf{S}$) possess fundamental mathematica
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   The two eigenvectors $\mathbf{q}_1$ and $\mathbf{q}_2$ are strictly perpendicular at $90^\circ$:
 
-  $$\mathbf{q}_1 \cdot \mathbf{q}_2 = 0 \quad (\mathbf{q}_1 \perp \mathbf{q}_2)$$
+$$\mathbf{q}_1 \cdot \mathbf{q}_2 = 0 \quad (\mathbf{q}_1 \perp \mathbf{q}_2)$$
 
   As demonstrated in Figure 2.5, the symmetric matrix stretches space along this rigid $90^\circ$ coordinate frame.
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   By the **Spectral Theorem**, eigenvectors corresponding to distinct eigenvalues of any symmetric matrix are always mutually orthogonal. Furthermore, even if eigenvalues repeat, one can always construct a complete orthonormal basis $\{\mathbf{q}_1, \mathbf{q}_2, \dots, \mathbf{q}_n\}$ spanning $\mathbb{R}^n$:
 
-  $$\mathbf{q}_i \cdot \mathbf{q}_j = \delta_{ij} = \begin{cases} 1 & \text{if } i = j \\ 0 & \text{if } i \ne j \end{cases}$$
+$$\mathbf{q}_i \cdot \mathbf{q}_j = \delta_{ij} = \begin{cases} 1 & \text{if } i = j \\\\ 0 & \text{if } i \ne j \end{cases}$$
 
 > **Side Note on Repeated Eigenvalues & Multiplicity:**  
 > What happens if an eigenvalue repeats (e.g., $(\lambda - 3)^2 = 0$)?
@@ -666,13 +672,13 @@ Is the rank of a symmetric matrix guaranteed to equal its dimension? **No.**
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   For a $2 \times 2$ symmetric matrix:
-  - **Rank 2 (Full Rank):** Both $\lambda_1 \ne 0$ and $\lambda_2 \ne 0$ (e.g., $\begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$, $\lambda_1 = 4, \lambda_2 = 2$). The matrix is invertible and spans all of $\mathbb{R}^2$.
-  - **Rank 1:** Exactly one eigenvalue is 0 (e.g., $\begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}$, $\lambda_1 = 2, \lambda_2 = 0$). Space collapses completely from 2D onto a 1D line.
+  - **Rank 2 (Full Rank):** Both $\lambda_1 \ne 0$ and $\lambda_2 \ne 0$ (e.g., our benchmark matrix $\mathbf{S}$ with $\lambda_1 = 4, \lambda_2 = 2$). The matrix is invertible and spans all of $\mathbb{R}^2$.
+  - **Rank 1:** Exactly one eigenvalue is 0 (e.g., a line projector with $\lambda_1 = 2, \lambda_2 = 0$). Space collapses completely from 2D onto a 1D line.
   - **Rank 0:** Both eigenvalues are 0 (only the zero matrix $\mathbf{S} = \mathbf{0}$).
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   The rank of any symmetric matrix $\mathbf{S}$ is **strictly equal to the number of non-zero eigenvalues**:
 
-  $$\text{rank}(\mathbf{S}) = r = \text{Count of } \{\lambda_i \ne 0\} \le n$$
+$$\text{rank}(\mathbf{S}) = r = \text{Count of } \{\lambda_i \ne 0\} \le n$$
 
   An $n \times n$ symmetric matrix is full rank ($r = n$) if and only if zero is not an eigenvalue.
 
@@ -683,7 +689,7 @@ Because the eigenvectors form an orthonormal basis ($\mathbf{Q}^T \mathbf{Q} = \
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
 
-  $$\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T) + \lambda_2 (\mathbf{q}_2 \mathbf{q}_2^T)$$
+$$\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T) + \lambda_2 (\mathbf{q}_2 \mathbf{q}_2^T)$$
 
   Each outer product $(\mathbf{q}_i \mathbf{q}_i^T)$ is an $n \times n$ matrix of **rank 1**—the exact 1D orthogonal projection matrix onto line $\text{span}(\mathbf{q}_i)$ from Section 1.2!
   - If $\mathbf{S}$ is **Full Rank** ($\text{rank} = 2$), $\mathbf{S}$ is a weighted sum of **two active rank-1 projection matrices**.
@@ -692,7 +698,7 @@ Because the eigenvectors form an orthonormal basis ($\mathbf{Q}^T \mathbf{Q} = \
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any symmetric $\mathbf{S} \in \mathbb{R}^{n \times n}$ with rank $r \le n$:
 
-  $$\mathbf{S} = \sum_{i=1}^n \lambda_i (\mathbf{q}_i \mathbf{q}_i^T) = \sum_{i=1}^r \lambda_i (\mathbf{q}_i \mathbf{q}_i^T)$$
+$$\mathbf{S} = \sum_{i=1}^n \lambda_i (\mathbf{q}_i \mathbf{q}_i^T) = \sum_{i=1}^r \lambda_i (\mathbf{q}_i \mathbf{q}_i^T)$$
 
   where each $\mathbf{P}_i = \mathbf{q}_i \mathbf{q}_i^T$ is a **rank-1** orthogonal projector, satisfying $\mathbf{P}_i^2 = \mathbf{P}_i$ and $\mathbf{P}_i \mathbf{P}_j = \mathbf{0}$ for $i \ne j$.
   
@@ -720,13 +726,13 @@ $$\mathbf{v}^T \mathbf{S} \mathbf{v} = \mathbf{v} \cdot (\mathbf{S}\mathbf{v}) =
 where $\theta$ is the angle between the original vector $\mathbf{v}$ and the transformed vector $\mathbf{S}\mathbf{v}$.
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
-  Take our symmetric matrix $\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$ from Figure 2.5 and an arbitrary vector $\mathbf{v} = \begin{bmatrix} v_1 \\ v_2 \end{bmatrix}$:
+  Take our symmetric matrix $\mathbf{S}$ from Figure 2.5 and an arbitrary vector $\mathbf{v} = \begin{bmatrix} v_1 \\\\ v_2 \end{bmatrix}$:
 
-  $$\mathbf{v}^T \mathbf{S} \mathbf{v} = \begin{bmatrix} v_1 & v_2 \end{bmatrix} \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = 3v_1^2 + 2v_1 v_2 + 3v_2^2$$
+$$\mathbf{v}^T \mathbf{S} \mathbf{v} = \begin{bmatrix} v_1 & v_2 \end{bmatrix} \begin{bmatrix} 3 & 1 \\\\ 1 & 3 \end{bmatrix} \begin{bmatrix} v_1 \\\\ v_2 \end{bmatrix} = 3v_1^2 + 2v_1 v_2 + 3v_2^2$$
 
   Notice how this quadratic expression rewrites:
 
-  $$3v_1^2 + 2v_1 v_2 + 3v_2^2 = 2(v_1^2 + v_2^2) + (v_1 + v_2)^2$$
+$$3v_1^2 + 2v_1 v_2 + 3v_2^2 = 2(v_1^2 + v_2^2) + (v_1 + v_2)^2$$
 
   Because $v_1^2 + v_2^2 > 0$ for any non-zero vector and $(v_1 + v_2)^2 \ge 0$, **this value is strictly positive for every possible vector**!
   - **Geometric Meaning:** $\mathbf{v} \cdot (\mathbf{S}\mathbf{v}) > 0 \implies \cos(\theta) > 0 \implies \theta < 90^\circ$.  
@@ -734,7 +740,7 @@ where $\theta$ is the angle between the original vector $\mathbf{v}$ and the tra
   - **Connection to Eigenvalues:**  
     If we test the quadratic form on an eigenvector $\mathbf{q}_i$:
 
-    $$\mathbf{q}_i^T \mathbf{S} \mathbf{q}_i = \mathbf{q}_i^T (\lambda_i \mathbf{q}_i) = \lambda_i \|\mathbf{q}_i\|^2 = \lambda_i$$
+$$\mathbf{q}_i^T \mathbf{S} \mathbf{q}_i = \mathbf{q}_i^T (\lambda_i \mathbf{q}_i) = \lambda_i \|\mathbf{q}_i\|^2 = \lambda_i$$
 
     Because $\mathbf{v}^T \mathbf{S} \mathbf{v} > 0$ for all non-zero vectors, **all eigenvalues must be strictly positive**: $\lambda_1 = 4 > 0, \lambda_2 = 2 > 0$.
 
@@ -778,17 +784,17 @@ Consider a dataset of $N = 40$ individuals measured on $D = 2$ physical attribut
 In linear algebra, our raw data matrix $\mathbf{X}_{40 \times 2}$ is a $40 \times 2$ matrix that unites two clean geometric viewpoints:
 - **Every row is an individual observation vector in $\mathbb{R}^2$:**  
 
-  $$\mathbf{r}_{i, 2 \times 1} = \begin{bmatrix} x_{i1} \\ x_{i2} \end{bmatrix}_{2 \times 1} \in \mathbb{R}^2 \quad (\text{represented as row } \mathbf{r}_{i, 1 \times 2}^T \text{ in } \mathbf{X}_{40 \times 2})$$
+$$\mathbf{r}_{i, 2 \times 1} = \begin{bmatrix} x_{i1} \\\\ x_{i2} \end{bmatrix}_{2 \times 1} \in \mathbb{R}^2 \quad (\text{represented as row } \mathbf{r}_{i, 1 \times 2}^T \text{ in } \mathbf{X}_{40 \times 2})$$
 
 - **Every column is a feature vector across all 40 individuals in $\mathbb{R}^{40}$:**  
 
-  $$\mathbf{x}_{1, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Height column}), \qquad \mathbf{x}_{2, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Weight column})$$
+$$\mathbf{x}_{1, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Height column}), \qquad \mathbf{x}_{2, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Weight column})$$
 
-$$\mathbf{X}_{40 \times 2} = \underbrace{\begin{bmatrix} (\mathbf{x}_1)_{40 \times 1} & (\mathbf{x}_2)_{40 \times 1} \end{bmatrix}}_{2 \text{ column vectors in } \mathbb{R}^{40}} = \underbrace{\begin{bmatrix} (\mathbf{r}_1^T)_{1 \times 2} \\ (\mathbf{r}_2^T)_{1 \times 2} \\ \vdots \\ (\mathbf{r}_{40}^T)_{1 \times 2} \end{bmatrix}}_{40 \text{ row vectors from } \mathbb{R}^2}$$
+$$\mathbf{X}_{40 \times 2} = \underbrace{\begin{bmatrix} (\mathbf{x}_1)_{40 \times 1} & (\mathbf{x}_2)_{40 \times 1} \end{bmatrix}}_{2 \text{ column vectors in } \mathbb{R}^{40}} = \underbrace{\begin{bmatrix} (\mathbf{r}_1^T)_{1 \times 2} \\\\ (\mathbf{r}_2^T)_{1 \times 2} \\\\ \vdots \\\\ (\mathbf{r}_{40}^T)_{1 \times 2} \end{bmatrix}}_{40 \text{ row vectors from } \mathbb{R}^2}$$
 
 To keep calculations completely transparent and verifiable by hand with pencil and paper, we focus our step-by-step arithmetic on **5 clean benchmark individuals (Persons A through E)**, accompanied by 35 peer observations that form the realistic data cloud (all sharing the exact same center of mass $\mathbf{\mu}_{2 \times 1} = [4, 3]^T$):
 
-$$\mathbf{X}_{\text{bench}, 5 \times 2} = \begin{bmatrix} (\mathbf{r}_A^T)_{1 \times 2} \\ (\mathbf{r}_B^T)_{1 \times 2} \\ (\mathbf{r}_C^T)_{1 \times 2} \\ (\mathbf{r}_D^T)_{1 \times 2} \\ (\mathbf{r}_E^T)_{1 \times 2} \end{bmatrix}_{5 \times 2} = \begin{bmatrix} 6 & 4 \\ 2 & 2 \\ 5 & 5 \\ 3 & 1 \\ 4 & 3 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A} \\ \leftarrow \text{Person B} \\ \leftarrow \text{Person C} \\ \leftarrow \text{Person D} \\ \leftarrow \text{Person E} \end{matrix}$$
+$$\mathbf{X}_{\text{bench}, 5 \times 2} = \begin{bmatrix} (\mathbf{r}_A^T)_{1 \times 2} \\\\ (\mathbf{r}_B^T)_{1 \times 2} \\\\ (\mathbf{r}_C^T)_{1 \times 2} \\\\ (\mathbf{r}_D^T)_{1 \times 2} \\\\ (\mathbf{r}_E^T)_{1 \times 2} \end{bmatrix}_{5 \times 2} = \begin{bmatrix} 6 & 4 \\\\ 2 & 2 \\\\ 5 & 5 \\\\ 3 & 1 \\\\ 4 & 3 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A} \\\\ \leftarrow \text{Person B} \\\\ \leftarrow \text{Person C} \\\\ \leftarrow \text{Person D} \\\\ \leftarrow \text{Person E} \end{matrix}$$
 
 ### Calculating the Center of Mass (Mean Vector $\mathbf{\mu}$)
 Before analyzing how features vary, we compute the sample average for each feature column:
@@ -801,7 +807,7 @@ $$\bar{x}_1 = \frac{6 + 2 + 5 + 3 + 4}{5} = \frac{20}{5} = 4.0, \qquad \bar{x}_2
 
 The **Center of Mass** (mean vector $\mathbf{\mu}_{2 \times 1} \in \mathbb{R}^2$) is:
 
-$$\mathbf{\mu}_{2 \times 1} = \begin{bmatrix} \bar{x}_1 \\ \bar{x}_2 \end{bmatrix}_{2 \times 1} = \begin{bmatrix} 4.0 \\ 3.0 \end{bmatrix}_{2 \times 1}$$
+$$\mathbf{\mu}_{2 \times 1} = \begin{bmatrix} \bar{x}_1 \\\\ \bar{x}_2 \end{bmatrix}_{2 \times 1} = \begin{bmatrix} 4.0 \\\\ 3.0 \end{bmatrix}_{2 \times 1}$$
 
 Notice that the raw data cloud is offset into Quadrant 1, centered around the point $(4, 3)$.
 
@@ -811,15 +817,15 @@ Notice that the raw data cloud is offset into Quadrant 1, centered around the po
 
 To analyze pure variation, we subtract the mean vector $\mathbf{\mu}_{2 \times 1}$ from every individual observation vector:
 
-$$\tilde{\mathbf{r}}_{i, 2 \times 1} = \mathbf{r}_{i, 2 \times 1} - \mathbf{\mu}_{2 \times 1} = \begin{bmatrix} x_{i1} - \bar{x}_1 \\ x_{i2} - \bar{x}_2 \end{bmatrix}_{2 \times 1} \in \mathbb{R}^2$$
+$$\tilde{\mathbf{r}}_{i, 2 \times 1} = \mathbf{r}_{i, 2 \times 1} - \mathbf{\mu}_{2 \times 1} = \begin{bmatrix} x_{i1} - \bar{x}_1 \\\\ x_{i2} - \bar{x}_2 \end{bmatrix}_{2 \times 1} \in \mathbb{R}^2$$
 
 This centers every individual observation vector in $\mathbb{R}^2$, producing the centered $40 \times 2$ data matrix $(\mathbf{X}_c)_{40 \times 2}$ where every column is a centered feature vector $\tilde{\mathbf{x}}_{1, 40 \times 1}, \tilde{\mathbf{x}}_{2, 40 \times 1} \in \mathbb{R}^{40}$:
 
-$$(\mathbf{X}_c)_{40 \times 2} = \begin{bmatrix} (\tilde{\mathbf{x}}_1)_{40 \times 1} & (\tilde{\mathbf{x}}_2)_{40 \times 1} \end{bmatrix}_{40 \times 2} = \begin{bmatrix} (\tilde{\mathbf{r}}_1^T)_{1 \times 2} \\ (\tilde{\mathbf{r}}_2^T)_{1 \times 2} \\ \vdots \\ (\tilde{\mathbf{r}}_{40}^T)_{1 \times 2} \end{bmatrix}_{40 \times 2}$$
+$$(\mathbf{X}_c)_{40 \times 2} = \begin{bmatrix} (\tilde{\mathbf{x}}_1)_{40 \times 1} & (\tilde{\mathbf{x}}_2)_{40 \times 1} \end{bmatrix}_{40 \times 2} = \begin{bmatrix} (\tilde{\mathbf{r}}_1^T)_{1 \times 2} \\\\ (\tilde{\mathbf{r}}_2^T)_{1 \times 2} \\\\ \vdots \\\\ (\tilde{\mathbf{r}}_{40}^T)_{1 \times 2} \end{bmatrix}_{40 \times 2}$$
 
 For our 5 benchmark individuals:
 
-$$\mathbf{X}_{c,\text{bench}, 5 \times 2} = \begin{bmatrix} 6 - 4 & 4 - 3 \\ 2 - 4 & 2 - 3 \\ 5 - 4 & 5 - 3 \\ 3 - 4 & 1 - 3 \\ 4 - 4 & 3 - 3 \end{bmatrix}_{5 \times 2} = \begin{bmatrix} +2 & +1 \\ -2 & -1 \\ +1 & +2 \\ -1 & -2 \\ 0 & 0 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A: } \tilde{\mathbf{r}}_{A, 2 \times 1} = [+2, +1]^T \\ \leftarrow \text{Person B: } \tilde{\mathbf{r}}_{B, 2 \times 1} = [-2, -1]^T \\ \leftarrow \text{Person C: } \tilde{\mathbf{r}}_{C, 2 \times 1} = [+1, +2]^T \\ \leftarrow \text{Person D: } \tilde{\mathbf{r}}_{D, 2 \times 1} = [-1, -2]^T \\ \leftarrow \text{Person E: } \tilde{\mathbf{r}}_{E, 2 \times 1} = [0, 0]^T \end{matrix}$$
+$$\mathbf{X}_{c,\text{bench}, 5 \times 2} = \begin{bmatrix} 6 - 4 & 4 - 3 \\\\ 2 - 4 & 2 - 3 \\\\ 5 - 4 & 5 - 3 \\\\ 3 - 4 & 1 - 3 \\\\ 4 - 4 & 3 - 3 \end{bmatrix}_{5 \times 2} = \begin{bmatrix} +2 & +1 \\\\ -2 & -1 \\\\ +1 & +2 \\\\ -1 & -2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A: } \tilde{\mathbf{r}}_{A, 2 \times 1} = [+2, +1]^T \\\\ \leftarrow \text{Person B: } \tilde{\mathbf{r}}_{B, 2 \times 1} = [-2, -1]^T \\\\ \leftarrow \text{Person C: } \tilde{\mathbf{r}}_{C, 2 \times 1} = [+1, +2]^T \\\\ \leftarrow \text{Person D: } \tilde{\mathbf{r}}_{D, 2 \times 1} = [-1, -2]^T \\\\ \leftarrow \text{Person E: } \tilde{\mathbf{r}}_{E, 2 \times 1} = [0, 0]^T \end{matrix}$$
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   Every centered coordinate now tells a direct physical story relative to the average:
@@ -831,7 +837,7 @@ $$\mathbf{X}_{c,\text{bench}, 5 \times 2} = \begin{bmatrix} 6 - 4 & 4 - 3 \\ 2 -
 - **Generic ($\mathbb{R}^D \to \mathbb{R}^D, D \times D$):**  
   Centering anchors the data cloud's center of mass at the origin:
 
-  $$\mathbf{0}_{D \times 1} = [0, 0, \dots, 0]^T \in \mathbb{R}^D$$
+$$\mathbf{0}_{D \times 1} = [0, 0, \dots, 0]^T \in \mathbb{R}^D$$
 
   Centering does **not** alter the shape of the data, the distances between points, or the variances. However, it is mathematically essential because linear transformations require $T(\mathbf{0}) = \mathbf{0}$ (from Section 2.1). Anchoring the mean at the origin ensures that linear matrix operations act purely on data spread without being distorted by arbitrary coordinate offsets.
 
@@ -855,21 +861,21 @@ Before looking at matrices, let's understand how statistics packages individual 
 1. **Individual Spread (Sample Variance):**  
    The variance of Feature 1 ($\mathbf{x}_{1, 40 \times 1}$) is the average squared deviation across all $N$ individuals:
 
-   $$s_1^2 = \text{Var}(\mathbf{x}_1) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{1, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
+$$s_1^2 = \text{Var}(\mathbf{x}_1) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{1, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
 
    The variance of Feature 2 ($\mathbf{x}_{2, 40 \times 1}$) is:
 
-   $$s_2^2 = \text{Var}(\mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i2}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{2, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
+$$s_2^2 = \text{Var}(\mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i2}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{2, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
 
 2. **Joint Spread (Sample Covariance):**  
    The degree to which deviations in Feature 1 correspond to deviations in Feature 2 is the **sample covariance**, denoted by $s_{12}$:
 
-   $$s_{12} = \text{Cov}(\mathbf{x}_1, \mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1} \tilde{r}_{i2} = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
+$$s_{12} = \text{Cov}(\mathbf{x}_1, \mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1} \tilde{r}_{i2} = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
 
 ### Packaging the Spread: The Covariance Matrix $\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N-1}(\mathbf{X}_c^T)_{2 \times 40} (\mathbf{X}_c)_{40 \times 2}$
 To analyze all features together in a single operation, we evaluate the matrix product:
 
-$$\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N - 1} \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} \, \underbrace{\mathbf{X}_{c, 40 \times 2}}_{40 \times 2} = \frac{1}{N - 1} \begin{bmatrix} \tilde{\mathbf{x}}_1^T \\ \tilde{\mathbf{x}}_2^T \end{bmatrix}_{2 \times 40} \begin{bmatrix} \tilde{\mathbf{x}}_1 & \tilde{\mathbf{x}}_2 \end{bmatrix}_{40 \times 2} = \begin{bmatrix} s_1^2 & s_{12} \\ s_{12} & s_2^2 \end{bmatrix}_{2 \times 2}$$
+$$\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N - 1} \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} \, \underbrace{\mathbf{X}_{c, 40 \times 2}}_{40 \times 2} = \frac{1}{N - 1} \begin{bmatrix} \tilde{\mathbf{x}}_1^T \\\\ \tilde{\mathbf{x}}_2^T \end{bmatrix}_{2 \times 40} \begin{bmatrix} \tilde{\mathbf{x}}_1 & \tilde{\mathbf{x}}_2 \end{bmatrix}_{40 \times 2} = \begin{bmatrix} s_1^2 & s_{12} \\\\ s_{12} & s_2^2 \end{bmatrix}_{2 \times 2}$$
 
 #### Dimension Verification:
 
@@ -904,13 +910,13 @@ To see how covariance directly controls the geometric tilt of data, we examine o
 #### Dataset 1: Positive Covariance (Height vs. Weight)
 Consider our centered benchmark individuals where taller people are generally heavier:
 
-$$\mathbf{X}_{c1,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & +1 \\ -2 & -1 \\ +1 & +2 \\ -1 & -2 \\ 0 & 0 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A: } \tilde{\mathbf{r}}_{A, 2 \times 1} = [+2, +1]^T \\ \leftarrow \text{Person B: } \tilde{\mathbf{r}}_{B, 2 \times 1} = [-2, -1]^T \\ \leftarrow \text{Person C: } \tilde{\mathbf{r}}_{C, 2 \times 1} = [+1, +2]^T \\ \leftarrow \text{Person D: } \tilde{\mathbf{r}}_{D, 2 \times 1} = [-1, -2]^T \\ \leftarrow \text{Person E: } \tilde{\mathbf{r}}_{E, 2 \times 1} = [0, 0]^T \end{matrix}$$
+$$\mathbf{X}_{c1,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & +1 \\\\ -2 & -1 \\\\ +1 & +2 \\\\ -1 & -2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A: } \tilde{\mathbf{r}}_{A, 2 \times 1} = [+2, +1]^T \\\\ \leftarrow \text{Person B: } \tilde{\mathbf{r}}_{B, 2 \times 1} = [-2, -1]^T \\\\ \leftarrow \text{Person C: } \tilde{\mathbf{r}}_{C, 2 \times 1} = [+1, +2]^T \\\\ \leftarrow \text{Person D: } \tilde{\mathbf{r}}_{D, 2 \times 1} = [-1, -2]^T \\\\ \leftarrow \text{Person E: } \tilde{\mathbf{r}}_{E, 2 \times 1} = [0, 0]^T \end{matrix}$$
 
 - $\sum \tilde{r}_{i1}^2 = 2^2 + (-2)^2 + 1^2 + (-1)^2 + 0^2 = 10 \implies s_1^2 = \frac{10}{4} = 2.5$
 - $\sum \tilde{r}_{i2}^2 = 1^2 + (-1)^2 + 2^2 + (-2)^2 + 0^2 = 10 \implies s_2^2 = \frac{10}{4} = 2.5$
 - $\sum \tilde{r}_{i1} \tilde{r}_{i2} = (+2)(+1) + (-2)(-1) + (+1)(+2) + (-1)(-2) + 0 = 2 + 2 + 2 + 2 = +8 \implies s_{12} = \frac{+8}{4} = \mathbf{+2.0}$
 
-$$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{+2.0} \\ \mathbf{+2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$
+$$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{+2.0} \\\\ \mathbf{+2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$
 
 - **The Story:** Observations fall strictly in **Q1 and Q3**. Positive products dominate. The data cloud **tilts upward to the right** along the positive diagonal ($y \approx x$).
 
@@ -919,13 +925,13 @@ $$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{+2.0} \\ \math
 #### Dataset 2: Negative Covariance (Elevation vs. Temperature)
 Consider 5 centered benchmark observations where higher elevation corresponds to colder temperature:
 
-$$\mathbf{X}_{c2,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & -1 \\ -2 & +1 \\ +1 & -2 \\ -1 & +2 \\ 0 & 0 \end{bmatrix}_{5 \times 2}$$
+$$\mathbf{X}_{c2,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & -1 \\\\ -2 & +1 \\\\ +1 & -2 \\\\ -1 & +2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2}$$
 
 - $\sum \tilde{r}_{i1}^2 = 10 \implies s_1^2 = \frac{10}{4} = 2.5$
 - $\sum \tilde{r}_{i2}^2 = 10 \implies s_2^2 = \frac{10}{4} = 2.5$
 - $\sum \tilde{r}_{i1} \tilde{r}_{i2} = (+2)(-1) + (-2)(+1) + (+1)(-2) + (-1)(+2) + 0 = -2 - 2 - 2 - 2 = -8 \implies s_{12} = \frac{-8}{4} = \mathbf{-2.0}$
 
-$$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{-2.0} \\ \mathbf{-2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$
+$$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{-2.0} \\\\ \mathbf{-2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$
 
 - **The Story:** Observations fall strictly in **Q2 and Q4**. Negative products dominate. The data cloud **tilts downward to the right** along the negative diagonal ($y \approx -x$).
 
@@ -934,13 +940,13 @@ $$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{-2.0} \\ \math
 #### Dataset 3: Zero Covariance (Height vs. Shoe Brand / Uncorrelated)
 Consider 5 centered benchmark observations distributed symmetrically along the standard axes:
 
-$$\mathbf{X}_{c3,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & 0 \\ -2 & 0 \\ 0 & +2 \\ 0 & -2 \\ 0 & 0 \end{bmatrix}_{5 \times 2}$$
+$$\mathbf{X}_{c3,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & 0 \\\\ -2 & 0 \\\\ 0 & +2 \\\\ 0 & -2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2}$$
 
 - $\sum \tilde{r}_{i1}^2 = 2^2 + (-2)^2 + 0 + 0 + 0 = 8 \implies s_1^2 = \frac{8}{4} = 2.0$
 - $\sum \tilde{r}_{i2}^2 = 0 + 0 + 2^2 + (-2)^2 + 0 = 8 \implies s_2^2 = \frac{8}{4} = 2.0$
 - $\sum \tilde{r}_{i1} \tilde{r}_{i2} = (2)(0) + (-2)(0) + (0)(2) + (0)(-2) + 0 = 0 \implies s_{12} = \frac{0}{4} = \mathbf{0.0}$
 
-$$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & \mathbf{0.0} \\ \mathbf{0.0} & 2.0 \end{bmatrix}_{2 \times 2}$$
+$$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & \mathbf{0.0} \\\\ \mathbf{0.0} & 2.0 \end{bmatrix}_{2 \times 2}$$
 
 - **The Story:** Positive and negative products cancel out completely. Knowing $\mathbf{x}_1$ provides zero predictive information about $\mathbf{x}_2$.
 - *Direct Connection to Section 2.3:* This is a **diagonal matrix**! There is no tilt; its eigenvectors are already the standard coordinate axes.
@@ -984,7 +990,7 @@ Physical meaning: $z_{i, 1 \times 1} \in \mathbb{R}$ is a single real number rep
 
 Stacking the shadow coordinates of all 40 individuals gives a score vector $\mathbf{z}_{40 \times 1} \in \mathbb{R}^{40}$, computed for the entire dataset in a single matrix-vector multiplication $\mathbf{z}_{40 \times 1} = (\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}$:
 
-$$\mathbf{z}_{40 \times 1} = \begin{bmatrix} z_1 \\ z_2 \\ \vdots \\ z_{40} \end{bmatrix}_{40 \times 1} = \begin{bmatrix} \tilde{\mathbf{r}}_{1, 1 \times 2}^T \mathbf{u}_{2 \times 1} \\ \tilde{\mathbf{r}}_{2, 1 \times 2}^T \mathbf{u}_{2 \times 1} \\ \vdots \\ \tilde{\mathbf{r}}_{40, 1 \times 2}^T \mathbf{u}_{2 \times 1} \end{bmatrix}_{40 \times 1} = \underbrace{\begin{bmatrix} \tilde{\mathbf{r}}_{1, 1 \times 2}^T \\ \tilde{\mathbf{r}}_{2, 1 \times 2}^T \\ \vdots \\ \tilde{\mathbf{r}}_{40, 1 \times 2}^T \end{bmatrix}}_{40 \times 2} \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \underbrace{(\mathbf{X}_c)_{40 \times 2}}_{40 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = (40 \times 1) \text{ Column Vector} \in \mathbb{R}^{40}$$
+$$\mathbf{z}_{40 \times 1} = \begin{bmatrix} z_1 \\\\ z_2 \\\\ \vdots \\\\ z_{40} \end{bmatrix}_{40 \times 1} = \begin{bmatrix} \tilde{\mathbf{r}}_{1, 1 \times 2}^T \mathbf{u}_{2 \times 1} \\\\ \tilde{\mathbf{r}}_{2, 1 \times 2}^T \mathbf{u}_{2 \times 1} \\\\ \vdots \\\\ \tilde{\mathbf{r}}_{40, 1 \times 2}^T \mathbf{u}_{2 \times 1} \end{bmatrix}_{40 \times 1} = \underbrace{\begin{bmatrix} \tilde{\mathbf{r}}_{1, 1 \times 2}^T \\\\ \tilde{\mathbf{r}}_{2, 1 \times 2}^T \\\\ \vdots \\\\ \tilde{\mathbf{r}}_{40, 1 \times 2}^T \end{bmatrix}}_{40 \times 2} \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \underbrace{(\mathbf{X}_c)_{40 \times 2}}_{40 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = (40 \times 1) \text{ Column Vector} \in \mathbb{R}^{40}$$
 
 <div align="center">
 
@@ -1118,32 +1124,32 @@ Where does this derivative come from? Let us derive each term component-by-compo
 #### Part A: Differentiating the Quadratic Variance Term $\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}$
 Let the unit vector and symmetric covariance matrix be:
 
-$$\mathbf{u}_{2 \times 1} = \begin{bmatrix} u_1 \\ u_2 \end{bmatrix}_{2 \times 1}, \qquad \mathbf{\Sigma}_{2 \times 2} = \begin{bmatrix} s_{11} & s_{12} \\ s_{21} & s_{22} \end{bmatrix}_{2 \times 2} \quad (\text{where } s_{12} = s_{21} \text{ due to symmetry})$$
+$$\mathbf{u}_{2 \times 1} = \begin{bmatrix} u_1 \\\\ u_2 \end{bmatrix}_{2 \times 1}, \qquad \mathbf{\Sigma}_{2 \times 2} = \begin{bmatrix} s_{11} & s_{12} \\\\ s_{21} & s_{22} \end{bmatrix}_{2 \times 2} \quad (\text{where } s_{12} = s_{21} \text{ due to symmetry})$$
 
 1. First, multiply the matrix $\mathbf{\Sigma}_{2 \times 2}$ by vector $\mathbf{u}_{2 \times 1}$:
 
-   $$\mathbf{\Sigma} \mathbf{u} = \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\ s_{21} u_1 + s_{22} u_2 \end{bmatrix}_{2 \times 1}$$
+$$\mathbf{\Sigma} \mathbf{u} = \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\\\ s_{21} u_1 + s_{22} u_2 \end{bmatrix}_{2 \times 1}$$
 
 2. Multiply on the left by row vector $\mathbf{u}_{1 \times 2}^T = [u_1, u_2]$:
 
-   $$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = u_1 (s_{11} u_1 + s_{12} u_2) + u_2 (s_{21} u_1 + s_{22} u_2) = s_{11} u_1^2 + s_{12} u_1 u_2 + s_{21} u_1 u_2 + s_{22} u_2^2$$
+$$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = u_1 (s_{11} u_1 + s_{12} u_2) + u_2 (s_{21} u_1 + s_{22} u_2) = s_{11} u_1^2 + s_{12} u_1 u_2 + s_{21} u_1 u_2 + s_{22} u_2^2$$
 
    Because $\mathbf{\Sigma}$ is symmetric ($s_{12} = s_{21}$), the two cross terms combine:
 
-   $$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = s_{11} u_1^2 + 2 s_{12} u_1 u_2 + s_{22} u_2^2$$
+$$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = s_{11} u_1^2 + 2 s_{12} u_1 u_2 + s_{22} u_2^2$$
 
 3. Take the partial derivative with respect to each component:
    - Partial derivative with respect to $u_1$:
 
-     $$\frac{\partial}{\partial u_1} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 2 s_{11} u_1 + 2 s_{12} u_2 + 0 = 2 (s_{11} u_1 + s_{12} u_2)$$
+$$\frac{\partial}{\partial u_1} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 2 s_{11} u_1 + 2 s_{12} u_2 + 0 = 2 (s_{11} u_1 + s_{12} u_2)$$
 
    - Partial derivative with respect to $u_2$:
 
-     $$\frac{\partial}{\partial u_2} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 0 + 2 s_{12} u_1 + 2 s_{22} u_2 = 2 (s_{21} u_1 + s_{22} u_2) \quad (\text{since } s_{12} = s_{21})$$
+$$\frac{\partial}{\partial u_2} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 0 + 2 s_{12} u_1 + 2 s_{22} u_2 = 2 (s_{21} u_1 + s_{22} u_2) \quad (\text{since } s_{12} = s_{21})$$
 
 4. Stacking these two partial derivatives into the gradient vector:
 
-   $$\nabla_{\mathbf{u}} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = \begin{bmatrix} \frac{\partial}{\partial u_1} \\ \frac{\partial}{\partial u_2} \end{bmatrix} = 2 \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\ s_{21} u_1 + s_{22} u_2 \end{bmatrix} = 2 \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$
+$$\nabla_{\mathbf{u}} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = \begin{bmatrix} \frac{\partial}{\partial u_1} \\\\ \frac{\partial}{\partial u_2} \end{bmatrix} = 2 \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\\\ s_{21} u_1 + s_{22} u_2 \end{bmatrix} = 2 \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$
 
 *(General Matrix Calculus Rule: For any symmetric matrix $\mathbf{A} = \mathbf{A}^T$, $\nabla_{\mathbf{u}} (\mathbf{u}^T \mathbf{A} \mathbf{u}) = (\mathbf{A} + \mathbf{A}^T)\mathbf{u} = 2\mathbf{A}\mathbf{u}$.)*
 
@@ -1160,7 +1166,7 @@ Taking partial derivatives with respect to $u_1$ and $u_2$:
 
 Stacking into the gradient vector:
 
-$$\nabla_{\mathbf{u}} [\lambda (\mathbf{u}^T \mathbf{u} - 1)] = 2 \lambda \begin{bmatrix} u_1 \\ u_2 \end{bmatrix} = 2 \lambda \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$
+$$\nabla_{\mathbf{u}} [\lambda (\mathbf{u}^T \mathbf{u} - 1)] = 2 \lambda \begin{bmatrix} u_1 \\\\ u_2 \end{bmatrix} = 2 \lambda \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$
 
 ---
 
@@ -1208,7 +1214,7 @@ Although each dataset contains 40 observations, **$\mathbf{\Sigma}_{2 \times 2}$
 ### Case 1: Positive Covariance (Height vs. Weight)
 Our positive covariance matrix was:
 
-$$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & 2.0 \\ 2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$
+$$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & 2.0 \\\\ 2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$
 
 Using the trace-determinant formula from Section 2.4:
 1. $\text{Tr}(\mathbf{\Sigma}_{1, 2 \times 2}) = 2.5 + 2.5 = 5.0$
@@ -1220,12 +1226,12 @@ $$\lambda_1 = 4.50, \qquad \lambda_2 = 0.50$$
 
 The unit eigenvectors are vectors $\mathbf{q}_1, \mathbf{q}_2 \in \mathbb{R}^2$:
 
-$$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } 45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} -1 \\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 135^\circ)$$
+$$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\\\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } 45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} -1 \\\\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 135^\circ)$$
 
 - **Total Variance:** $\text{Tr}(\mathbf{\Sigma}_{1, 2 \times 2}) = \lambda_1 + \lambda_2 = 4.50 + 0.50 = 5.00$
 - **Explained Variance Ratio for PC1:**
 
-  $$\frac{\lambda_1}{\lambda_1 + \lambda_2} = \frac{4.50}{5.00} = 0.90$$
+$$\frac{\lambda_1}{\lambda_1 + \lambda_2} = \frac{4.50}{5.00} = 0.90$$
 
   Compressing along PC1 captures **90.0%** of total variance.
 - **The Story:** The data cloud tilts upward to the right along $y = x$. Compressing 2D down to 1D along PC1 retains **90% of all information** across all 40 people!
@@ -1235,13 +1241,13 @@ $$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ 1 \end{bma
 ### Case 2: Negative Covariance (Elevation vs. Temperature)
 Our negative covariance matrix was:
 
-$$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & -2.0 \\ -2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$
+$$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & -2.0 \\\\ -2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$
 
 1. $\text{Tr}(\mathbf{\Sigma}_{2, 2 \times 2}) = 5.0, \quad \det(\mathbf{\Sigma}_{2, 2 \times 2}) = 2.25$
 2. Eigenvalues: $\lambda_1 = 4.50, \quad \lambda_2 = 0.50$
 3. The unit eigenvectors are vectors $\mathbf{q}_1, \mathbf{q}_2 \in \mathbb{R}^2$:
 
-$$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ -1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } -45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 45^\circ)$$
+$$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\\\ -1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } -45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\\\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 45^\circ)$$
 
 - **Explained Variance Ratio for PC1:** $\frac{4.50}{5.00} = 0.90$ (**90.0%**)
 - **The Story:** The negative covariance tilted the spine by $90^\circ$! The dominant line of spread now slopes downward along $y = -x$.
@@ -1251,7 +1257,7 @@ $$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ -1 \end{bm
 ### Case 3: Zero Covariance (Height vs. Shoe Brand / Uncorrelated)
 Our zero covariance matrix was:
 
-$$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & 0.0 \\ 0.0 & 2.0 \end{bmatrix}_{2 \times 2}$$
+$$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & 0.0 \\\\ 0.0 & 2.0 \end{bmatrix}_{2 \times 2}$$
 
 1. This matrix is already diagonal!
 2. Eigenvalues: $\lambda_1 = 2.00, \quad \lambda_2 = 2.00$
@@ -1296,7 +1302,7 @@ $$\hat{\mathbf{r}}_{i, 2 \times 1} = z_{i, 1 \times 1} \, (\mathbf{q}_1)_{2 \tim
 
 For **Person A**:
 
-$$\hat{\mathbf{r}}_{A, 2 \times 1} = \frac{3}{\sqrt{2}} \left( \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ 1 \end{bmatrix}_{2 \times 1} \right) = \begin{bmatrix} 1.5 \\ 1.5 \end{bmatrix}_{2 \times 1}$$
+$$\hat{\mathbf{r}}_{A, 2 \times 1} = \frac{3}{\sqrt{2}} \left( \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\\\ 1 \end{bmatrix}_{2 \times 1} \right) = \begin{bmatrix} 1.5 \\\\ 1.5 \end{bmatrix}_{2 \times 1}$$
 
 ---
 
@@ -1308,7 +1314,7 @@ $$\mathbf{e}_{i, 2 \times 1} = \tilde{\mathbf{r}}_{i, 2 \times 1} - \hat{\mathbf
 
 For **Person A**:
 
-$$\mathbf{e}_{A, 2 \times 1} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}_{2 \times 1} - \begin{bmatrix} 1.5 \\ 1.5 \end{bmatrix}_{2 \times 1} = \begin{bmatrix} 0.5 \\ -0.5 \end{bmatrix}_{2 \times 1}$$
+$$\mathbf{e}_{A, 2 \times 1} = \begin{bmatrix} 2 \\\\ 1 \end{bmatrix}_{2 \times 1} - \begin{bmatrix} 1.5 \\\\ 1.5 \end{bmatrix}_{2 \times 1} = \begin{bmatrix} 0.5 \\\\ -0.5 \end{bmatrix}_{2 \times 1}$$
 
 Notice that $\mathbf{e}_{A, 2 \times 1}$ points in direction $[1, -1]^T$—it lies **strictly along the dropped PC2 axis $\mathbf{q}_{2, 2 \times 1}$**!
 
@@ -1416,7 +1422,7 @@ Consider Leonardo da Vinci’s **Mona Lisa**, represented as an $H \times W$ gra
 
 $$\mathbf{X}_{H \times W} \in \mathbb{R}^{512 \times 512} \quad (H = 512 \text{ rows}, \quad W = 512 \text{ columns})$$
 
-$$\mathbf{X}_{512 \times 512} = \begin{bmatrix} (\mathbf{r}_1^T)_{1 \times 512} \\ (\mathbf{r}_2^T)_{1 \times 512} \\ \vdots \\ (\mathbf{r}_{512}^T)_{1 \times 512} \end{bmatrix}_{512 \times 512} = \begin{bmatrix} x_{1,1} & x_{1,2} & \cdots & x_{1,512} \\ x_{2,1} & x_{2,2} & \cdots & x_{2,512} \\ \vdots & \vdots & \ddots & \vdots \\ x_{512,1} & x_{512,2} & \cdots & x_{512,512} \end{bmatrix}$$
+$$\mathbf{X}_{512 \times 512} = \begin{bmatrix} (\mathbf{r}_1^T)_{1 \times 512} \\\\ (\mathbf{r}_2^T)_{1 \times 512} \\\\ \vdots \\\\ (\mathbf{r}_{512}^T)_{1 \times 512} \end{bmatrix}_{512 \times 512} = \begin{bmatrix} x_{1,1} & x_{1,2} & \cdots & x_{1,512} \\\\ x_{2,1} & x_{2,2} & \cdots & x_{2,512} \\\\ \vdots & \vdots & \ddots & \vdots \\\\ x_{512,1} & x_{512,2} & \cdots & x_{512,512} \end{bmatrix}$$
 
 Each pixel intensity is an 8-bit integer in $[0, 255]$:
 - $0 \implies$ Pure Black
