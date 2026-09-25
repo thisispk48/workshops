@@ -318,9 +318,17 @@ From homogeneity, setting scalar $c = 0$:
 
 $$T(\mathbf{0}) = T(0 \cdot \mathbf{v}) = 0 \cdot T(\mathbf{v}) = \mathbf{0}$$
 
-> **Key Geometric Rule:** Under any linear transformation, **the origin $(0, 0)$ is permanently anchored**. It can never move, shift, or translate!
+> **Key Geometric Rule:** Under any linear transformation, **the origin is permanently anchored**. It can never move, shift, or translate!
 
-Furthermore, grid lines must remain straight and evenly spaced; space can be stretched, sheared, or rotated, but it can never be bent or curved.
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  For complete visual intuition, we explore $2 \times 2$ matrices transforming points in the 2D plane:
+  $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix}$$
+  The 2D origin $(0, 0)$ remains anchored at $(0, 0)$. Grid lines remain straight and parallel.
+
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  Any square matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ defines an operator $T: \mathbb{R}^n \to \mathbb{R}^n$ via matrix-vector multiplication $\mathbf{y} = \mathbf{M}\mathbf{x}$. The $n$-dimensional zero vector is permanently anchored:
+  $$T(\mathbf{0}_n) = \mathbf{M}\mathbf{0}_n = \mathbf{0}_n$$
+  Lines, planes, and flat hyperplanes in $\mathbb{R}^n$ remain straight and evenly spaced under any linear transformation; space is never bent or curved.
 
 ---
 
@@ -379,8 +387,14 @@ $$\mathbf{D} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 3x \\ 2y \en
 > $$\mathbf{M} \mathbf{v} = \lambda \mathbf{v}$$
 > 
 > When transformed by $\mathbf{M}$, the vector **does not change its direction**—it is purely scaled by the scalar factor $\lambda$ (the **Eigenvalue**).
-> 
-> An eigenvalue does not belong to just one isolated vector. It defines an **entire 1-dimensional subspace (an infinite straight line through the origin)** called an **Eigenspace**. Every vector on that line scales by the exact same $\lambda$.
+
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  An eigenvector defines an invariant 1-dimensional straight line through the origin ($y = mx$). Every point on that line stays on that line, simply scaled by $\lambda$. In our $2 \times 2$ diagonal example, the two eigenspaces are the X-axis ($y = 0$, $\lambda_1 = 3$) and the Y-axis ($x = 0$, $\lambda_2 = 2$).
+
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  For any operator $\mathbf{M} \in \mathbb{R}^{n \times n}$, an eigenvalue $\lambda$ corresponds to an entire **Eigenspace** $E_\lambda$, defined as the null space of $(\mathbf{M} - \lambda\mathbf{I})$:
+  $$E_\lambda = \text{null}(\mathbf{M} - \lambda\mathbf{I}) = \{\mathbf{v} \in \mathbb{R}^n : \mathbf{M}\mathbf{v} = \lambda\mathbf{v}\}$$
+  This is a linear subspace of dimension $1 \le k \le n$ (the geometric multiplicity). In $\mathbb{R}^3$, an eigenspace can be an invariant line or an invariant plane; in $\mathbb{R}^n$, it is an invariant $k$-dimensional hyperplane. Every vector in $E_\lambda$ scales by the exact same factor $\lambda$.
 
 ---
 
@@ -433,25 +447,25 @@ $$\det(\mathbf{A} - \lambda\mathbf{I}) = 0 \quad \text{(The Characteristic Equat
 
 ---
 
-### Step 3: The General $2 \times 2$ Characteristic Equation
+### Step 3: The Characteristic Equation
 
-For any general $2 \times 2$ matrix $\mathbf{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$:
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  For any general $2 \times 2$ matrix $\mathbf{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$:
+  $$\det\begin{bmatrix} a - \lambda & b \\ c & d - \lambda \end{bmatrix} = (a - \lambda)(d - \lambda) - bc = 0$$
+  $$\lambda^2 - (a + d)\lambda + (ad - bc) = 0$$
+  Notice the two fundamental matrix invariants that appear naturally:
+  1. **The Trace:** $\text{Tr}(\mathbf{A}) = a + d$ (sum of diagonal entries)
+  2. **The Determinant:** $\det(\mathbf{A}) = ad - bc$
+  
+  This yields the universal $2 \times 2$ characteristic formula:
+  $$\lambda^2 - \text{Tr}(\mathbf{A})\lambda + \det(\mathbf{A}) = 0$$
+  where $\lambda_1 + \lambda_2 = \text{Tr}(\mathbf{A})$ and $\lambda_1 \lambda_2 = \det(\mathbf{A})$.
 
-$$\det\begin{bmatrix} a - \lambda & b \\ c & d - \lambda \end{bmatrix} = (a - \lambda)(d - \lambda) - bc = 0$$
-
-$$\lambda^2 - (a + d)\lambda + (ad - bc) = 0$$
-
-Notice the two fundamental properties of matrices that appear naturally in this equation:
-1. **The Trace:** $\text{Tr}(\mathbf{A}) = a + d$ (sum of diagonal entries)
-2. **The Determinant:** $\det(\mathbf{A}) = ad - bc$
-
-This gives the universal $2 \times 2$ characteristic formula:
-
-$$\lambda^2 - \text{Tr}(\mathbf{A})\lambda + \det(\mathbf{A}) = 0$$
-
-> **Student Quick Check:**  
-> The sum of the eigenvalues is always the trace: $\lambda_1 + \lambda_2 = \text{Tr}(\mathbf{A})$.  
-> The product of the eigenvalues is always the determinant: $\lambda_1 \lambda_2 = \det(\mathbf{A})$.
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  For any $n \times n$ matrix $\mathbf{A} \in \mathbb{R}^{n \times n}$, expanding $\det(\mathbf{A} - \lambda\mathbf{I}) = 0$ yields an **$n$-th degree characteristic polynomial** in $\lambda$:
+  $$p(\lambda) = (-1)^n \lambda^n + (-1)^{n-1}\text{Tr}(\mathbf{A})\lambda^{n-1} + \dots + \det(\mathbf{A}) = 0$$
+  By the Fundamental Theorem of Algebra, it has exactly $n$ roots (eigenvalues $\lambda_1, \lambda_2, \dots, \lambda_n$, counted with algebraic multiplicity). The trace and determinant invariant identities generalize universally to $\mathbb{R}^n$:
+  $$\sum_{i=1}^n \lambda_i = \text{Tr}(\mathbf{A}) = \sum_{i=1}^n A_{ii}, \qquad \prod_{i=1}^n \lambda_i = \det(\mathbf{A})$$
 
 ---
 
@@ -561,41 +575,76 @@ The angle between them is **exactly $90^\circ$** on both the input and output si
 
 ---
 
-## 2.6 The Bridge to PCA: The Four Special Properties of Symmetric Matrices
+## 2.6 Special Properties of Symmetric Matrices
 
-Why is this linear algebra so vital to Data Science and PCA?
-
-Because in modern machine learning, the core object that captures data variation is the **Covariance Matrix**:
-
-$$\mathbf{\Sigma} = \frac{1}{N} \mathbf{X}^T \mathbf{X}$$
-
-Because $(\mathbf{X}^T\mathbf{X})^T = \mathbf{X}^T (\mathbf{X}^T)^T = \mathbf{X}^T\mathbf{X}$, **the Covariance Matrix is ALWAYS symmetric!**
-
-Every symmetric matrix enjoys four mathematical properties that make PCA possible:
+Symmetric matrices ($\mathbf{S}^T = \mathbf{S}$) possess fundamental mathematical properties that set them apart from all other square matrices:
 
 ### 1. All Eigenvalues are Real Numbers
-Symmetric matrices can never produce imaginary or complex eigenvalues. The variance along each direction is always a real, measurable quantity.
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  For any $2 \times 2$ symmetric matrix $\mathbf{S} = \begin{bmatrix} a & b \\ b & c \end{bmatrix}$, the characteristic equation is $\lambda^2 - (a + c)\lambda + (ac - b^2) = 0$. Its discriminant is:
+  $$\Delta = (a + c)^2 - 4(ac - b^2) = (a - c)^2 + 4b^2 \ge 0$$
+  Because $\Delta$ is the sum of two squares, it is never negative. A $2 \times 2$ symmetric matrix can never yield complex or imaginary eigenvalues.
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  For any real symmetric matrix $\mathbf{S} \in \mathbb{R}^{n \times n}$, every eigenvalue is guaranteed to be a real number:
+  $$\lambda_i \in \mathbb{R} \quad \forall i \in \{1, 2, \dots, n\}$$
+
+---
 
 ### 2. Eigenvectors are Strictly Orthogonal
-By the **Spectral Theorem**, eigenvectors corresponding to distinct eigenvalues of a symmetric matrix are **guaranteed to be orthogonal ($90^\circ$)**. This ensures that principal components represent completely independent, uncorrelated axes of information.
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  The two eigenvectors $\mathbf{q}_1$ and $\mathbf{q}_2$ are strictly perpendicular at $90^\circ$:
+  $$\mathbf{q}_1 \cdot \mathbf{q}_2 = 0 \quad (\mathbf{q}_1 \perp \mathbf{q}_2)$$
+  As demonstrated in Figure 2.5, the symmetric matrix stretches space along this rigid $90^\circ$ coordinate frame.
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  By the **Spectral Theorem**, eigenvectors corresponding to distinct eigenvalues of any symmetric matrix are always mutually orthogonal. Furthermore, even if eigenvalues repeat, one can always construct a complete orthonormal basis $\{\mathbf{q}_1, \mathbf{q}_2, \dots, \mathbf{q}_n\}$ spanning $\mathbb{R}^n$:
+  $$\mathbf{q}_i \cdot \mathbf{q}_j = \delta_{ij} = \begin{cases} 1 & \text{if } i = j \\ 0 & \text{if } i \ne j \end{cases}$$
 
-### 3. The Spectral Decomposition (Connecting Directly to Part 1!)
-Any symmetric matrix $\mathbf{S}$ can be factored as:
+> **Side Note on Repeated Eigenvalues & Multiplicity:**  
+> What happens if an eigenvalue repeats (e.g., $(\lambda - 3)^2 = 0$)?
+> - **Algebraic Multiplicity (AM):** How many times a root $\lambda$ repeats in the characteristic polynomial.
+> - **Geometric Multiplicity (GM):** The dimension of the eigenspace $\dim(\text{null}(\mathbf{S} - \lambda\mathbf{I}))$.
+> - While general non-symmetric matrices can be "defective" ($\text{GM} < \text{AM}$, lacking enough independent eigenvectors), **symmetric matrices always satisfy $\mathbf{GM = AM}$**.
+> - If an eigenvalue repeats $k$ times ($\text{AM} = k$), its eigenspace is guaranteed to be a full **$k$-dimensional subspace** where every single vector scales by $\lambda$. Within that $k$-dimensional subspace, one can always pick $k$ mutually perpendicular unit vectors (e.g., via Gram-Schmidt) to construct a full orthonormal basis spanning $\mathbb{R}^n$.
 
-$$\mathbf{S} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T$$
+---
 
-where $\mathbf{Q} = [\mathbf{q}_1 \quad \mathbf{q}_2]$ is an orthonormal matrix of eigenvectors, and $\mathbf{\Lambda} = \begin{bmatrix} \lambda_1 & 0 \\ 0 & \lambda_2 \end{bmatrix}$.
+### 3. Rank of a Symmetric Matrix
+Is the rank of a symmetric matrix guaranteed to equal its dimension? **No.**
 
-Multiplying this out reveals a breathtaking mathematical insight:
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  For a $2 \times 2$ symmetric matrix:
+  - **Rank 2 (Full Rank):** Both $\lambda_1 \ne 0$ and $\lambda_2 \ne 0$ (e.g., $\begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$, $\lambda_1 = 4, \lambda_2 = 2$). The matrix is invertible and spans all of $\mathbb{R}^2$.
+  - **Rank 1:** Exactly one eigenvalue is 0 (e.g., $\begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}$, $\lambda_1 = 2, \lambda_2 = 0$). Space collapses completely from 2D onto a 1D line.
+  - **Rank 0:** Both eigenvalues are 0 (only the zero matrix $\mathbf{S} = \mathbf{0}$).
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  The rank of any symmetric matrix $\mathbf{S}$ is **strictly equal to the number of non-zero eigenvalues**:
+  $$\text{rank}(\mathbf{S}) = r = \text{Count of } \{\lambda_i \ne 0\} \le n$$
+  An $n \times n$ symmetric matrix is full rank ($r = n$) if and only if zero is not an eigenvalue.
 
-$$\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T) + \lambda_2 (\mathbf{q}_2 \mathbf{q}_2^T)$$
+---
 
-Look closely at the terms $(\mathbf{q}_1 \mathbf{q}_1^T)$ and $(\mathbf{q}_2 \mathbf{q}_2^T)$:
-**These are the EXACT 1D projection matrices we derived in Section 1.2!**
+### 4. Spectral Decomposition (Sum of Rank-1 Projections)
+Because the eigenvectors form an orthonormal basis ($\mathbf{Q}^T \mathbf{Q} = \mathbf{I}$), any symmetric matrix $\mathbf{S}$ can be factored as $\mathbf{S} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T$:
 
-> **The Big Connection:**  
-> A symmetric matrix is nothing more than a **weighted sum of orthogonal projection matrices**, where the weights are its eigenvalues!
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  $$\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T) + \lambda_2 (\mathbf{q}_2 \mathbf{q}_2^T)$$
+  Each outer product $(\mathbf{q}_i \mathbf{q}_i^T)$ is an $n \times n$ matrix of **rank 1**—the exact 1D orthogonal projection matrix onto line $\text{span}(\mathbf{q}_i)$ from Section 1.2!
+  - If $\mathbf{S}$ is **Full Rank** ($\text{rank} = 2$), $\mathbf{S}$ is a weighted sum of **two active rank-1 projection matrices**.
+  - If $\mathbf{S}$ is **Rank 1** ($\lambda_2 = 0$), the second term vanishes, leaving $\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T)$ as a single active rank-1 projection matrix.
 
-### 4. Positive Semi-Definiteness ($\lambda_i \ge 0$)
-Because covariance is computed as $\mathbf{v}^T \mathbf{\Sigma} \mathbf{v} = \frac{1}{N}\|\mathbf{X}\mathbf{v}\|^2 \ge 0$, all eigenvalues of a covariance matrix are non-negative ($\lambda_i \ge 0$). Variances can never be negative.
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  For any symmetric $\mathbf{S} \in \mathbb{R}^{n \times n}$ with rank $r \le n$:
+  $$\mathbf{S} = \sum_{i=1}^n \lambda_i (\mathbf{q}_i \mathbf{q}_i^T) = \sum_{i=1}^r \lambda_i (\mathbf{q}_i \mathbf{q}_i^T)$$
+  where each $\mathbf{P}_i = \mathbf{q}_i \mathbf{q}_i^T$ is a **rank-1** orthogonal projector, satisfying $\mathbf{P}_i^2 = \mathbf{P}_i$ and $\mathbf{P}_i \mathbf{P}_j = \mathbf{0}$ for $i \ne j$.
+  
+  > **Key Geometric Takeaway:**  
+  > Any symmetric matrix is nothing more than a **weighted linear combination of $r$ orthogonal rank-1 projection matrices**, where the weights are its non-zero eigenvalues!
+
+---
+
+### 5. Always Orthogonally Diagonalizable
+- **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+  $\mathbf{S} = \mathbf{Q}\mathbf{\Lambda}\mathbf{Q}^T$, where $\mathbf{Q}$ is a $2 \times 2$ rotation/reflection matrix.
+- **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
+  Every symmetric matrix in $\mathbb{R}^{n \times n}$ is orthogonally diagonalizable ($\mathbf{Q}^T \mathbf{S} \mathbf{Q} = \mathbf{\Lambda}$). Unlike general matrices (which may lack enough eigenvectors or produce skewed, sheared axes), a symmetric matrix **never shears space**—it purely rotates the coordinate frame to line up with its eigenvectors and scales each perpendicular axis by $\lambda_i$.
 
