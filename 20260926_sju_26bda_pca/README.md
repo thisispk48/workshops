@@ -101,18 +101,23 @@ $$\mathbf{P} = \mathbf{u} \mathbf{u}^T$$
 Let the direction line be $\mathbf{a} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$ (the $45^\circ$ diagonal line $y = x$).
 
 1. **Outer product matrix ($\mathbf{a}\mathbf{a}^T$):**
+
    $$\mathbf{a} \mathbf{a}^T = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}$$
 
 2. **Squared length ($\mathbf{a}^T\mathbf{a}$):**
+
    $$\mathbf{a}^T \mathbf{a} = 1^2 + 1^2 = 2$$
 
 3. **Projection Matrix $\mathbf{P}$:**
+
    $$\mathbf{P} = \frac{1}{2} \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} = \begin{bmatrix} 0.5 & 0.5 \\ 0.5 & 0.5 \end{bmatrix}$$
 
 4. **Calculate the Shadow Vector $\mathbf{p}$:**
+
    $$\mathbf{p} = \mathbf{P} \mathbf{v} = \begin{bmatrix} 0.5 & 0.5 \\ 0.5 & 0.5 \end{bmatrix} \begin{bmatrix} 2 \\ 4 \end{bmatrix} = \begin{bmatrix} 0.5(2) + 0.5(4) \\ 0.5(2) + 0.5(4) \end{bmatrix} = \begin{bmatrix} 3 \\ 3 \end{bmatrix}$$
 
 5. **Calculate the Error Drop Line $\mathbf{e}$:**
+
    $$\mathbf{e} = \mathbf{v} - \mathbf{p} = \begin{bmatrix} 2 \\ 4 \end{bmatrix} - \begin{bmatrix} 3 \\ 3 \end{bmatrix} = \begin{bmatrix} -1 \\ 1 \end{bmatrix}$$
 
 6. **Orthogonality Check:**
@@ -232,6 +237,7 @@ This reveals the **Master Projection Matrix Formula**:
 $$\mathbf{P} = \mathbf{A} (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T$$
 
 #### Dimension Verification (in 3D):
+
 $$\mathbf{P} = \underbrace{\mathbf{A}}_{3 \times 2} \, \underbrace{(\mathbf{A}^T \mathbf{A})^{-1}}_{2 \times 2} \, \underbrace{\mathbf{A}^T}_{2 \times 3} = (3 \times 3) \text{ Matrix}$$
 
 Multiplying $(3 \times 3) \mathbf{P}$ by $(3 \times 1) \mathbf{b}$ yields the $(3 \times 1)$ projected vector $\mathbf{p}$.
@@ -273,15 +279,21 @@ Here is the complete taxonomy of all possible linear subspace projections in 2D 
 Regardless of whether you project in 2D, 3D, or 100D, every orthogonal projection matrix $\mathbf{P}$ satisfies three immutable laws for any vector $\mathbf{v}$:
 
 ### 1. Symmetry
+
 $$\mathbf{P}^T = \mathbf{P}$$
+
 *(The matrix is equal to its own transpose).*
 
 ### 2. Idempotency (Repeat Projections Do Nothing)
+
 $$\mathbf{P}^2 = \mathbf{P} \mathbf{P} = \mathbf{P}$$
+
 *Intuition: Once you drop the shadow onto the floor, shining the light on the shadow a second time leaves it in the exact same spot.*
 
 ### 3. The Complement Projector (The Error Vector)
+
 $$(\mathbf{I} - \mathbf{P})$$
+
 *Intuition: If $\mathbf{P}$ projects onto the subspace, then $(\mathbf{I} - \mathbf{P})$ is also a projection matrix that projects onto the **perpendicular (orthogonal) complement**.*
 
 $$\mathbf{p} = \mathbf{P} \mathbf{v} \quad (\text{the shadow})$$
@@ -309,11 +321,15 @@ A matrix $\mathbf{M}$ is not just a table of numbers—it is a **transformation 
 To be a **linear transformation**, the operation must satisfy two strict axioms:
 
 1. **Additivity:**
+
    $$T(\mathbf{u} + \mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})$$
+
    *(Transforming the sum of two vectors is the same as transforming them individually and then adding).*
 
 2. **Homogeneity (Scaling):**
+
    $$T(c\mathbf{v}) = cT(\mathbf{v})$$
+
    *(Scaling a vector by $c$ scales its output by $c$).*
 
 ### The Axiomatic Consequence: $T(\mathbf{0}) = \mathbf{0}$
@@ -325,12 +341,16 @@ $$T(\mathbf{0}) = T(0 \cdot \mathbf{v}) = 0 \cdot T(\mathbf{v}) = \mathbf{0}$$
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   For complete visual intuition, we explore $2 \times 2$ matrices transforming points in the 2D plane:
+
   $$\begin{bmatrix} x' \\ y' \end{bmatrix} = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix}$$
+
   The 2D origin $(0, 0)$ remains anchored at $(0, 0)$. Grid lines remain straight and parallel.
 
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   Any square matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ defines an operator $T: \mathbb{R}^n \to \mathbb{R}^n$ via matrix-vector multiplication $\mathbf{w} = \mathbf{M}\mathbf{v}$ (transforming input vector $\mathbf{v} \in \mathbb{R}^n$ into output vector $\mathbf{w} \in \mathbb{R}^n$). The $n$-dimensional zero vector is permanently anchored:
+
   $$T(\mathbf{0}_n) = \mathbf{M}\mathbf{0}_n = \mathbf{0}_n$$
+
   Lines, planes, and flat hyperplanes in $\mathbb{R}^n$ remain straight and evenly spaced under any linear transformation; space is never bent or curved.
 
 ---
@@ -388,6 +408,7 @@ $$\mathbf{D} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 3x \\ 2y \en
 > An **Eigenvector** is a vector that **retains its directional span (line of action)** under a linear transformation:
 > 
 > $$\mathbf{M} \mathbf{v} = \lambda \mathbf{v}$$
+
 > 
 > When transformed by $\mathbf{M}$, the vector **does not change its direction**—it is purely scaled by the scalar factor $\lambda$ (the **Eigenvalue**).
 
@@ -396,7 +417,9 @@ $$\mathbf{D} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 3x \\ 2y \en
 
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any operator $\mathbf{M} \in \mathbb{R}^{n \times n}$, an eigenvalue $\lambda$ corresponds to an entire **Eigenspace** $E_\lambda$, defined as the null space of $(\mathbf{M} - \lambda\mathbf{I})$:
+
   $$E_\lambda = \text{null}(\mathbf{M} - \lambda\mathbf{I}) = \{\mathbf{v} \in \mathbb{R}^n : \mathbf{M}\mathbf{v} = \lambda\mathbf{v}\}$$
+
   This is a linear subspace of dimension $1 \le k \le n$ (the geometric multiplicity). In $\mathbb{R}^3$, an eigenspace can be an invariant line or an invariant plane; in $\mathbb{R}^n$, it is an invariant $k$-dimensional hyperplane. Every vector in $E_\lambda$ scales by the exact same factor $\lambda$.
 
 ---
@@ -454,20 +477,28 @@ $$\det(\mathbf{A} - \lambda\mathbf{I}) = 0 \quad \text{(The Characteristic Equat
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   For any general $2 \times 2$ matrix $\mathbf{A} = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$:
+
   $$\det\begin{bmatrix} a - \lambda & b \\ c & d - \lambda \end{bmatrix} = (a - \lambda)(d - \lambda) - bc = 0$$
+
   $$\lambda^2 - (a + d)\lambda + (ad - bc) = 0$$
+
   Notice the two fundamental matrix invariants that appear naturally:
   1. **The Trace:** $\text{Tr}(\mathbf{A}) = a + d$ (sum of diagonal entries)
   2. **The Determinant:** $\det(\mathbf{A}) = ad - bc$
   
   This yields the universal $2 \times 2$ characteristic formula:
+
   $$\lambda^2 - \text{Tr}(\mathbf{A})\lambda + \det(\mathbf{A}) = 0$$
+
   where $\lambda_1 + \lambda_2 = \text{Tr}(\mathbf{A})$ and $\lambda_1 \lambda_2 = \det(\mathbf{A})$.
 
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any $n \times n$ matrix $\mathbf{A} \in \mathbb{R}^{n \times n}$, expanding $\det(\mathbf{A} - \lambda\mathbf{I}) = 0$ yields an **$n$-th degree characteristic polynomial** in $\lambda$:
+
   $$p(\lambda) = (-1)^n \lambda^n + (-1)^{n-1}\text{Tr}(\mathbf{A})\lambda^{n-1} + \dots + \det(\mathbf{A}) = 0$$
+
   By the Fundamental Theorem of Algebra, it has exactly $n$ roots (eigenvalues $\lambda_1, \lambda_2, \dots, \lambda_n$, counted with algebraic multiplicity). The trace and determinant invariant identities generalize universally to $\mathbb{R}^n$:
+
   $$\sum_{i=1}^n \lambda_i = \text{Tr}(\mathbf{A}) = \sum_{i=1}^n A_{ii}, \qquad \prod_{i=1}^n \lambda_i = \det(\mathbf{A})$$
 
 ---
@@ -481,22 +512,30 @@ Now we can solve our non-diagonal matrix $\mathbf{A} = \begin{bmatrix} 1 & 1 \\ 
    - $\det(\mathbf{A}) = (1)(4) - (1)(-2) = 4 + 2 = 6$
 
 2. **Characteristic Equation:**
+
    $$\lambda^2 - 5\lambda + 6 = 0$$
+
    $$(\lambda - 3)(\lambda - 2) = 0 \implies \lambda_1 = 3, \quad \lambda_2 = 2$$
 
 3. **Finding the Direction Lines (Eigenvectors):**  
    Substitute each $\lambda$ back into $(\mathbf{A} - \lambda\mathbf{I})\mathbf{v} = \mathbf{0}$. Because the matrix collapsed space, the two row equations are redundant multiples of each other—they reduce to a single invariant line:
 
    - **For $\lambda_1 = 3$:**
+
      $$\begin{bmatrix} 1 - 3 & 1 \\ -2 & 4 - 3 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} -2 & 1 \\ -2 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+
      Both rows state: $-2x + y = 0 \implies y = 2x$.  
      Any vector along the line $y = 2x$ is an eigenvector! We choose the simple integer representative:
+
      $$\mathbf{v}_1 = \begin{bmatrix} 1 \\ 2 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_1 = 3)$$
 
    - **For $\lambda_2 = 2$:**
+
      $$\begin{bmatrix} 1 - 2 & 1 \\ -2 & 4 - 2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} -1 & 1 \\ -2 & 2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+
      Both rows state: $-x + y = 0 \implies y = x$.  
      Any vector along the line $y = x$ is an eigenvector:
+
      $$\mathbf{v}_2 = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_2 = 2)$$
 
 <div align="center">
@@ -547,9 +586,11 @@ $$\lambda^2 - 6\lambda + 8 = 0 \implies (\lambda - 4)(\lambda - 2) = 0 \implies 
 
 ### Step 2: Finding the Eigenvectors
 - **For $\lambda_1 = 4$:**
+
   $$(\mathbf{S} - 4\mathbf{I})\mathbf{q}_1 = \begin{bmatrix} -1 & 1 \\ 1 & -1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies y = x \implies \mathbf{q}_1 = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$
 
 - **For $\lambda_2 = 2$:**
+
   $$(\mathbf{S} - 2\mathbf{I})\mathbf{q}_2 = \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix} \implies y = -x \implies \mathbf{q}_2 = \begin{bmatrix} -1 \\ 1 \end{bmatrix}$$
 
 <div align="center">
@@ -588,10 +629,13 @@ Symmetric matrices ($\mathbf{S}^T = \mathbf{S}$) possess fundamental mathematica
 ### 1. All Eigenvalues are Real Numbers
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   For any $2 \times 2$ symmetric matrix $\mathbf{S} = \begin{bmatrix} a & b \\ b & c \end{bmatrix}$, the characteristic equation is $\lambda^2 - (a + c)\lambda + (ac - b^2) = 0$. Its discriminant is:
+
   $$\Delta = (a + c)^2 - 4(ac - b^2) = (a - c)^2 + 4b^2 \ge 0$$
+
   Because $\Delta$ is the sum of two squares, it is never negative. A $2 \times 2$ symmetric matrix can never yield complex or imaginary eigenvalues.
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any real symmetric matrix $\mathbf{S} \in \mathbb{R}^{n \times n}$, every eigenvalue is guaranteed to be a real number:
+
   $$\lambda_i \in \mathbb{R} \quad \forall i \in \{1, 2, \dots, n\}$$
 
 ---
@@ -599,10 +643,13 @@ Symmetric matrices ($\mathbf{S}^T = \mathbf{S}$) possess fundamental mathematica
 ### 2. Eigenvectors are Strictly Orthogonal
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   The two eigenvectors $\mathbf{q}_1$ and $\mathbf{q}_2$ are strictly perpendicular at $90^\circ$:
+
   $$\mathbf{q}_1 \cdot \mathbf{q}_2 = 0 \quad (\mathbf{q}_1 \perp \mathbf{q}_2)$$
+
   As demonstrated in Figure 2.5, the symmetric matrix stretches space along this rigid $90^\circ$ coordinate frame.
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   By the **Spectral Theorem**, eigenvectors corresponding to distinct eigenvalues of any symmetric matrix are always mutually orthogonal. Furthermore, even if eigenvalues repeat, one can always construct a complete orthonormal basis $\{\mathbf{q}_1, \mathbf{q}_2, \dots, \mathbf{q}_n\}$ spanning $\mathbb{R}^n$:
+
   $$\mathbf{q}_i \cdot \mathbf{q}_j = \delta_{ij} = \begin{cases} 1 & \text{if } i = j \\ 0 & \text{if } i \ne j \end{cases}$$
 
 > **Side Note on Repeated Eigenvalues & Multiplicity:**  
@@ -624,7 +671,9 @@ Is the rank of a symmetric matrix guaranteed to equal its dimension? **No.**
   - **Rank 0:** Both eigenvalues are 0 (only the zero matrix $\mathbf{S} = \mathbf{0}$).
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   The rank of any symmetric matrix $\mathbf{S}$ is **strictly equal to the number of non-zero eigenvalues**:
+
   $$\text{rank}(\mathbf{S}) = r = \text{Count of } \{\lambda_i \ne 0\} \le n$$
+
   An $n \times n$ symmetric matrix is full rank ($r = n$) if and only if zero is not an eigenvalue.
 
 ---
@@ -633,14 +682,18 @@ Is the rank of a symmetric matrix guaranteed to equal its dimension? **No.**
 Because the eigenvectors form an orthonormal basis ($\mathbf{Q}^T \mathbf{Q} = \mathbf{I}$), any symmetric matrix $\mathbf{S}$ can be factored as $\mathbf{S} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T$:
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
+
   $$\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T) + \lambda_2 (\mathbf{q}_2 \mathbf{q}_2^T)$$
+
   Each outer product $(\mathbf{q}_i \mathbf{q}_i^T)$ is an $n \times n$ matrix of **rank 1**—the exact 1D orthogonal projection matrix onto line $\text{span}(\mathbf{q}_i)$ from Section 1.2!
   - If $\mathbf{S}$ is **Full Rank** ($\text{rank} = 2$), $\mathbf{S}$ is a weighted sum of **two active rank-1 projection matrices**.
   - If $\mathbf{S}$ is **Rank 1** ($\lambda_2 = 0$), the second term vanishes, leaving $\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T)$ as a single active rank-1 projection matrix.
 
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
   For any symmetric $\mathbf{S} \in \mathbb{R}^{n \times n}$ with rank $r \le n$:
+
   $$\mathbf{S} = \sum_{i=1}^n \lambda_i (\mathbf{q}_i \mathbf{q}_i^T) = \sum_{i=1}^r \lambda_i (\mathbf{q}_i \mathbf{q}_i^T)$$
+
   where each $\mathbf{P}_i = \mathbf{q}_i \mathbf{q}_i^T$ is a **rank-1** orthogonal projector, satisfying $\mathbf{P}_i^2 = \mathbf{P}_i$ and $\mathbf{P}_i \mathbf{P}_j = \mathbf{0}$ for $i \ne j$.
   
   > **Key Geometric Takeaway:**  
@@ -668,15 +721,21 @@ where $\theta$ is the angle between the original vector $\mathbf{v}$ and the tra
 
 - **Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):**  
   Take our symmetric matrix $\mathbf{S} = \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix}$ from Figure 2.5 and an arbitrary vector $\mathbf{v} = \begin{bmatrix} v_1 \\ v_2 \end{bmatrix}$:
+
   $$\mathbf{v}^T \mathbf{S} \mathbf{v} = \begin{bmatrix} v_1 & v_2 \end{bmatrix} \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = 3v_1^2 + 2v_1 v_2 + 3v_2^2$$
+
   Notice how this quadratic expression rewrites:
+
   $$3v_1^2 + 2v_1 v_2 + 3v_2^2 = 2(v_1^2 + v_2^2) + (v_1 + v_2)^2$$
+
   Because $v_1^2 + v_2^2 > 0$ for any non-zero vector and $(v_1 + v_2)^2 \ge 0$, **this value is strictly positive for every possible vector**!
   - **Geometric Meaning:** $\mathbf{v} \cdot (\mathbf{S}\mathbf{v}) > 0 \implies \cos(\theta) > 0 \implies \theta < 90^\circ$.  
     The matrix $\mathbf{S}$ **never flips any vector backwards**! Every vector is rotated by less than $90^\circ$.
   - **Connection to Eigenvalues:**  
     If we test the quadratic form on an eigenvector $\mathbf{q}_i$:
+
     $$\mathbf{q}_i^T \mathbf{S} \mathbf{q}_i = \mathbf{q}_i^T (\lambda_i \mathbf{q}_i) = \lambda_i \|\mathbf{q}_i\|^2 = \lambda_i$$
+
     Because $\mathbf{v}^T \mathbf{S} \mathbf{v} > 0$ for all non-zero vectors, **all eigenvalues must be strictly positive**: $\lambda_1 = 4 > 0, \lambda_2 = 2 > 0$.
 
 - **Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):**  
@@ -718,8 +777,11 @@ Consider a dataset of $N = 40$ individuals measured on $D = 2$ physical attribut
 
 In linear algebra, our raw data matrix $\mathbf{X}_{40 \times 2}$ is a $40 \times 2$ matrix that unites two clean geometric viewpoints:
 - **Every row is an individual observation vector in $\mathbb{R}^2$:**  
+
   $$\mathbf{r}_{i, 2 \times 1} = \begin{bmatrix} x_{i1} \\ x_{i2} \end{bmatrix}_{2 \times 1} \in \mathbb{R}^2 \quad (\text{represented as row } \mathbf{r}_{i, 1 \times 2}^T \text{ in } \mathbf{X}_{40 \times 2})$$
+
 - **Every column is a feature vector across all 40 individuals in $\mathbb{R}^{40}$:**  
+
   $$\mathbf{x}_{1, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Height column}), \qquad \mathbf{x}_{2, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Weight column})$$
 
 $$\mathbf{X}_{40 \times 2} = \underbrace{\begin{bmatrix} (\mathbf{x}_1)_{40 \times 1} & (\mathbf{x}_2)_{40 \times 1} \end{bmatrix}}_{2 \text{ column vectors in } \mathbb{R}^{40}} = \underbrace{\begin{bmatrix} (\mathbf{r}_1^T)_{1 \times 2} \\ (\mathbf{r}_2^T)_{1 \times 2} \\ \vdots \\ (\mathbf{r}_{40}^T)_{1 \times 2} \end{bmatrix}}_{40 \text{ row vectors from } \mathbb{R}^2}$$
@@ -734,6 +796,7 @@ Before analyzing how features vary, we compute the sample average for each featu
 $$\bar{x}_1 = \frac{1}{N} \sum_{i=1}^N x_{i1} = 4.0, \qquad \bar{x}_2 = \frac{1}{N} \sum_{i=1}^N x_{i2} = 3.0$$
 
 As demonstrated by our 5 benchmark individuals:
+
 $$\bar{x}_1 = \frac{6 + 2 + 5 + 3 + 4}{5} = \frac{20}{5} = 4.0, \qquad \bar{x}_2 = \frac{4 + 2 + 5 + 1 + 3}{5} = \frac{15}{5} = 3.0$$
 
 The **Center of Mass** (mean vector $\mathbf{\mu}_{2 \times 1} \in \mathbb{R}^2$) is:
@@ -767,7 +830,9 @@ $$\mathbf{X}_{c,\text{bench}, 5 \times 2} = \begin{bmatrix} 6 - 4 & 4 - 3 \\ 2 -
 
 - **Generic ($\mathbb{R}^D \to \mathbb{R}^D, D \times D$):**  
   Centering anchors the data cloud's center of mass at the origin:
+
   $$\mathbf{0}_{D \times 1} = [0, 0, \dots, 0]^T \in \mathbb{R}^D$$
+
   Centering does **not** alter the shape of the data, the distances between points, or the variances. However, it is mathematically essential because linear transformations require $T(\mathbf{0}) = \mathbf{0}$ (from Section 2.1). Anchoring the mean at the origin ensures that linear matrix operations act purely on data spread without being distorted by arbitrary coordinate offsets.
 
 <div align="center">
@@ -789,12 +854,16 @@ Now we ask the fundamental data science question: **How do Height ($\mathbf{x}_{
 Before looking at matrices, let's understand how statistics packages individual and joint variation using vector dot products:
 1. **Individual Spread (Sample Variance):**  
    The variance of Feature 1 ($\mathbf{x}_{1, 40 \times 1}$) is the average squared deviation across all $N$ individuals:
+
    $$s_1^2 = \text{Var}(\mathbf{x}_1) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{1, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
+
    The variance of Feature 2 ($\mathbf{x}_{2, 40 \times 1}$) is:
+
    $$s_2^2 = \text{Var}(\mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i2}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{2, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
 
 2. **Joint Spread (Sample Covariance):**  
    The degree to which deviations in Feature 1 correspond to deviations in Feature 2 is the **sample covariance**, denoted by $s_{12}$:
+
    $$s_{12} = \text{Cov}(\mathbf{x}_1, \mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1} \tilde{r}_{i2} = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$
 
 ### Packaging the Spread: The Covariance Matrix $\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N-1}(\mathbf{X}_c^T)_{2 \times 40} (\mathbf{X}_c)_{40 \times 2}$
@@ -803,6 +872,7 @@ To analyze all features together in a single operation, we evaluate the matrix p
 $$\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N - 1} \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} \, \underbrace{\mathbf{X}_{c, 40 \times 2}}_{40 \times 2} = \frac{1}{N - 1} \begin{bmatrix} \tilde{\mathbf{x}}_1^T \\ \tilde{\mathbf{x}}_2^T \end{bmatrix}_{2 \times 40} \begin{bmatrix} \tilde{\mathbf{x}}_1 & \tilde{\mathbf{x}}_2 \end{bmatrix}_{40 \times 2} = \begin{bmatrix} s_1^2 & s_{12} \\ s_{12} & s_2^2 \end{bmatrix}_{2 \times 2}$$
 
 #### Dimension Verification:
+
 $$\mathbf{\Sigma}_{2 \times 2} = \frac{1}{39} \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} \, \underbrace{\mathbf{X}_{c, 40 \times 2}}_{40 \times 2} = (2 \times 2) \text{ Symmetric Matrix}$$
 
 Notice that because dot products commute ($\tilde{\mathbf{x}}_{1, 1 \times 40}^T \tilde{\mathbf{x}}_{2, 40 \times 1} = \tilde{\mathbf{x}}_{2, 1 \times 40}^T \tilde{\mathbf{x}}_{1, 40 \times 1}$), the off-diagonal covariances are identical ($s_{12} = s_{21}$).  
@@ -833,6 +903,7 @@ To see how covariance directly controls the geometric tilt of data, we examine o
 
 #### Dataset 1: Positive Covariance (Height vs. Weight)
 Consider our centered benchmark individuals where taller people are generally heavier:
+
 $$\mathbf{X}_{c1,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & +1 \\ -2 & -1 \\ +1 & +2 \\ -1 & -2 \\ 0 & 0 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A: } \tilde{\mathbf{r}}_{A, 2 \times 1} = [+2, +1]^T \\ \leftarrow \text{Person B: } \tilde{\mathbf{r}}_{B, 2 \times 1} = [-2, -1]^T \\ \leftarrow \text{Person C: } \tilde{\mathbf{r}}_{C, 2 \times 1} = [+1, +2]^T \\ \leftarrow \text{Person D: } \tilde{\mathbf{r}}_{D, 2 \times 1} = [-1, -2]^T \\ \leftarrow \text{Person E: } \tilde{\mathbf{r}}_{E, 2 \times 1} = [0, 0]^T \end{matrix}$$
 
 - $\sum \tilde{r}_{i1}^2 = 2^2 + (-2)^2 + 1^2 + (-1)^2 + 0^2 = 10 \implies s_1^2 = \frac{10}{4} = 2.5$
@@ -840,12 +911,14 @@ $$\mathbf{X}_{c1,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & +1 \\ -2 & -1 
 - $\sum \tilde{r}_{i1} \tilde{r}_{i2} = (+2)(+1) + (-2)(-1) + (+1)(+2) + (-1)(-2) + 0 = 2 + 2 + 2 + 2 = +8 \implies s_{12} = \frac{+8}{4} = \mathbf{+2.0}$
 
 $$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{+2.0} \\ \mathbf{+2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$
+
 - **The Story:** Observations fall strictly in **Q1 and Q3**. Positive products dominate. The data cloud **tilts upward to the right** along the positive diagonal ($y \approx x$).
 
 ---
 
 #### Dataset 2: Negative Covariance (Elevation vs. Temperature)
 Consider 5 centered benchmark observations where higher elevation corresponds to colder temperature:
+
 $$\mathbf{X}_{c2,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & -1 \\ -2 & +1 \\ +1 & -2 \\ -1 & +2 \\ 0 & 0 \end{bmatrix}_{5 \times 2}$$
 
 - $\sum \tilde{r}_{i1}^2 = 10 \implies s_1^2 = \frac{10}{4} = 2.5$
@@ -853,12 +926,14 @@ $$\mathbf{X}_{c2,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & -1 \\ -2 & +1 
 - $\sum \tilde{r}_{i1} \tilde{r}_{i2} = (+2)(-1) + (-2)(+1) + (+1)(-2) + (-1)(+2) + 0 = -2 - 2 - 2 - 2 = -8 \implies s_{12} = \frac{-8}{4} = \mathbf{-2.0}$
 
 $$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{-2.0} \\ \mathbf{-2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$
+
 - **The Story:** Observations fall strictly in **Q2 and Q4**. Negative products dominate. The data cloud **tilts downward to the right** along the negative diagonal ($y \approx -x$).
 
 ---
 
 #### Dataset 3: Zero Covariance (Height vs. Shoe Brand / Uncorrelated)
 Consider 5 centered benchmark observations distributed symmetrically along the standard axes:
+
 $$\mathbf{X}_{c3,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & 0 \\ -2 & 0 \\ 0 & +2 \\ 0 & -2 \\ 0 & 0 \end{bmatrix}_{5 \times 2}$$
 
 - $\sum \tilde{r}_{i1}^2 = 2^2 + (-2)^2 + 0 + 0 + 0 = 8 \implies s_1^2 = \frac{8}{4} = 2.0$
@@ -866,6 +941,7 @@ $$\mathbf{X}_{c3,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & 0 \\ -2 & 0 \\
 - $\sum \tilde{r}_{i1} \tilde{r}_{i2} = (2)(0) + (-2)(0) + (0)(2) + (0)(-2) + 0 = 0 \implies s_{12} = \frac{0}{4} = \mathbf{0.0}$
 
 $$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & \mathbf{0.0} \\ \mathbf{0.0} & 2.0 \end{bmatrix}_{2 \times 2}$$
+
 - **The Story:** Positive and negative products cancel out completely. Knowing $\mathbf{x}_1$ provides zero predictive information about $\mathbf{x}_2$.
 - *Direct Connection to Section 2.3:* This is a **diagonal matrix**! There is no tilt; its eigenvectors are already the standard coordinate axes.
 
@@ -924,6 +1000,7 @@ $$\mathbf{z}_{40 \times 1} = \begin{bmatrix} z_1 \\ z_2 \\ \vdots \\ z_{40} \end
 
 #### Step 2: Calculating the Variance of the Shadows
 First, what is the sample mean of the projected coordinates $\mathbf{z}_{40 \times 1}$?
+
 $$\bar{z}_{1 \times 1} = \frac{1}{N} \sum_{i=1}^N z_{i, 1 \times 1} = \frac{1}{N} \sum_{i=1}^N (\tilde{\mathbf{r}}_{i, 1 \times 2}^T \mathbf{u}_{2 \times 1}) = \left( \frac{1}{N} \sum_{i=1}^N \tilde{\mathbf{r}}_{i, 2 \times 1} \right)^T \mathbf{u}_{2 \times 1} = \mathbf{0}_{1 \times 2}^T \mathbf{u}_{2 \times 1} = 0$$
 
 Because our data was centered in Section 3.1, the average shadow coordinate is strictly zero ($\bar{z} = 0$).  
@@ -932,6 +1009,7 @@ Therefore, the sample variance of $\mathbf{z}_{40 \times 1}$ is simply the avera
 $$\text{Var}(\mathbf{z})_{1 \times 1} = \frac{1}{N - 1} \sum_{i=1}^N (z_i - \bar{z})^2 = \frac{1}{N - 1} \sum_{i=1}^N z_i^2 = \frac{1}{N - 1} \underbrace{\mathbf{z}_{1 \times 40}^T}_{1 \times 40} \, \underbrace{\mathbf{z}_{40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar (Variance)}$$
 
 For our test direction at $\theta = 15^\circ$, the sum of squared scores is $\mathbf{z}_{1 \times 40}^T \mathbf{z}_{40 \times 1} = 136.50$, yielding sample variance:
+
 $$\text{Var}(\mathbf{z})_{1 \times 1} = \frac{136.50}{39} = \mathbf{3.50}$$
 
 <div align="center">
@@ -959,6 +1037,7 @@ In Step 1, we found that our 1D shadow score vector is $\mathbf{z}_{40 \times 1}
 $$\text{Var}(\mathbf{z})_{1 \times 1} = \text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}) = \frac{1}{N - 1} \underbrace{\left((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}\right)^T}_{1 \times 40} \, \underbrace{\left((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}\right)}_{40 \times 1}$$
 
 Apply the transpose rule $(\mathbf{A}\mathbf{B})^T = \mathbf{B}^T \mathbf{A}^T$:
+
 $$\left((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}\right)^T = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} = (1 \times 40)$$
 
 Substitute this back into the variance expression:
@@ -1038,23 +1117,32 @@ Where does this derivative come from? Let us derive each term component-by-compo
 
 #### Part A: Differentiating the Quadratic Variance Term $\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}$
 Let the unit vector and symmetric covariance matrix be:
+
 $$\mathbf{u}_{2 \times 1} = \begin{bmatrix} u_1 \\ u_2 \end{bmatrix}_{2 \times 1}, \qquad \mathbf{\Sigma}_{2 \times 2} = \begin{bmatrix} s_{11} & s_{12} \\ s_{21} & s_{22} \end{bmatrix}_{2 \times 2} \quad (\text{where } s_{12} = s_{21} \text{ due to symmetry})$$
 
 1. First, multiply the matrix $\mathbf{\Sigma}_{2 \times 2}$ by vector $\mathbf{u}_{2 \times 1}$:
+
    $$\mathbf{\Sigma} \mathbf{u} = \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\ s_{21} u_1 + s_{22} u_2 \end{bmatrix}_{2 \times 1}$$
 
 2. Multiply on the left by row vector $\mathbf{u}_{1 \times 2}^T = [u_1, u_2]$:
+
    $$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = u_1 (s_{11} u_1 + s_{12} u_2) + u_2 (s_{21} u_1 + s_{22} u_2) = s_{11} u_1^2 + s_{12} u_1 u_2 + s_{21} u_1 u_2 + s_{22} u_2^2$$
+
    Because $\mathbf{\Sigma}$ is symmetric ($s_{12} = s_{21}$), the two cross terms combine:
+
    $$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = s_{11} u_1^2 + 2 s_{12} u_1 u_2 + s_{22} u_2^2$$
 
 3. Take the partial derivative with respect to each component:
    - Partial derivative with respect to $u_1$:
+
      $$\frac{\partial}{\partial u_1} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 2 s_{11} u_1 + 2 s_{12} u_2 + 0 = 2 (s_{11} u_1 + s_{12} u_2)$$
+
    - Partial derivative with respect to $u_2$:
+
      $$\frac{\partial}{\partial u_2} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 0 + 2 s_{12} u_1 + 2 s_{22} u_2 = 2 (s_{21} u_1 + s_{22} u_2) \quad (\text{since } s_{12} = s_{21})$$
 
 4. Stacking these two partial derivatives into the gradient vector:
+
    $$\nabla_{\mathbf{u}} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = \begin{bmatrix} \frac{\partial}{\partial u_1} \\ \frac{\partial}{\partial u_2} \end{bmatrix} = 2 \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\ s_{21} u_1 + s_{22} u_2 \end{bmatrix} = 2 \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$
 
 *(General Matrix Calculus Rule: For any symmetric matrix $\mathbf{A} = \mathbf{A}^T$, $\nabla_{\mathbf{u}} (\mathbf{u}^T \mathbf{A} \mathbf{u}) = (\mathbf{A} + \mathbf{A}^T)\mathbf{u} = 2\mathbf{A}\mathbf{u}$.)*
@@ -1063,6 +1151,7 @@ $$\mathbf{u}_{2 \times 1} = \begin{bmatrix} u_1 \\ u_2 \end{bmatrix}_{2 \times 1
 
 #### Part B: Differentiating the Constraint Term $\lambda (\mathbf{u}^T \mathbf{u} - 1)$
 Since $\mathbf{u}^T \mathbf{u} = u_1^2 + u_2^2$:
+
 $$\lambda (\mathbf{u}^T \mathbf{u} - 1) = \lambda (u_1^2 + u_2^2 - 1)$$
 
 Taking partial derivatives with respect to $u_1$ and $u_2$:
@@ -1070,6 +1159,7 @@ Taking partial derivatives with respect to $u_1$ and $u_2$:
 - $\frac{\partial}{\partial u_2} [\lambda (u_1^2 + u_2^2 - 1)] = 2 \lambda u_2$
 
 Stacking into the gradient vector:
+
 $$\nabla_{\mathbf{u}} [\lambda (\mathbf{u}^T \mathbf{u} - 1)] = 2 \lambda \begin{bmatrix} u_1 \\ u_2 \end{bmatrix} = 2 \lambda \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$
 
 ---
@@ -1117,6 +1207,7 @@ Although each dataset contains 40 observations, **$\mathbf{\Sigma}_{2 \times 2}$
 
 ### Case 1: Positive Covariance (Height vs. Weight)
 Our positive covariance matrix was:
+
 $$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & 2.0 \\ 2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$
 
 Using the trace-determinant formula from Section 2.4:
@@ -1128,37 +1219,44 @@ $$\lambda^2 - 5.0\lambda + 2.25 = 0 \implies (\lambda - 4.5)(\lambda - 0.5) = 0$
 $$\lambda_1 = 4.50, \qquad \lambda_2 = 0.50$$
 
 The unit eigenvectors are vectors $\mathbf{q}_1, \mathbf{q}_2 \in \mathbb{R}^2$:
+
 $$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } 45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} -1 \\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 135^\circ)$$
 
 - **Total Variance:** $\text{Tr}(\mathbf{\Sigma}_{1, 2 \times 2}) = \lambda_1 + \lambda_2 = 4.50 + 0.50 = 5.00$
 - **Explained Variance Ratio for PC1:**
-  $$\frac{\lambda_1}{\lambda_1 + \lambda_2} = \frac{4.50}{5.00} = \mathbf{90.0\%}$$
+
+  $$\frac{\lambda_1}{\lambda_1 + \lambda_2} = \frac{4.50}{5.00} = 0.90$$
+
+  Compressing along PC1 captures **90.0%** of total variance.
 - **The Story:** The data cloud tilts upward to the right along $y = x$. Compressing 2D down to 1D along PC1 retains **90% of all information** across all 40 people!
 
 ---
 
 ### Case 2: Negative Covariance (Elevation vs. Temperature)
 Our negative covariance matrix was:
+
 $$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & -2.0 \\ -2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$
 
 1. $\text{Tr}(\mathbf{\Sigma}_{2, 2 \times 2}) = 5.0, \quad \det(\mathbf{\Sigma}_{2, 2 \times 2}) = 2.25$
 2. Eigenvalues: $\lambda_1 = 4.50, \quad \lambda_2 = 0.50$
 3. The unit eigenvectors are vectors $\mathbf{q}_1, \mathbf{q}_2 \in \mathbb{R}^2$:
+
 $$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ -1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } -45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 45^\circ)$$
 
-- **Explained Variance Ratio for PC1:** $\frac{4.50}{5.00} = \mathbf{90.0\%}$
+- **Explained Variance Ratio for PC1:** $\frac{4.50}{5.00} = 0.90$ (**90.0%**)
 - **The Story:** The negative covariance tilted the spine by $90^\circ$! The dominant line of spread now slopes downward along $y = -x$.
 
 ---
 
 ### Case 3: Zero Covariance (Height vs. Shoe Brand / Uncorrelated)
 Our zero covariance matrix was:
+
 $$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & 0.0 \\ 0.0 & 2.0 \end{bmatrix}_{2 \times 2}$$
 
 1. This matrix is already diagonal!
 2. Eigenvalues: $\lambda_1 = 2.00, \quad \lambda_2 = 2.00$
 3. Eigenvectors: Any pair of perpendicular unit vectors in $\mathbb{R}^2$ (e.g. standard axes $\mathbf{e}_{1, 2 \times 1} = [1, 0]^T$ and $\mathbf{e}_{2, 2 \times 1} = [0, 1]^T$).
-- **Explained Variance Ratio:** $\frac{2.00}{4.00} = \mathbf{50.0\%}$
+- **Explained Variance Ratio:** $\frac{2.00}{4.00} = 0.50$ (**50.0%**)
 - **The Story:** Both eigenvalues are identical! The cloud is circular, with equal spread in every direction. **There is no single dominant spine in uncorrelated data.**
 
 <div align="center">
@@ -1197,6 +1295,7 @@ To decompress a 1D score $z_{i, 1 \times 1}$ back into a 2D centered observation
 $$\hat{\mathbf{r}}_{i, 2 \times 1} = z_{i, 1 \times 1} \, (\mathbf{q}_1)_{2 \times 1} = (\underbrace{\tilde{\mathbf{r}}_{i, 1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{q}_{1, 2 \times 1}}_{2 \times 1}) (\mathbf{q}_1)_{2 \times 1} = \underbrace{(\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T)}_{2 \times 2} \, \underbrace{\tilde{\mathbf{r}}_{i, 2 \times 1}}_{2 \times 1} \in \mathbb{R}^2$$
 
 For **Person A**:
+
 $$\hat{\mathbf{r}}_{A, 2 \times 1} = \frac{3}{\sqrt{2}} \left( \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ 1 \end{bmatrix}_{2 \times 1} \right) = \begin{bmatrix} 1.5 \\ 1.5 \end{bmatrix}_{2 \times 1}$$
 
 ---
@@ -1208,6 +1307,7 @@ The difference between the original centered point and the reconstructed point i
 $$\mathbf{e}_{i, 2 \times 1} = \tilde{\mathbf{r}}_{i, 2 \times 1} - \hat{\mathbf{r}}_{i, 2 \times 1}$$
 
 For **Person A**:
+
 $$\mathbf{e}_{A, 2 \times 1} = \begin{bmatrix} 2 \\ 1 \end{bmatrix}_{2 \times 1} - \begin{bmatrix} 1.5 \\ 1.5 \end{bmatrix}_{2 \times 1} = \begin{bmatrix} 0.5 \\ -0.5 \end{bmatrix}_{2 \times 1}$$
 
 Notice that $\mathbf{e}_{A, 2 \times 1}$ points in direction $[1, -1]^T$—it lies **strictly along the dropped PC2 axis $\mathbf{q}_{2, 2 \times 1}$**!
@@ -1218,13 +1318,13 @@ Notice that $\mathbf{e}_{A, 2 \times 1}$ points in direction $[1, -1]^T$—it li
 
 The table below shows the complete compression, reconstruction, and error metrics for our benchmark individuals, followed by the summary totals across the entire **$N = 40$ point cloud**:
 
-| Individual | Centered Point $\tilde{\mathbf{r}}_i$ | Original Energy $\|\tilde{\mathbf{r}}_i\|^2$ | 1D Score $z_i = \tilde{\mathbf{r}}_i^T \mathbf{q}_1$ | Shadow Energy $z_i^2$ | Reconstructed Point $\hat{\mathbf{r}}_i$ | Error Vector $\mathbf{e}_i$ | Error Energy $\|\mathbf{e}_i\|^2$ | Pythagoras Check |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Person A** | $\begin{bmatrix} +2 \\ +1 \end{bmatrix}_{2 \times 1}$ | $4 + 1 = \mathbf{5.0}$ | $+3/\sqrt{2} \approx +2.12$ | $\mathbf{4.5}$ | $\begin{bmatrix} +1.5 \\ +1.5 \end{bmatrix}_{2 \times 1}$ | $\begin{bmatrix} +0.5 \\ -0.5 \end{bmatrix}_{2 \times 1}$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
-| **Person B** | $\begin{bmatrix} -2 \\ -1 \end{bmatrix}_{2 \times 1}$ | $4 + 1 = \mathbf{5.0}$ | $-3/\sqrt{2} \approx -2.12$ | $\mathbf{4.5}$ | $\begin{bmatrix} -1.5 \\ -1.5 \end{bmatrix}_{2 \times 1}$ | $\begin{bmatrix} -0.5 \\ +0.5 \end{bmatrix}_{2 \times 1}$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
-| **Person C** | $\begin{bmatrix} +1 \\ +2 \end{bmatrix}_{2 \times 1}$ | $1 + 4 = \mathbf{5.0}$ | $+3/\sqrt{2} \approx +2.12$ | $\mathbf{4.5}$ | $\begin{bmatrix} +1.5 \\ +1.5 \end{bmatrix}_{2 \times 1}$ | $\begin{bmatrix} -0.5 \\ +0.5 \end{bmatrix}_{2 \times 1}$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
-| **Person D** | $\begin{bmatrix} -1 \\ -2 \end{bmatrix}_{2 \times 1}$ | $1 + 4 = \mathbf{5.0}$ | $-3/\sqrt{2} \approx -2.12$ | $\mathbf{4.5}$ | $\begin{bmatrix} -1.5 \\ -1.5 \end{bmatrix}_{2 \times 1}$ | $\begin{bmatrix} +0.5 \\ -0.5 \end{bmatrix}_{2 \times 1}$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
-| **Person E** | $\begin{bmatrix} 0 \\ 0 \end{bmatrix}_{2 \times 1}$ | $0 + 0 = \mathbf{0.0}$ | $0.00$ | $\mathbf{0.0}$ | $\begin{bmatrix} 0.0 \\ 0.0 \end{bmatrix}_{2 \times 1}$ | $\begin{bmatrix} 0.0 \\ 0.0 \end{bmatrix}_{2 \times 1}$ | $0.00 + 0.00 = \mathbf{0.0}$ | $0.0 + 0.0 = \mathbf{0.0}$ |
+| Individual | Centered Point $\tilde{\mathbf{r}}_i$ | Original Energy $\Vert\tilde{\mathbf{r}}_i\Vert^2$ | 1D Score $z_i = \tilde{\mathbf{r}}_i^T \mathbf{q}_1$ | Shadow Energy $z_i^2$ | Reconstructed Point $\hat{\mathbf{r}}_i$ | Error Vector $\mathbf{e}_i$ | Error Energy $\Vert\mathbf{e}_i\Vert^2$ | Pythagoras Check |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Person A** | $[+2, +1]^T$ | $4 + 1 = \mathbf{5.0}$ | $+3/\sqrt{2} \approx +2.12$ | $\mathbf{4.5}$ | $[+1.5, +1.5]^T$ | $[+0.5, -0.5]^T$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
+| **Person B** | $[-2, -1]^T$ | $4 + 1 = \mathbf{5.0}$ | $-3/\sqrt{2} \approx -2.12$ | $\mathbf{4.5}$ | $[-1.5, -1.5]^T$ | $[-0.5, +0.5]^T$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
+| **Person C** | $[+1, +2]^T$ | $1 + 4 = \mathbf{5.0}$ | $+3/\sqrt{2} \approx +2.12$ | $\mathbf{4.5}$ | $[+1.5, +1.5]^T$ | $[-0.5, +0.5]^T$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
+| **Person D** | $[-1, -2]^T$ | $1 + 4 = \mathbf{5.0}$ | $-3/\sqrt{2} \approx -2.12$ | $\mathbf{4.5}$ | $[-1.5, -1.5]^T$ | $[+0.5, -0.5]^T$ | $0.25 + 0.25 = \mathbf{0.5}$ | $4.5 + 0.5 = \mathbf{5.0}$ |
+| **Person E** | $[0, 0]^T$ | $0 + 0 = \mathbf{0.0}$ | $0.00$ | $\mathbf{0.0}$ | $[0.0, 0.0]^T$ | $[0.0, 0.0]^T$ | $0.00 + 0.00 = \mathbf{0.0}$ | $0.0 + 0.0 = \mathbf{0.0}$ |
 | **Summary (All $N=40$)** | $\frac{1}{N-1}\sum$ | $\text{Tr}(\mathbf{\Sigma}_{1, 2 \times 2}) = \mathbf{5.00}$ | $\text{Mean} = 0$ | $\lambda_1 = \mathbf{4.50}$ (90%) | - | - | $\lambda_2 = \mathbf{0.50}$ (10%) | $\mathbf{4.50 + 0.50 = 5.00}$ |
 
 <div align="center">
@@ -1268,6 +1368,7 @@ The PCA reconstruction operator is:
 $$\mathbf{P}_{\text{PCA}, 2 \times 2} = \underbrace{\mathbf{q}_{1, 2 \times 1}}_{2 \times 1} \, \underbrace{\mathbf{q}_{1, 1 \times 2}^T}_{1 \times 2}$$
 
 $$\mathbf{P}_{\text{PCA}, 2 \times 2}^T = (\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T)^T = \mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T = \mathbf{P}_{\text{PCA}, 2 \times 2}$$
+
 $$\mathbf{P}_{\text{PCA}, 2 \times 2}^2 = (\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T)(\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T) = \underbrace{\mathbf{q}_{1, 2 \times 1}}_{2 \times 1} \, \underbrace{(\mathbf{q}_{1, 1 \times 2}^T \mathbf{q}_{1, 2 \times 1})}_{1 \times 1} \, \underbrace{\mathbf{q}_{1, 1 \times 2}^T}_{1 \times 2} = \mathbf{q}_{1, 2 \times 1} (1) \mathbf{q}_{1, 1 \times 2}^T = \mathbf{P}_{\text{PCA}, 2 \times 2}$$
 
 $\mathbf{P}_{\text{PCA}, 2 \times 2}$ **IS an exact orthogonal projection matrix!** It drops high-dimensional centered observations directly onto the optimal principal component subspace.
@@ -1282,7 +1383,7 @@ $$\text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1})_{1 \times 1} 
 
 In linear algebra, a matrix satisfying $\mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1} \ge 0$ for all $\mathbf{u}_{2 \times 1}$ is called **Positive Semi-Definite (PSD)**.  
 - The statistical law that *variance cannot be negative* is the exact physical twin of the linear algebra property that *$\mathbf{\Sigma}_{2 \times 2}$ is Positive Semi-Definite*.
-- If an eigenvalue equals zero ($\lambda = 0$), the variance along that axis is literally zero (data points lie perfectly flat on a lower-dimensional line or plane). Dropping that dimension loses $0\%$ information!
+- If an eigenvalue equals zero ($\lambda = 0$), the variance along that axis is literally zero (data points lie perfectly flat on a lower-dimensional line or plane). Dropping that dimension loses **0%** information!
 
 ---
 
@@ -1392,17 +1493,21 @@ To transmit or store the compressed image on disk, we only need to save:
 
 $$\text{Total Numbers Stored} = (H \cdot k) + (k \cdot W) + W$$
 
-$$\text{Storage Savings (\%)} = \left( 1 - \frac{(H \cdot k) + (k \cdot W) + W}{H \cdot W} \right) \times 100\%$$
+$$\text{Storage Savings Ratio} = 1 - \frac{(H \cdot k) + (k \cdot W) + W}{H \cdot W}$$
+
+Multiplying this ratio by $100$ yields the percentage of storage space saved:
+
+$$\text{Storage Savings (\%)} = \text{Storage Savings Ratio} \times 100$$
 
 #### The Compression vs. Information Retention Table (Mona Lisa, $512 \times 512$):
 
 | Rank $k$ | Stored Numbers | Original Numbers | Storage Saved (%) | Explained Variance (%) | Reconstruction RMSE | Visual Quality |
 | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Original** | $262{,}144$ | $262{,}144$ | **$0.00\%$** (Baseline) | **$100.00\%$** | $0.00$ | Perfect Masterpiece |
-| **$k = 5$** | $5{,}632$ | $262{,}144$ | **$97.85\%$** | **$89.48\%$** | $16.76$ | Coarse lighting & head silhouette |
-| **$k = 20$** | $20{,}992$ | $262{,}144$ | **$91.99\%$** | **$96.91\%$** | $9.10$ | Face, smile, veil, hands clearly identifiable |
-| **$k = 50$** | $51{,}712$ | $262{,}144$ | **$80.27\%$** | **$98.47\%$** | $6.41$ | High-frequency landscape & fabric textures emerge |
-| **$k = 100$** | $102{,}912$ | $262{,}144$ | **$60.74\%$** | **$99.25\%$** | $4.49$ | Visually indistinguishable from original |
+| **Original** | $262{,}144$ | $262{,}144$ | **0.00%** (Baseline) | **100.00%** | $0.00$ | Perfect Masterpiece |
+| **$k = 5$** | $5{,}632$ | $262{,}144$ | **97.85%** | **89.48%** | $16.76$ | Coarse lighting & head silhouette |
+| **$k = 20$** | $20{,}992$ | $262{,}144$ | **91.99%** | **96.91%** | $9.10$ | Face, smile, veil, hands clearly identifiable |
+| **$k = 50$** | $51{,}712$ | $262{,}144$ | **80.27%** | **98.47%** | $6.41$ | High-frequency landscape & fabric textures emerge |
+| **$k = 100$** | $102{,}912$ | $262{,}144$ | **60.74%** | **99.25%** | $4.49$ | Visually indistinguishable from original |
 
 ---
 
@@ -1459,12 +1564,12 @@ $$\Delta(\mathbf{X}) = |\hat{\mathbf{X}}_{\text{scratch}} - \hat{\mathbf{X}}_{\t
 
 ### The Master Parity Verification Table:
 
-| Rank $k$ | Maximum Absolute Difference $\max(\Delta)$ | Mean Absolute Difference $\text{mean}(\Delta)$ | Frobenius Norm $\|\hat{\mathbf{X}}_{\text{scratch}} - \hat{\mathbf{X}}_{\text{sklearn}}\|_F$ | Variance Discrepancy | `np.allclose(atol=1e-10)` |
+| Rank $k$ | Maximum Absolute Difference $\max(\Delta)$ | Mean Absolute Difference $\text{mean}(\Delta)$ | Frobenius Norm $\Vert\hat{\mathbf{X}}_{\text{scratch}} - \hat{\mathbf{X}}_{\text{sklearn}}\Vert_F$ | Variance Discrepancy | `np.allclose(atol=1e-10)` |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| **$k = 5$** | $\mathbf{9.95 \times 10^{-13}}$ | $7.74 \times 10^{-14}$ | $6.40 \times 10^{-11}$ | $2.84 \times 10^{-14}\%$ | **PASS (True)** |
-| **$k = 20$** | $\mathbf{1.11 \times 10^{-12}}$ | $8.61 \times 10^{-14}$ | $6.77 \times 10^{-11}$ | $0.00 \times 10^{0}\%$ | **PASS (True)** |
-| **$k = 50$** | $\mathbf{1.17 \times 10^{-12}}$ | $9.05 \times 10^{-14}$ | $6.98 \times 10^{-11}$ | $1.42 \times 10^{-14}\%$ | **PASS (True)** |
-| **$k = 100$** | $\mathbf{1.17 \times 10^{-12}}$ | $9.57 \times 10^{-14}$ | $7.23 \times 10^{-11}$ | $2.84 \times 10^{-14}\%$ | **PASS (True)** |
+| **$k = 5$** | $\mathbf{9.95 \times 10^{-13}}$ | $7.74 \times 10^{-14}$ | $6.40 \times 10^{-11}$ | $2.84 \times 10^{-14}$% | **PASS (True)** |
+| **$k = 20$** | $\mathbf{1.11 \times 10^{-12}}$ | $8.61 \times 10^{-14}$ | $6.77 \times 10^{-11}$ | $0.00 \times 10^{0}$% | **PASS (True)** |
+| **$k = 50$** | $\mathbf{1.17 \times 10^{-12}}$ | $9.05 \times 10^{-14}$ | $6.98 \times 10^{-11}$ | $1.42 \times 10^{-14}$% | **PASS (True)** |
+| **$k = 100$** | $\mathbf{1.17 \times 10^{-12}}$ | $9.57 \times 10^{-14}$ | $7.23 \times 10^{-11}$ | $2.84 \times 10^{-14}$% | **PASS (True)** |
 
 > **Pedagogical Finding for MSc Big Data Students:**  
 > In `sklearn.decomposition.PCA`, setting `svd_solver='auto'` automatically defaults to a randomized approximation algorithm (`Halko et al.`) when image dimensions exceed 500 pixels. This achieves great speed on massive web-scale datasets at the cost of slight approximation error.  
