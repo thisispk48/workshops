@@ -14,44 +14,44 @@ assets_dir = os.path.dirname(os.path.abspath(__file__))
 # -------------------------------------------------------------
 # 1. Define Vectors and Calculate Projection
 # -------------------------------------------------------------
-x = np.array([5.0, 2.0])
+a = np.array([5.0, 2.0])
 v = np.array([2.0, 4.0])
 
-# Projection: p = ((v . x) / (x . x)) * x
-scalar_proj = np.dot(v, x) / np.dot(x, x)
-p = scalar_proj * x
+# Projection: p = ((v . a) / (a . a)) * a
+scalar_proj = np.dot(v, a) / np.dot(a, a)
+p = scalar_proj * a
 
 # Error vector: e = v - p
 e = v - p
 
 # -------------------------------------------------------------
-# 2. Matplotlib Static Figure (01_vector_projection_2d.png)
+# 2. Matplotlib Static Figure (1_2_fig_vector_projection.png)
 # -------------------------------------------------------------
 fig, ax = plt.subplots(figsize=(8, 6), dpi=300)
 
 ax.set_facecolor('#fafbfc')
 fig.patch.set_facecolor('#ffffff')
 
-# Subspace line spanned by x
+# Subspace line spanned by a
 line_t = np.linspace(-0.5, 1.4, 100)
-line_x = [t * x[0] for t in line_t]
-line_y = [t * x[1] for t in line_t]
-ax.plot(line_x, line_y, color='#b0bec5', linestyle='--', linewidth=1.5, zorder=1, label='Subspace spanned by x (Line)')
+line_x = [t * a[0] for t in line_t]
+line_y = [t * a[1] for t in line_t]
+ax.plot(line_x, line_y, color='#b0bec5', linestyle='--', linewidth=1.5, zorder=1, label='Subspace spanned by a (Line)')
 
 # Drop line
 ax.plot([v[0], p[0]], [v[1], p[1]], color='#e53935', linestyle=':', linewidth=2, zorder=2, label='Error vector e = v - p (drop line)')
 
 # Right-angle marker
 box_size = 0.25
-u_x = x / np.linalg.norm(x)
+u_a = a / np.linalg.norm(a)
 u_e = e / np.linalg.norm(e)
 corner_1 = p + box_size * u_e
-corner_2 = corner_1 - box_size * u_x
-corner_3 = p - box_size * u_x
+corner_2 = corner_1 - box_size * u_a
+corner_3 = p - box_size * u_a
 ax.plot([corner_3[0], corner_2[0], corner_1[0]], [corner_3[1], corner_2[1], corner_1[1]], color='#78909c', linewidth=1.2, zorder=2)
 
 # Vector arrows
-ax.annotate('', xy=x, xytext=(0, 0),
+ax.annotate('', xy=a, xytext=(0, 0),
             arrowprops=dict(arrowstyle="-|>", color='#1e88e5', lw=2.5, mutation_scale=18), zorder=3)
 ax.annotate('', xy=v, xytext=(0, 0),
             arrowprops=dict(arrowstyle="-|>", color='#8e24aa', lw=2.5, mutation_scale=18), zorder=3)
@@ -60,9 +60,9 @@ ax.annotate('', xy=p, xytext=(0, 0),
 
 # Text labels
 ax.text(v[0] - 0.4, v[1] + 0.15, r'$\mathbf{v} = [2, 4]^T$', fontsize=12, fontweight='bold', color='#8e24aa', zorder=5)
-ax.text(x[0] + 0.15, x[1] - 0.1, r'$\mathbf{x} = [5, 2]^T$', fontsize=12, fontweight='bold', color='#1e88e5', zorder=5)
-ax.text(p[0] + 0.1, p[1] - 0.35, r'$\mathbf{p} = \mathrm{proj}_{\mathbf{x}}(\mathbf{v})$', fontsize=12, fontweight='bold', color='#2e7d32', zorder=5)
-ax.text((v[0] + p[0])/2 + 0.15, (v[1] + p[1])/2 + 0.1, r'$\mathbf{e} \perp \mathbf{x}$', fontsize=11, fontweight='bold', color='#e53935', zorder=5)
+ax.text(a[0] + 0.15, a[1] - 0.1, r'$\mathbf{a} = [5, 2]^T$', fontsize=12, fontweight='bold', color='#1e88e5', zorder=5)
+ax.text(p[0] + 0.1, p[1] - 0.35, r'$\mathbf{p} = \mathrm{proj}_{\mathbf{a}}(\mathbf{v})$', fontsize=12, fontweight='bold', color='#2e7d32', zorder=5)
+ax.text((v[0] + p[0])/2 + 0.15, (v[1] + p[1])/2 + 0.1, r'$\mathbf{e} \perp \mathbf{a}$', fontsize=11, fontweight='bold', color='#e53935', zorder=5)
 
 # Origin
 ax.scatter([0], [0], color='#263238', s=40, zorder=5)
@@ -86,7 +86,7 @@ plt.savefig(png_path, dpi=300)
 print(f"Saved {png_path} successfully.")
 
 # -------------------------------------------------------------
-# 3. Interactive Standalone HTML (01_vector_projection_2d.html)
+# 3. Interactive Standalone HTML (1_2_fig_vector_projection.html)
 # -------------------------------------------------------------
 html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -146,7 +146,7 @@ html_content = f"""<!DOCTYPE html>
 </head>
 <body>
   <div class="container">
-    <h1>Interactive 2D Projection: Vector v onto Vector x</h1>
+    <h1>Interactive 2D Projection: Vector v onto Vector a</h1>
     <p>
       Hover over the vectors to see their coordinates. Click and drag to pan, scroll to zoom.
     </p>
@@ -155,7 +155,7 @@ html_content = f"""<!DOCTYPE html>
 
     <div class="legend-box">
       <div><span class="badge" style="background:#8e24aa;"></span><b>Vector v:</b> [{v[0]}, {v[1]}] (Original vector)</div>
-      <div><span class="badge" style="background:#1e88e5;"></span><b>Vector x:</b> [{x[0]}, {x[1]}] (Direction line)</div>
+      <div><span class="badge" style="background:#1e88e5;"></span><b>Direction a:</b> [{a[0]}, {a[1]}] (Direction line)</div>
       <div><span class="badge" style="background:#2e7d32;"></span><b>Projection p:</b> [{p[0]:.2f}, {p[1]:.2f}] (Shadow)</div>
       <div><span class="badge" style="background:#e53935;"></span><b>Error e:</b> [{e[0]:.2f}, {e[1]:.2f}] (Perpendicular drop)</div>
     </div>
@@ -167,7 +167,7 @@ html_content = f"""<!DOCTYPE html>
       y: [-1.0, 3.0],
       mode: 'lines',
       line: {{ color: '#b0bec5', width: 2, dash: 'dash' }},
-      name: 'Subspace Line (spanned by x)',
+      name: 'Subspace Line (spanned by a)',
       hoverinfo: 'skip'
     }};
 
@@ -180,13 +180,13 @@ html_content = f"""<!DOCTYPE html>
       name: 'Vector v [{v[0]}, {v[1]}]'
     }};
 
-    const traceX = {{
-      x: [0, {x[0]}],
-      y: [0, {x[1]}],
+    const traceA = {{
+      x: [0, {a[0]}],
+      y: [0, {a[1]}],
       mode: 'lines+markers',
       line: {{ color: '#1e88e5', width: 4 }},
       marker: {{ size: [0, 8], color: '#1e88e5' }},
-      name: 'Vector x [{x[0]}, {x[1]}]'
+      name: 'Direction a [{a[0]}, {a[1]}]'
     }};
 
     const traceP = {{
@@ -217,7 +217,7 @@ html_content = f"""<!DOCTYPE html>
       }}
     }};
 
-    Plotly.newPlot('plot', [traceSubspace, traceX, traceV, traceP, traceE], layout, {{responsive: true}});
+    Plotly.newPlot('plot', [traceSubspace, traceA, traceV, traceP, traceE], layout, {{responsive: true}});
   </script>
 </body>
 </html>

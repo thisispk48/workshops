@@ -56,7 +56,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Example 1.2.1: Projecting Vector v [2, 4] onto Line x [1, 1]</h1>
+    <h1>Example 1.2.1: Projecting Vector v [2, 4] onto Line a [1, 1]</h1>
     <p>
       Notice the perpendicular drop: line <i>y = x</i> has slope +1, and drop line <i>e</i> has slope -1. 
       Their product is -1, confirming the 90° angle. Hover over points to inspect coordinates.
@@ -66,7 +66,7 @@
 
     <div class="legend-box">
       <div><span class="badge" style="background:#8e24aa;"></span><b>Vector v:</b> [2, 4] (Original)</div>
-      <div><span class="badge" style="background:#1e88e5;"></span><b>Vector x:</b> [1, 1] (Diagonal line)</div>
+      <div><span class="badge" style="background:#1e88e5;"></span><b>Direction a:</b> [1, 1] (Diagonal line)</div>
       <div><span class="badge" style="background:#2e7d32;"></span><b>Projection p:</b> [3, 3] (Shadow)</div>
       <div><span class="badge" style="background:#e53935;"></span><b>Error e:</b> [-1, 1] (Slope = -1, Orthogonal drop)</div>
     </div>
@@ -91,13 +91,13 @@
       name: 'Vector v [2, 4]'
     };
 
-    const traceX = {
+    const traceA = {
       x: [0, 1],
       y: [0, 1],
       mode: 'lines+markers',
       line: { color: '#1e88e5', width: 4 },
       marker: { size: [0, 8], color: '#1e88e5' },
-      name: 'Vector x [1, 1]'
+      name: 'Direction a [1, 1]'
     };
 
     const traceP = {
@@ -129,7 +129,7 @@
       }
     };
 
-    Plotly.newPlot('plot', [traceSubspace, traceX, traceV, traceP, traceE], layout, {responsive: true});
+    Plotly.newPlot('plot', [traceSubspace, traceA, traceV, traceP, traceE], layout, {responsive: true});
   </script>
 </body>
 </html>

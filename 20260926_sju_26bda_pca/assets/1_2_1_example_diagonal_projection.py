@@ -15,20 +15,20 @@ assets_dir = os.path.dirname(os.path.abspath(__file__))
 # -------------------------------------------------------------
 # 1. Math Calculation
 # -------------------------------------------------------------
-x = np.array([1.0, 1.0])
+a = np.array([1.0, 1.0])
 v = np.array([2.0, 4.0])
 
-# Projection matrix P = (x * x^T) / (x^T * x)
-P = np.outer(x, x) / np.dot(x, x)
+# Projection matrix P = (a * a^T) / (a^T * a)
+P = np.outer(a, a) / np.dot(a, a)
 p = P @ v  # [3.0, 3.0]
 e = v - p  # [-1.0, 1.0]
 
 print("Vector v:", v)
-print("Direction x:", x)
+print("Direction a:", a)
 print("Projection Matrix P:\n", P)
 print("Projection p:", p)
 print("Error e:", e)
-print("Check orthogonality (x . e):", np.dot(x, e))
+print("Check orthogonality (a . e):", np.dot(a, e))
 
 # -------------------------------------------------------------
 # 2. Matplotlib Static Figure (1_2_1_example_diagonal_projection.png)
@@ -55,8 +55,8 @@ c3 = p + box * u_diag
 ax.plot([c3[0], c2[0], c1[0]], [c3[1], c2[1], c1[1]], color='#546e7a', linewidth=1.3, zorder=2)
 
 # Vector arrows
-# x = [1, 1]
-ax.annotate('', xy=x, xytext=(0, 0),
+# a = [1, 1]
+ax.annotate('', xy=a, xytext=(0, 0),
             arrowprops=dict(arrowstyle="-|>", color='#1e88e5', lw=2.5, mutation_scale=16), zorder=3)
 # v = [2, 4]
 ax.annotate('', xy=v, xytext=(0, 0),
@@ -72,7 +72,7 @@ ax.scatter([p[0]], [p[1]], color='#2e7d32', s=60, zorder=5)
 
 # Text labels with coordinates
 ax.text(v[0] - 0.45, v[1] + 0.15, r'$\mathbf{v} = [2, 4]^T$', fontsize=12, fontweight='bold', color='#8e24aa', zorder=6)
-ax.text(x[0] + 0.15, x[1] - 0.25, r'$\mathbf{x} = [1, 1]^T$', fontsize=11, fontweight='bold', color='#1e88e5', zorder=6)
+ax.text(a[0] + 0.15, a[1] - 0.25, r'$\mathbf{a} = [1, 1]^T$', fontsize=11, fontweight='bold', color='#1e88e5', zorder=6)
 ax.text(p[0] + 0.15, p[1] - 0.25, r'$\mathbf{p} = [3, 3]^T$', fontsize=12, fontweight='bold', color='#2e7d32', zorder=6)
 ax.text((v[0]+p[0])/2 - 0.85, (v[1]+p[1])/2 + 0.1, r'$\mathbf{e} = [-1, 1]^T$', fontsize=11, fontweight='bold', color='#e53935', zorder=6)
 
@@ -164,7 +164,7 @@ html_content = f"""<!DOCTYPE html>
 </head>
 <body>
   <div class="container">
-    <h1>Example 1.2.1: Projecting Vector v [2, 4] onto Line x [1, 1]</h1>
+    <h1>Example 1.2.1: Projecting Vector v [2, 4] onto Line a [1, 1]</h1>
     <p>
       Notice the perpendicular drop: line <i>y = x</i> has slope +1, and drop line <i>e</i> has slope -1. 
       Their product is -1, confirming the 90° angle. Hover over points to inspect coordinates.
@@ -174,7 +174,7 @@ html_content = f"""<!DOCTYPE html>
 
     <div class="legend-box">
       <div><span class="badge" style="background:#8e24aa;"></span><b>Vector v:</b> [2, 4] (Original)</div>
-      <div><span class="badge" style="background:#1e88e5;"></span><b>Vector x:</b> [1, 1] (Diagonal line)</div>
+      <div><span class="badge" style="background:#1e88e5;"></span><b>Direction a:</b> [1, 1] (Diagonal line)</div>
       <div><span class="badge" style="background:#2e7d32;"></span><b>Projection p:</b> [3, 3] (Shadow)</div>
       <div><span class="badge" style="background:#e53935;"></span><b>Error e:</b> [-1, 1] (Slope = -1, Orthogonal drop)</div>
     </div>
@@ -199,13 +199,13 @@ html_content = f"""<!DOCTYPE html>
       name: 'Vector v [2, 4]'
     }};
 
-    const traceX = {{
+    const traceA = {{
       x: [0, 1],
       y: [0, 1],
       mode: 'lines+markers',
       line: {{ color: '#1e88e5', width: 4 }},
       marker: {{ size: [0, 8], color: '#1e88e5' }},
-      name: 'Vector x [1, 1]'
+      name: 'Direction a [1, 1]'
     }};
 
     const traceP = {{
@@ -237,7 +237,7 @@ html_content = f"""<!DOCTYPE html>
       }}
     }};
 
-    Plotly.newPlot('plot', [traceSubspace, traceX, traceV, traceP, traceE], layout, {{responsive: true}});
+    Plotly.newPlot('plot', [traceSubspace, traceA, traceV, traceP, traceE], layout, {{responsive: true}});
   </script>
 </body>
 </html>

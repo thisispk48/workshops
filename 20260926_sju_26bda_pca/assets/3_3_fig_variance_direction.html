@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Figure 3.3: Worst Direction (PC2 Clump) vs. Optimal Direction (PC1 Spread)</title>
+  <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0; padding: 20px; background: #f8fafc; color: #1e293b;
+    }
+    .container {
+      max-width: 1200px; margin: 0 auto; background: #ffffff;
+      border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 24px;
+    }
+    h1 { font-size: 22px; margin-top: 0; color: #0f172a; }
+    p { line-height: 1.6; color: #475569; font-size: 14px; }
+    .charts-row { display: flex; gap: 20px; margin-top: 15px; }
+    .chart-col { flex: 1; height: 500px; border: 1px solid #e2e8f0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Figure 3.3: Why Maximize Variance? Worst Line (PC2 Clumping) vs. Best Line (PC1 Spread)</h1>
+    <p>
+      <b>Left (Worst Direction - PC2 at 135°):</b> Points collapse into a dense, uninformative clump with <b>Var = λ₂ = 0.50</b>. Individuals collide (Person A & D both get -0.71; Person B & C both get +0.71), destroying individual distinguishability.<br>
+      <b>Right (Optimal Direction - PC1 at 45°):</b> Data spreads widely across 9 units with <b>Var = λ₁ = 4.50</b> (retaining 90% of total variance). Every individual is distinctly separated with minimal error drop lines!
+    </p>
+    <div class="charts-row">
+      <div id="plot1" class="chart-col"></div>
+      <div id="plot2" class="chart-col"></div>
+    </div>
+  </div>
+  <script>
+    const traceCloudLeft = {
+      x: [-1.113621740066637, -2.35538689600933, 0.23049212880411787, -3.552960793632614, 0.18894721527766034, 0.7704844859690567, 0.37779494641671824, 3.0499866001406426, 1.2804505036180238, 2.109851386014024, -2.7695056269886016, 0.39821685421982345, 0.5744553839616585, 1.487803197296132, 0.9100524061862605, -0.34730713818879844, 0.32540957417304733, -1.051899861731073, 0.46336216048300594, 1.9050581268829987, -1.72145432411183, 0.0610159266357264, 2.7083713293789184, -0.1288444617174227, 0.110432832021352, -0.664477557322027, 0.5138795239794826, -2.6832304265287066, 1.3407227352542062, -1.476279310980547, 0.6337509797187301, 2.332356834083104, -2.547871267914151, -0.7821411579280875, -0.5779145673948641], y: [-1.2378194271699987, -0.7952845817097002, 0.1432529216141539, -2.944728328008923, 0.9459905904315584, 0.48712713676891717, -1.5286399779250703, 2.9014601800593782, 1.903107348486983, 0.9334279810234556, -3.1639091109631177, -0.9722673353157683, 0.9005128061024386, 2.199466389765695, 0.8315716802523427, 1.7842688386200987, -0.6517053881836612, -2.3524770541444844, -1.484739321402928, 2.4653067542394607, -1.5714158304612602, -0.11726333489279725, 2.3516720077196704, 1.1569326578129726, -1.6600301905361012, -1.0110076976440057, 1.3807018722477444, -1.8042727542025823, 1.2885071587166317, -0.42170238935623733, 0.6419984414842789, 1.415512720880175, -1.1903071527682791, 0.3762020366131395, -1.1994496481541814],
+      mode: 'markers', marker: { color: '#90caf9', size: 6, opacity: 0.6 }, name: 'Cloud Points (N=35)'
+    };
+    const traceDataLeft = {
+      x: [2.0, -2.0, 1.0, -1.0, 0.0], y: [1.0, -1.0, 2.0, -2.0, 0.0],
+      mode: 'markers', marker: { color: '#1976d2', size: 9 }, name: 'Benchmark Points (N=5)'
+    };
+    const traceProjLeft = {
+      x: [0.4999999999999999, -0.4999999999999999, -0.4999999999999999, 0.4999999999999999, -0.0], y: [-0.4999999999999999, 0.4999999999999999, 0.4999999999999999, -0.4999999999999999, 0.0],
+      mode: 'markers', marker: { color: '#2e7d32', size: 8, symbol: 'diamond' }, name: 'Shadows on PC2'
+    };
+    const traceLinePC2 = {
+      x: [-4.5 * q2[0], 4.5 * q2[0]], y: [-4.5 * q2[1], 4.5 * q2[1]],
+      mode: 'lines', line: { color: '#2e7d32', width: 2.5 }, name: 'PC2 Line (λ₂ = 0.50)'
+    };
+
+    Plotly.newPlot('plot1', [traceCloudLeft, traceDataLeft, traceProjLeft, traceLinePC2], {
+      title: 'Worst Direction: PC2 Clump (Variance = 0.50)',
+      xaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: '#334155', scaleanchor: 'y' },
+      yaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: '#334155' },
+      margin: { l: 40, r: 20, b: 40, t: 40 }, showlegend: false
+    }, {responsive: true});
+
+    const traceCloudRight = {
+      x: [-1.113621740066637, -2.35538689600933, 0.23049212880411787, -3.552960793632614, 0.18894721527766034, 0.7704844859690567, 0.37779494641671824, 3.0499866001406426, 1.2804505036180238, 2.109851386014024, -2.7695056269886016, 0.39821685421982345, 0.5744553839616585, 1.487803197296132, 0.9100524061862605, -0.34730713818879844, 0.32540957417304733, -1.051899861731073, 0.46336216048300594, 1.9050581268829987, -1.72145432411183, 0.0610159266357264, 2.7083713293789184, -0.1288444617174227, 0.110432832021352, -0.664477557322027, 0.5138795239794826, -2.6832304265287066, 1.3407227352542062, -1.476279310980547, 0.6337509797187301, 2.332356834083104, -2.547871267914151, -0.7821411579280875, -0.5779145673948641], y: [-1.2378194271699987, -0.7952845817097002, 0.1432529216141539, -2.944728328008923, 0.9459905904315584, 0.48712713676891717, -1.5286399779250703, 2.9014601800593782, 1.903107348486983, 0.9334279810234556, -3.1639091109631177, -0.9722673353157683, 0.9005128061024386, 2.199466389765695, 0.8315716802523427, 1.7842688386200987, -0.6517053881836612, -2.3524770541444844, -1.484739321402928, 2.4653067542394607, -1.5714158304612602, -0.11726333489279725, 2.3516720077196704, 1.1569326578129726, -1.6600301905361012, -1.0110076976440057, 1.3807018722477444, -1.8042727542025823, 1.2885071587166317, -0.42170238935623733, 0.6419984414842789, 1.415512720880175, -1.1903071527682791, 0.3762020366131395, -1.1994496481541814],
+      mode: 'markers', marker: { color: '#90caf9', size: 6, opacity: 0.6 }, name: 'Cloud Points (N=35)'
+    };
+    const traceDataRight = {
+      x: [2.0, -2.0, 1.0, -1.0, 0.0], y: [1.0, -1.0, 2.0, -2.0, 0.0],
+      mode: 'markers', marker: { color: '#1976d2', size: 9 }, name: 'Benchmark Points (N=5)'
+    };
+    const traceProjRight = {
+      x: [1.4999999999999998, -1.4999999999999998, 1.4999999999999998, -1.4999999999999998, 0.0], y: [1.4999999999999998, -1.4999999999999998, 1.4999999999999998, -1.4999999999999998, 0.0],
+      mode: 'markers', marker: { color: '#d32f2f', size: 9, symbol: 'diamond' }, name: 'Shadows on PC1'
+    };
+    const tracePC1 = {
+      x: [-4.5 * q1[0], 4.5 * q1[0]], y: [-4.5 * q1[1], 4.5 * q1[1]],
+      mode: 'lines', line: { color: '#d32f2f', width: 3 }, name: 'PC1 (λ₁ = 4.50)'
+    };
+    const tracePC2_dash = {
+      x: [-3 * q2[0], 3 * q2[0]], y: [-3 * q2[1], 3 * q2[1]],
+      mode: 'lines', line: { color: '#2e7d32', width: 1.5, dash: 'dash' }, name: 'PC2 (λ₂ = 0.50)'
+    };
+
+    Plotly.newPlot('plot2', [traceCloudRight, traceDataRight, traceProjRight, tracePC1, tracePC2_dash], {
+      title: 'Optimal Direction: PC1 Spread (Variance = 4.50)',
+      xaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: '#334155', scaleanchor: 'y' },
+      yaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: '#334155' },
+      margin: { l: 40, r: 20, b: 40, t: 40 }, showlegend: false
+    }, {responsive: true});
+  </script>
+</body>
+</html>
