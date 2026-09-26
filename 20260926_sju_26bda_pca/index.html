@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixels, Projections and Principal Components</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+  <script>
+    function toggleFullscreen(cardId) {
+      const card = document.getElementById(cardId);
+      if (!card) return;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (card.requestFullscreen) {
+          card.requestFullscreen();
+        } else if (card.webkitRequestFullscreen) {
+          card.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenUI);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+    function updateFullscreenUI() {
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      document.querySelectorAll('.btn-fullscreen').forEach(btn => {
+        const card = btn.closest('.interactive-box');
+        if (card && card === fsEl) {
+          btn.innerHTML = '⛶ Exit Full Screen';
+        } else {
+          btn.innerHTML = '⛶ Full Screen';
+        }
+      });
+    }
+
+    function openNewTab(event, iframeId, fallbackUrl) {
+      const iframe = document.getElementById(iframeId);
+      if (iframe && iframe.hasAttribute('srcdoc')) {
+        event.preventDefault();
+        const doc = iframe.getAttribute('srcdoc');
+        const blob = new Blob([doc], { type: 'text/html' });
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+        return false;
+      }
+      return true;
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #000000;
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      padding: 40px 0;
+    }
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 24px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      color: #ffffff;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-top: 1.8em;
+      margin-bottom: 0.6em;
+    }
+    h1 {
+      font-size: 2.2em;
+      border-bottom: 1px solid #222222;
+      padding-bottom: 0.3em;
+    }
+    h2 {
+      font-size: 1.6em;
+      border-bottom: 1px solid #1a1a1a;
+      padding-bottom: 0.3em;
+      color: #58a6ff;
+    }
+    h3 {
+      font-size: 1.3em;
+      color: #79c0ff;
+    }
+    h4 {
+      font-size: 1.15em;
+      color: #a5d6ff;
+    }
+    p, li {
+      color: #d1d7e0;
+    }
+    a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background: #222222;
+      margin: 40px 0;
+    }
+    blockquote {
+      border-left: 4px solid #388bfd;
+      background: #0a0a0a;
+      padding: 12px 20px;
+      margin: 20px 0;
+      border-radius: 0 6px 6px 0;
+      color: #8b949e;
+    }
+    code {
+      background-color: #121212;
+      color: #ff7b72;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      background-color: #0a0a0a;
+      border: 1px solid #222222;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+    }
+    pre code {
+      background-color: transparent;
+      color: #e6edf3;
+      padding: 0;
+    }
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 28px 0;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      background-color: #0a0a0a;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .table-wrapper table {
+      width: 100%;
+      min-width: 750px;
+      border-collapse: collapse;
+      margin: 0;
+      border: none;
+    }
+    th, td {
+      padding: 12px 14px;
+      border: 1px solid #21262d;
+      text-align: left;
+    }
+    th {
+      background-color: #161b22;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #0d1117;
+    }
+    .workshop-img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 1px solid #222222;
+      display: block;
+      margin: 12px auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .interactive-box {
+      background: #0a0a0a;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 32px 0;
+      box-shadow: 0 6px 28px rgba(0, 0, 0, 0.7);
+      max-width: 100%;
+      box-sizing: border-box;
+      cursor: default;
+    }
+    .interactive-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 0 4px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .interactive-title {
+      font-weight: 600;
+      color: #58a6ff;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fullscreen-tip {
+      font-size: 11.5px;
+      color: #8b949e;
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 400;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      user-select: none;
+    }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn-action {
+      font-size: 12px;
+      font-weight: 500;
+      color: #c9d1d9;
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 5px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-action:hover {
+      color: #ffffff;
+      border-color: #58a6ff;
+      background: #1f242c;
+      text-decoration: none;
+    }
+    .interactive-box iframe {
+      width: 100%;
+      max-width: 100%;
+      border: 1px solid #222222;
+      border-radius: 8px;
+      background: #ffffff;
+      display: block;
+    }
+    .figure-caption {
+      color: #8b949e;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin: 14px 0 4px 0;
+      text-align: center;
+    }
+
+    /* Browser Native Full Screen Styling */
+    .interactive-box:fullscreen,
+    .interactive-box:-webkit-full-screen {
+      background: #000000;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .interactive-box:fullscreen .interactive-header,
+    .interactive-box:-webkit-full-screen .interactive-header {
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+    .interactive-box:fullscreen iframe,
+    .interactive-box:-webkit-full-screen iframe {
+      flex: 1;
+      width: 100%;
+      height: 100% !important;
+      max-height: none;
+      border-radius: 8px;
+    }
+    .interactive-box:fullscreen img.workshop-img,
+    .interactive-box:-webkit-full-screen img.workshop-img {
+      flex: 1;
+      width: auto;
+      max-width: 100%;
+      max-height: 84vh;
+      object-fit: contain;
+      margin: auto;
+    }
+    .interactive-box:fullscreen .figure-caption,
+    .interactive-box:-webkit-full-screen .figure-caption {
+      font-size: 13px;
+      margin: 8px 0 0 0;
+      color: #8b949e;
+      flex-shrink: 0;
+    }
+
+    mjx-container[jax="CHTML"][display="true"] {
+      margin: 1.2em 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+<h1 id="pixels-projections-and-principal-components">Pixels, Projections and Principal Components</h1>
+<h3 id="linear-algebra-at-work-in-modern-image-processing">Linear Algebra at Work in Modern Image Processing</h3>
+<blockquote>
+<p><strong>Audience:</strong> MSc Big Data Analytics (BDA)<br />
+<strong>Topic:</strong> Linear Algebra at Work in Modern Image Processing</p>
+</blockquote>
+<hr />
+<h1 id="part-1-the-geometry-of-projections">Part 1: The Geometry of Projections</h1>
+<h2 id="11-the-intuition-projections-as-shadows">1.1 The Intuition: Projections as Shadows</h2>
+<p>Before looking at any formulas, imagine a physical setup:</p>
+<p>A flashlight shines directly from above, perpendicular to a line or surface. An object or arrow floating in space casts a <strong>shadow</strong> onto that line or surface.</p>
+<p>The <strong>projection</strong> is simply this shadow vector $\mathbf{p}$.</p>
+<p>To construct any vector in physics or geometry, we only ever need two ingredients:
+1. <strong>Length:</strong> How long is the shadow?
+2. <strong>Direction:</strong> Which way does the shadow point?</p>
+<p>$$\text{Projection Vector} = (\text{Length of Shadow}) \times (\text{Unit Direction})$$</p>
+<hr />
+<h2 id="12-projecting-a-2d-vector-onto-a-1d-line">1.2 Projecting a 2D Vector onto a 1D Line</h2>
+<p>Let $\mathbf{v}$ be a vector we want to project onto the line running along a direction vector $\mathbf{a}$.</p>
+<div class="interactive-box" id="fig_card_1" ondblclick="toggleFullscreen('fig_card_1')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 2D Vector Projection</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_1')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/1_2_fig_vector_projection.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_1', './assets/1_2_fig_vector_projection.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_1" src="./assets/1_2_fig_vector_projection.html" title="2D Vector Projection" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 1.2: Orthogonal projection of vector $\mathbf{v}$ onto direction vector $\mathbf{a}$, showing the perpendicular error line $\mathbf{e}$.</em></p>
+</div>
+
+<h3 id="step-a-finding-the-shadow-length">Step A: Finding the Shadow Length</h3>
+<p>From basic right-triangle trigonometry:</p>
+<p>$$\text{Shadow Length} = \|\mathbf{v}\| \cos(\theta)$$</p>
+<p>Now recall the geometric definition of the <strong>dot product</strong>:</p>
+<p>$$\mathbf{v} \cdot \mathbf{a} = \|\mathbf{v}\| \|\mathbf{a}\| \cos(\theta)$$</p>
+<p>Notice that $\|\mathbf{v}\| \cos(\theta)$ is already sitting inside the dot product. The only extra term is $\|\mathbf{a}\|$. Therefore, dividing by the length of $\mathbf{a}$ isolates the exact shadow length:</p>
+<p>$$\text{Shadow Length} = \frac{\mathbf{v} \cdot \mathbf{a}}{\|\mathbf{a}\|}$$</p>
+<h3 id="step-b-finding-the-direction">Step B: Finding the Direction</h3>
+<p>The shadow lies on the line spanned by $\mathbf{a}$. To capture purely its direction without altering length, we normalize $\mathbf{a}$ into a <strong>unit direction vector $\mathbf{u}$</strong>:</p>
+<p>$$\mathbf{u} = \frac{\mathbf{a}}{\|\mathbf{a}\|}$$</p>
+<h3 id="step-c-multiplying-length-by-direction">Step C: Multiplying Length by Direction</h3>
+<p>Combine the two parts:</p>
+<p>$$\mathbf{p} = \left( \frac{\mathbf{v} \cdot \mathbf{a}}{\|\mathbf{a}\|} \right) \left( \frac{\mathbf{a}}{\|\mathbf{a}\|} \right) = \left( \frac{\mathbf{v} \cdot \mathbf{a}}{\|\mathbf{a}\|^2} \right) \mathbf{a}$$</p>
+<p>In matrix-vector notation (with column vectors, where $\mathbf{v} \cdot \mathbf{a} = \mathbf{a}^T \mathbf{v}$ and $\|\mathbf{a}\|^2 = \mathbf{a}^T \mathbf{a}$):</p>
+<p>$$\mathbf{p} = \left( \frac{\mathbf{a}^T \mathbf{v}}{\mathbf{a}^T \mathbf{a}} \right) \mathbf{a}$$</p>
+<hr />
+<h3 id="step-d-deriving-the-1d-projection-matrix-">Step D: Deriving the 1D Projection Matrix $\mathbf{P}$</h3>
+<p>We want a single matrix $\mathbf{P}$ such that multiplying any vector $\mathbf{v}$ by $\mathbf{P}$ immediately gives its projection:</p>
+<p>$$\mathbf{p} = \mathbf{P} \mathbf{v}$$</p>
+<p>Notice that the scalar term $(\mathbf{a}^T \mathbf{v})$ can be commuted:</p>
+<p>$$\mathbf{p} = \frac{\mathbf{a} (\mathbf{a}^T \mathbf{v})}{\mathbf{a}^T \mathbf{a}} = \left[ \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}} \right] \mathbf{v}$$</p>
+<p>We have successfully factored out $\mathbf{v}$ to the right! The term in the brackets is our <strong>Projection Matrix</strong>:</p>
+<p>$$\mathbf{P} = \frac{\mathbf{a} \mathbf{a}^T}{\mathbf{a}^T \mathbf{a}}$$</p>
+<h4 id="dimension-check">Dimension Check:</h4>
+<ul>
+<li><strong>Numerator ($\mathbf{a} \mathbf{a}^T$):</strong> $(D \times 1) \times (1 \times D) = (D \times D)$ <strong>Matrix</strong> (Outer product).</li>
+<li><strong>Denominator ($\mathbf{a}^T \mathbf{a}$):</strong> $(1 \times D) \times (D \times 1) = (1 \times 1)$ <strong>Scalar</strong> (Inner / Dot product).</li>
+<li><strong>Special Case (Unit Direction $\mathbf{u}$):</strong> If $\mathbf{a}$ is already a unit vector $\mathbf{u}$ (with $\|\mathbf{u}\| = 1 \iff \mathbf{u}^T \mathbf{u} = 1$), the denominator equals $1$, simplifying to:</li>
+</ul>
+<p>$$\mathbf{P} = \mathbf{u} \mathbf{u}^T$$</p>
+<blockquote>
+<p><strong>Crucial Forward Connection for Part 3:</strong><br />
+Remember the formula $\mathbf{P} = \mathbf{u}\mathbf{u}^T$. In Part 3, we will see that the optimal principal component directions are unit eigenvectors $\mathbf{q}_1, \mathbf{q}_2$, and compressing/reconstructing data onto them uses this exact rank-1 projection matrix $\mathbf{P} = \mathbf{q}_1 \mathbf{q}_1^T$!</p>
+</blockquote>
+<hr />
+<h3 id="example-121-projecting-onto-the-diagonal-line">Example 1.2.1: Projecting $\mathbf{v} = [2, 4]^T$ onto the $45^\circ$ Diagonal Line</h3>
+<p>Let the direction line be $\mathbf{a} = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix}$ (the $45^\circ$ diagonal line $y = x$).</p>
+<ol>
+<li><strong>Outer product matrix ($\mathbf{a}\mathbf{a}^T$):</strong></li>
+</ol>
+<p>$$\mathbf{a} \mathbf{a}^T = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 \\\\ 1 & 1 \end{bmatrix}$$</p>
+<ol>
+<li><strong>Squared length ($\mathbf{a}^T\mathbf{a}$):</strong></li>
+</ol>
+<p>$$\mathbf{a}^T \mathbf{a} = 1^2 + 1^2 = 2$$</p>
+<ol>
+<li><strong>Projection Matrix $\mathbf{P}$:</strong></li>
+</ol>
+<p>$$\mathbf{P} = \frac{1}{2} \begin{bmatrix} 1 & 1 \\\\ 1 & 1 \end{bmatrix} = \begin{bmatrix} 0.5 & 0.5 \\\\ 0.5 & 0.5 \end{bmatrix}$$</p>
+<ol>
+<li><strong>Calculate the Shadow Vector $\mathbf{p}$:</strong></li>
+</ol>
+<p>$$\mathbf{p} = \mathbf{P} \mathbf{v} = \begin{bmatrix} 0.5 & 0.5 \\\\ 0.5 & 0.5 \end{bmatrix} \begin{bmatrix} 2 \\\\ 4 \end{bmatrix} = \begin{bmatrix} 0.5(2) + 0.5(4) \\\\ 0.5(2) + 0.5(4) \end{bmatrix} = \begin{bmatrix} 3 \\\\ 3 \end{bmatrix}$$</p>
+<ol>
+<li><strong>Calculate the Error Drop Line $\mathbf{e}$:</strong></li>
+</ol>
+<p>$$\mathbf{e} = \mathbf{v} - \mathbf{p} = \begin{bmatrix} 2 \\\\ 4 \end{bmatrix} - \begin{bmatrix} 3 \\\\ 3 \end{bmatrix} = \begin{bmatrix} -1 \\\\ 1 \end{bmatrix}$$</p>
+<ol>
+<li><strong>Orthogonality Check:</strong></li>
+<li><strong>Dot product check:</strong> $\mathbf{a}^T \mathbf{e} = (1)(-1) + (1)(1) = 0$.</li>
+<li><strong>Slope check:</strong> Line $y = x$ has slope $m_1 = +1$. The drop line $\mathbf{e}$ has slope $m_2 = \frac{1}{-1} = -1$. Because $m_1 \times m_2 = -1$, the drop hits at exactly $90^\circ$!</li>
+</ol>
+<div class="interactive-box" id="fig_card_2" ondblclick="toggleFullscreen('fig_card_2')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Example 1.2.1 Projection</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_2')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/1_2_1_example_diagonal_projection.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_2', './assets/1_2_1_example_diagonal_projection.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_2" src="./assets/1_2_1_example_diagonal_projection.html" title="Example 1.2.1 Projection" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Example 1.2.1: Orthogonal projection of $\mathbf{v} = [2, 4]^T$ onto direction $\mathbf{a} = [1, 1]^T$, yielding shadow $\mathbf{p} = [3, 3]^T$ and error $\mathbf{e} = [-1, 1]^T$.</em></p>
+</div>
+
+<hr />
+<h2 id="13-abstracting-up-what-subspaces-can-we-project-onto">1.3 Abstracting Up: What Subspaces Can We Project Onto?</h2>
+<p>When we projected onto direction vector $\mathbf{a}$, we were really projecting onto the <strong>1-dimensional subspace</strong> (the infinite straight line) spanned by $\mathbf{a}$.</p>
+<p>In any vector space, all valid linear subspaces must pass through the origin $(0, 0, \dots, 0)$.</p>
+<h3 id="the-subspaces-of-2d-space-">The Subspaces of 2D Space ($\mathbb{R}^2$):</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: left;">Geometry</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Projection Matrix $\mathbf{P}$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>0D</strong></td>
+<td style="text-align: left;"><strong>The Origin</strong></td>
+<td style="text-align: left;">The single point $(0, 0)$</td>
+<td style="text-align: left;">$\mathbf{0}_{2 \times 2}$ (Zero Matrix) <em>(total loss of info)</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>1D</strong></td>
+<td style="text-align: left;"><strong>Any Line through Origin</strong></td>
+<td style="text-align: left;">Line spanned by direction $\mathbf{a}$ (unit $\mathbf{u}$)</td>
+<td style="text-align: left;">$\mathbf{P} = \frac{\mathbf{a}\mathbf{a}^T}{\mathbf{a}^T\mathbf{a}} = \mathbf{u}\mathbf{u}^T$ <em>(Rank 1 matrix)</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2D</strong></td>
+<td style="text-align: left;"><strong>The Entire Plane</strong></td>
+<td style="text-align: left;">The whole space $\mathbb{R}^2$</td>
+<td style="text-align: left;">$\mathbf{I}_{2 \times 2}$ (Identity Matrix) <em>(zero loss of info)</em></td>
+</tr>
+</tbody>
+</table></div>
+<p>In 2D, the only non-trivial projection is onto a 1D line. To see how multiple directions work together, we must step up into <strong>3D space</strong>.</p>
+<hr />
+<h2 id="14-projecting-a-3d-vector-onto-a-2d-plane">1.4 Projecting a 3D Vector onto a 2D Plane</h2>
+<p>Imagine a vector $\mathbf{b}$ floating in 3-dimensional space above a flat tabletop (a 2D plane passing through the origin). We want to find its shadow $\mathbf{p}$ on the tabletop.</p>
+<div class="interactive-box" id="fig_card_3" ondblclick="toggleFullscreen('fig_card_3')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 3D Plane Projection</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_3')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/1_4_fig_plane_projection_3d.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_3', './assets/1_4_fig_plane_projection_3d.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_3" src="./assets/1_4_fig_plane_projection_3d.html" title="3D Plane Projection" loading="lazy" style="height: 700px;"></iframe>
+  <p class="figure-caption"><em>Figure 1.4: Orthogonal projection of 3D vector $\mathbf{b}$ onto a 2D plane spanned by $\mathbf{a}_1$ and $\mathbf{a}_2$.</em></p>
+</div>
+
+<h3 id="fact-1-any-vector-on-the-plane-is-a-combination-of-basis-vectors">Fact 1: Any vector on the plane is a combination of basis vectors</h3>
+<p>A 2D plane requires <strong>two linearly independent direction vectors</strong>, $\mathbf{a}_1$ and $\mathbf{a}_2$. We stack them as columns of a matrix $\mathbf{A}$:</p>
+<p>$$\mathbf{A} = \begin{bmatrix} \mathbf{a}_1 & \mathbf{a}_2 \end{bmatrix} \quad (\text{shape: } 3 \times 2)$$</p>
+<p>Because the projection $\mathbf{p}$ lives on the plane, it must be some linear combination of the columns of $\mathbf{A}$:</p>
+<p>$$\mathbf{p} = \hat{w}_1 \mathbf{a}_1 + \hat{w}_2 \mathbf{a}_2 = \mathbf{A} \mathbf{\hat{w}}$$</p>
+<p>where $\mathbf{\hat{w}} = \begin{bmatrix} \hat{w}_1 \\\\ \hat{w}_2 \end{bmatrix}$ is the coordinate weight vector we must determine (representing how much of each basis direction makes up the shadow).</p>
+<hr />
+<h3 id="fact-2-the-drop-line-error-vector-must-hit-at-90-degrees">Fact 2: The drop line (error vector) must hit at 90 degrees</h3>
+<p>The connection line from the tip of $\mathbf{b}$ down to the projection $\mathbf{p}$ is the <strong>error vector</strong> $\mathbf{e}$:</p>
+<p>$$\mathbf{e} = \mathbf{b} - \mathbf{p} = \mathbf{b} - \mathbf{A} \mathbf{\hat{w}}$$</p>
+<p>For $\mathbf{p}$ to be the closest point on the plane to $\mathbf{b}$, the drop line $\mathbf{e}$ must hit perpendicular ($90^\circ$) to the <strong>entire plane</strong>.</p>
+<p>That means $\mathbf{e}$ must be orthogonal to <strong>both</strong> direction vectors spanning the plane:</p>
+<p>$$\mathbf{a}_1 \cdot \mathbf{e} = 0 \implies \mathbf{a}_1^T \mathbf{e} = 0$$</p>
+<p>$$\mathbf{a}_2 \cdot \mathbf{e} = 0 \implies \mathbf{a}_2^T \mathbf{e} = 0$$</p>
+<p>Stack these two equations together:</p>
+<p>$$\begin{bmatrix} \mathbf{a}_1^T \\\\ \mathbf{a}_2^T \end{bmatrix} \mathbf{e} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix}$$</p>
+<p>Notice that the stacked matrix is simply $\mathbf{A}^T$! This yields the <strong>fundamental orthogonality condition</strong>:</p>
+<p>$$\mathbf{A}^T \mathbf{e} = \mathbf{0}$$</p>
+<hr />
+<h3 id="fact-3-solving-for-the-weights-the-normal-equations">Fact 3: Solving for the weights $\mathbf{\hat{w}}$ (The Normal Equations)</h3>
+<p>Substitute $\mathbf{e} = \mathbf{b} - \mathbf{A} \mathbf{\hat{w}}$ into the orthogonality condition:</p>
+<p>$$\mathbf{A}^T (\mathbf{b} - \mathbf{A} \mathbf{\hat{w}}) = \mathbf{0}$$</p>
+<p>$$\mathbf{A}^T \mathbf{b} - \mathbf{A}^T \mathbf{A} \mathbf{\hat{w}} = \mathbf{0}$$</p>
+<p>$$(\mathbf{A}^T \mathbf{A}) \mathbf{\hat{w}} = \mathbf{A}^T \mathbf{b}$$</p>
+<p>Because the columns of $\mathbf{A}$ are linearly independent, the symmetric square matrix $(\mathbf{A}^T \mathbf{A})$ (size $2 \times 2$) is invertible. Multiply both sides by $(\mathbf{A}^T \mathbf{A})^{-1}$:</p>
+<p>$$\mathbf{\hat{w}} = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \mathbf{b}$$</p>
+<hr />
+<h3 id="fact-4-extracting-the-master-projection-matrix-">Fact 4: Extracting the Master Projection Matrix $\mathbf{P}$</h3>
+<p>Recall that the projection vector is $\mathbf{p} = \mathbf{A} \mathbf{\hat{w}}$. Substituting our solution for $\mathbf{\hat{w}}$:</p>
+<p>$$\mathbf{p} = \mathbf{A} \left[ (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \mathbf{b} \right]$$</p>
+<p>Grouping the matrices together:</p>
+<p>$$\mathbf{p} = \left[ \mathbf{A} (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \right] \mathbf{b}$$</p>
+<p>This reveals the <strong>Master Projection Matrix Formula</strong>:</p>
+<p>$$\mathbf{P} = \mathbf{A} (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T$$</p>
+<h4 id="dimension-verification-in-3d">Dimension Verification (in 3D):</h4>
+<p>$$\mathbf{P} = \underbrace{\mathbf{A}}_{3 \times 2} \, \underbrace{(\mathbf{A}^T \mathbf{A})^{-1}}_{2 \times 2} \, \underbrace{\mathbf{A}^T}_{2 \times 3} = (3 \times 3) \text{ Matrix}$$</p>
+<p>Multiplying $(3 \times 3) \mathbf{P}$ by $(3 \times 1) \mathbf{b}$ yields the $(3 \times 1)$ projected vector $\mathbf{p}$.</p>
+<hr />
+<h3 id="special-case-orthonormal-basis-vectors">Special Case: Orthonormal Basis Vectors</h3>
+<p>If the directions spanning the subspace are chosen to be <strong>mutually perpendicular and unit length</strong> ($\mathbf{q}_1, \mathbf{q}_2$, forming matrix $\mathbf{Q}$), then:</p>
+<p>$$\mathbf{Q}^T \mathbf{Q} = \mathbf{I}$$</p>
+<p>The inverse term $(\mathbf{Q}^T \mathbf{Q})^{-1}$ disappears entirely, leaving:</p>
+<p>$$\mathbf{P} = \mathbf{Q} \mathbf{Q}^T = \mathbf{q}_1 \mathbf{q}_1^T + \mathbf{q}_2 \mathbf{q}_2^T$$</p>
+<blockquote>
+<p><strong>Key Takeaway:</strong> Projecting onto an orthonormal subspace is simply the <strong>sum of individual 1D projections</strong> onto each basis vector!</p>
+</blockquote>
+<hr />
+<h2 id="15-master-taxonomy-all-projections-in-2d-3d-vector-spaces">1.5 Master Taxonomy: All Projections in 2D &amp; 3D Vector Spaces</h2>
+<p>Here is the complete taxonomy of all possible linear subspace projections in 2D and 3D:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Vector Space</th>
+<th style="text-align: left;">Subspace Dimension</th>
+<th style="text-align: left;">Geometric Subspace</th>
+<th style="text-align: left;">Basis Matrix $\mathbf{A}$</th>
+<th style="text-align: left;">Projection Matrix $\mathbf{P}$</th>
+<th style="text-align: left;">Rank of $\mathbf{P}$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>2D ($\mathbb{R}^2$)</strong></td>
+<td style="text-align: left;"><strong>0D</strong></td>
+<td style="text-align: left;">Origin $(0, 0)$</td>
+<td style="text-align: left;">None</td>
+<td style="text-align: left;">$\mathbf{0}_{2 \times 2}$</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><strong>1D</strong></td>
+<td style="text-align: left;">Line through origin</td>
+<td style="text-align: left;">Vector $\mathbf{a} \in \mathbb{R}^2$ (or unit $\mathbf{u} \in \mathbb{R}^2$)</td>
+<td style="text-align: left;">$\frac{\mathbf{a}\mathbf{a}^T}{\mathbf{a}^T\mathbf{a}} = \mathbf{u}\mathbf{u}^T$</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><strong>2D</strong></td>
+<td style="text-align: left;">Entire 2D space</td>
+<td style="text-align: left;">$\mathbf{I}_{2 \times 2}$</td>
+<td style="text-align: left;">$\mathbf{I}_{2 \times 2}$</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3D ($\mathbb{R}^3$)</strong></td>
+<td style="text-align: left;"><strong>0D</strong></td>
+<td style="text-align: left;">Origin $(0, 0, 0)$</td>
+<td style="text-align: left;">None</td>
+<td style="text-align: left;">$\mathbf{0}_{3 \times 3}$</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><strong>1D</strong></td>
+<td style="text-align: left;">Line through origin</td>
+<td style="text-align: left;">Vector $\mathbf{a} \in \mathbb{R}^3$ (or unit $\mathbf{u} \in \mathbb{R}^3$)</td>
+<td style="text-align: left;">$\frac{\mathbf{a}\mathbf{a}^T}{\mathbf{a}^T\mathbf{a}} = \mathbf{u}\mathbf{u}^T$</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><strong>2D</strong></td>
+<td style="text-align: left;">Plane through origin</td>
+<td style="text-align: left;">$3 \times 2$ matrix $\mathbf{A} = [\mathbf{a}_1, \mathbf{a}_2]$</td>
+<td style="text-align: left;">$\mathbf{A}(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T$</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"><strong>3D</strong></td>
+<td style="text-align: left;">Entire 3D space</td>
+<td style="text-align: left;">$\mathbf{I}_{3 \times 3}$</td>
+<td style="text-align: left;">$\mathbf{I}_{3 \times 3}$</td>
+<td style="text-align: left;">3</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="16-the-three-universal-properties-of-any-projection-matrix">1.6 The Three Universal Properties of Any Projection Matrix</h2>
+<p>Regardless of whether you project in 2D, 3D, or 100D, every orthogonal projection matrix $\mathbf{P}$ satisfies three immutable laws for any vector $\mathbf{v}$:</p>
+<h3 id="1-symmetry">1. Symmetry</h3>
+<p>$$\mathbf{P}^T = \mathbf{P}$$</p>
+<p><em>(The matrix is equal to its own transpose).</em></p>
+<h3 id="2-idempotency-repeat-projections-do-nothing">2. Idempotency (Repeat Projections Do Nothing)</h3>
+<p>$$\mathbf{P}^2 = \mathbf{P} \mathbf{P} = \mathbf{P}$$</p>
+<p><em>Intuition: Once you drop the shadow onto the floor, shining the light on the shadow a second time leaves it in the exact same spot.</em></p>
+<h3 id="3-the-complement-projector-the-error-vector">3. The Complement Projector (The Error Vector)</h3>
+<p>$$(\mathbf{I} - \mathbf{P})$$</p>
+<p><em>Intuition: If $\mathbf{P}$ projects onto the subspace, then $(\mathbf{I} - \mathbf{P})$ is also a projection matrix that projects onto the </em><em>perpendicular (orthogonal) complement</em><em>.</em></p>
+<p>$$\mathbf{p} = \mathbf{P} \mathbf{v} \quad (\text{the shadow})$$</p>
+<p>$$\mathbf{e} = (\mathbf{I} - \mathbf{P}) \mathbf{v} = \mathbf{v} - \mathbf{P}\mathbf{v} \quad (\text{the perpendicular drop line})$$</p>
+<p>$$\text{Total Vector} = \mathbf{p} + \mathbf{e} = \mathbf{P}\mathbf{v} + (\mathbf{I} - \mathbf{P})\mathbf{v} = \mathbf{v}$$</p>
+<hr />
+<h1 id="part-2-the-geometry-of-eigenvalues-and-eigenvectors">Part 2: The Geometry of Eigenvalues and Eigenvectors</h1>
+<p>In Part 1, we learned how to project vectors onto a subspace once the direction was already given to us. But in real-world data, <strong>who chooses the direction?</strong></p>
+<p>To find the natural axes of our data, we must understand how matrices deform space.</p>
+<hr />
+<h2 id="21-what-is-a-linear-transformation-the-axiomatic-view">2.1 What is a Linear Transformation? (The Axiomatic View)</h2>
+<p>For absolute visual clarity, we focus on <strong>$2 \times 2$ matrices</strong> acting on 2-dimensional space ($\mathbb{R}^2 \to \mathbb{R}^2$).</p>
+<p>A matrix $\mathbf{M}$ is not just a table of numbers—it is a <strong>transformation machine</strong>. You feed it an input vector $\mathbf{v} \in \mathbb{R}^2$, and it outputs a transformed vector $\mathbf{M}\mathbf{v} \in \mathbb{R}^2$.</p>
+<p>To be a <strong>linear transformation</strong>, the operation must satisfy two strict axioms:</p>
+<ol>
+<li><strong>Additivity:</strong></li>
+</ol>
+<p>$$T(\mathbf{u} + \mathbf{v}) = T(\mathbf{u}) + T(\mathbf{v})$$</p>
+<p><em>(Transforming the sum of two vectors is the same as transforming them individually and then adding).</em></p>
+<ol>
+<li><strong>Homogeneity (Scaling):</strong></li>
+</ol>
+<p>$$T(c\mathbf{v}) = cT(\mathbf{v})$$</p>
+<p><em>(Scaling a vector by $c$ scales its output by $c$).</em></p>
+<h3 id="the-axiomatic-consequence-">The Axiomatic Consequence: $T(\mathbf{0}) = \mathbf{0}$</h3>
+<p>From homogeneity, setting scalar $c = 0$:</p>
+<p>$$T(\mathbf{0}) = T(0 \cdot \mathbf{v}) = 0 \cdot T(\mathbf{v}) = \mathbf{0}$$</p>
+<blockquote>
+<p><strong>Key Geometric Rule:</strong> Under any linear transformation, <strong>the origin is permanently anchored</strong>. It can never move, shift, or translate!</p>
+</blockquote>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  For complete visual intuition, we explore $2 \times 2$ matrices transforming points in the 2D plane:</li>
+</ul>
+<p>$$\begin{bmatrix} x' \\\\ y' \end{bmatrix} = \begin{bmatrix} a & b \\\\ c & d \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix}$$</p>
+<p>The 2D origin $(0, 0)$ remains anchored at $(0, 0)$. Grid lines remain straight and parallel.</p>
+<ul>
+<li><strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  Any square matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ defines an operator $T: \mathbb{R}^n \to \mathbb{R}^n$ via matrix-vector multiplication $\mathbf{w} = \mathbf{M}\mathbf{v}$ (transforming input vector $\mathbf{v} \in \mathbb{R}^n$ into output vector $\mathbf{w} \in \mathbb{R}^n$). The $n$-dimensional zero vector is permanently anchored:</li>
+</ul>
+<p>$$T(\mathbf{0}_n) = \mathbf{M}\mathbf{0}_n = \mathbf{0}_n$$</p>
+<p>Lines, planes, and flat hyperplanes in $\mathbb{R}^n$ remain straight and evenly spaced under any linear transformation; space is never bent or curved.</p>
+<hr />
+<h2 id="22-visualizing-transformations-the-4-quadrant-benchmark-grid-in-">2.2 Visualizing Transformations: The 4-Quadrant Benchmark Grid in $\mathbb{R}^2$</h2>
+<p>To observe how different matrices deform space, we establish a <strong>standard benchmark</strong>: a symmetric lattice of 25 points spanning <strong>all 4 quadrants</strong>:</p>
+<p>$$(x, y) \in \{-2, -1, 0, 1, 2\} \times \{-2, -1, 0, 1, 2\}$$</p>
+<p>This forms a neat $2 \times 2$ cluster in each of the 4 quadrants, plus the axes and the origin.</p>
+<h3 id="the-side-by-side-visual-setup">The Side-by-Side Visual Setup:</h3>
+<p>Every transformation figure below is laid out as two matching panels:
+- <strong>Left Panel (Input Space $\mathbb{R}^2$):</strong> Shows the original benchmark grid and 5 specifically tracked test vectors.
+- <strong>Right Panel (Output Space $\mathbb{R}^2$):</strong> Shows the deformed grid and where those exact 5 vectors land after transformation $\mathbf{M}\mathbf{v}$.</p>
+<h3 id="the-5-specifically-tracked-vectors">The 5 Specifically Tracked Vectors:</h3>
+<p>In every chart, we track the exact same 5 vectors using <strong>identical colors</strong> on both the Left and Right panels so you can visually verify which vectors changed direction and which vectors maintained their span:</p>
+<ol>
+<li>🔵 <strong>$\mathbf{e}_1 = [1, 0]^T$ (Medium Blue):</strong> Standard basis vector along the X-axis.</li>
+<li>🔷 <strong>$\mathbf{e}_2 = [0, 1]^T$ (Light Blue):</strong> Standard basis vector along the Y-axis.</li>
+<li>🟦 <strong>$\mathbf{d} = [1, 1]^T$ (Dark Navy Blue):</strong> Diagonal benchmark vector.</li>
+<li>🔴 <strong>Eigenvector 1 (Red):</strong> The first invariant vector (corresponding to $\lambda_1$).</li>
+<li>🟢 <strong>Eigenvector 2 (Green):</strong> The second invariant vector (corresponding to $\lambda_2$).</li>
+</ol>
+<hr />
+<h2 id="23-the-origin-of-eigen-invariant-lines-and-eigenspaces">2.3 The Origin of "Eigen": Invariant Lines and Eigenspaces</h2>
+<p>Consider the simplest transformation: the <strong>diagonal matrix</strong> $\mathbf{D}$:</p>
+<p>$$\mathbf{D} = \text{diag}(3, 2)$$</p>
+<p>Multiplying any point $\begin{bmatrix} x \\\\ y \end{bmatrix}$ by $\mathbf{D}$ scales the horizontal coordinate by $3\times$ and the vertical coordinate by $2\times$:</p>
+<p>$$\mathbf{D} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 3x \\\\ 2y \end{bmatrix}$$</p>
+<div class="interactive-box" id="fig_card_4" ondblclick="toggleFullscreen('fig_card_4')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 2.3 Diagonal Transformation</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_4')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/2_3_fig_diagonal_transform.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_4', './assets/2_3_fig_diagonal_transform.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_4" src="./assets/2_3_fig_diagonal_transform.html" title="Figure 2.3 Diagonal Transformation" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 2.3: Side-by-side transformation by diagonal matrix $\mathbf{D} = \text{diag}(3, 2)$. Left: Input Space. Right: Transformed Output Space. Both panels feature the neutral grey benchmark grid and tick intervals of 1. Notice how $\mathbf{e}_1$ (Medium Blue) and $\mathbf{e}_2$ (Light Blue) maintain their direction along the red and green eigenspaces, while the diagonal vector $\mathbf{d}$ (Dark Navy Blue) tilts.</em></p>
+</div>
+
+<h3 id="tracking-our-5-vectors-under-">Tracking our 5 vectors under $\mathbf{D}$:</h3>
+<ol>
+<li>🔵 $\mathbf{e}_1 = [1, 0]^T$ (Medium Blue) $\to \mathbf{D}\mathbf{e}_1 = [3, 0]^T$: <strong>Direction strictly preserved!</strong> Stretched by $3\times$ along the X-axis (Eigenspace 1 line $y = 0$, $\lambda_1 = 3$).</li>
+<li>🔷 $\mathbf{e}_2 = [0, 1]^T$ (Light Blue) $\to \mathbf{D}\mathbf{e}_2 = [0, 2]^T$: <strong>Direction strictly preserved!</strong> Stretched by $2\times$ along the Y-axis (Eigenspace 2 line $x = 0$, $\lambda_2 = 2$).</li>
+<li>🟦 $\mathbf{d} = [1, 1]^T$ (Dark Navy Blue) $\to \mathbf{D}\mathbf{d} = [3, 2]^T$: <strong>Direction changed!</strong> Slope changed from $1$ to $\frac{2}{3}$.</li>
+</ol>
+<h3 id="the-big-lesson">The Big Lesson:</h3>
+<blockquote>
+<p>An <strong>Eigenvector</strong> is a vector that <strong>retains its directional span (line of action)</strong> under a linear transformation:</p>
+<p>$$\mathbf{M} \mathbf{v} = \lambda \mathbf{v}$$</p>
+<p>When transformed by $\mathbf{M}$, the vector <strong>does not change its direction</strong>—it is purely scaled by the scalar factor $\lambda$ (the <strong>Eigenvalue</strong>).</p>
+</blockquote>
+<ul>
+<li>
+<p><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  An eigenvector defines an invariant 1-dimensional straight line through the origin ($y = mx$). Every point on that line stays on that line, simply scaled by $\lambda$. In our $2 \times 2$ diagonal example, the two eigenspaces are the X-axis ($y = 0$, $\lambda_1 = 3$) and the Y-axis ($x = 0$, $\lambda_2 = 2$).</p>
+</li>
+<li>
+<p><strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  For any operator $\mathbf{M} \in \mathbb{R}^{n \times n}$, an eigenvalue $\lambda$ corresponds to an entire <strong>Eigenspace</strong> $E_\lambda$, defined as the null space of $(\mathbf{M} - \lambda\mathbf{I})$:</p>
+</li>
+</ul>
+<p>$$E_\lambda = \text{null}(\mathbf{M} - \lambda\mathbf{I}) = \{\mathbf{v} \in \mathbb{R}^n : \mathbf{M}\mathbf{v} = \lambda\mathbf{v}\}$$</p>
+<p>This is a linear subspace of dimension $1 \le k \le n$ (the geometric multiplicity). In $\mathbb{R}^3$, an eigenspace can be an invariant line or an invariant plane; in $\mathbb{R}^n$, it is an invariant $k$-dimensional hyperplane. Every vector in $E_\lambda$ scales by the exact same factor $\lambda$.</p>
+<hr />
+<h2 id="24-tilted-eigenvectors-the-non-diagonal-matrix">2.4 Tilted Eigenvectors: The Non-Diagonal Matrix</h2>
+<p>In the diagonal matrix above, the eigenvectors conveniently coincided with the familiar X and Y axes. But what happens in a general <strong>non-diagonal matrix</strong>?</p>
+<p>To explore this, consider the matrix $\mathbf{A}$:</p>
+<p>$$\mathbf{A}$$</p>
+<p>Here, the eigenvalues and eigenvectors are not obvious just by looking at the numbers. We need a general method to discover them.</p>
+<hr />
+<h3 id="step-1-setting-up-the-equation-the-how">Step 1: Setting up the Equation (The "How")</h3>
+<p>By definition, we are searching for a non-zero vector $\mathbf{v}$ and a scalar $\lambda$ such that:</p>
+<p>$$\mathbf{A}\mathbf{v} = \lambda\mathbf{v}$$</p>
+<p>Move everything to the left side:</p>
+<p>$$\mathbf{A}\mathbf{v} - \lambda\mathbf{v} = \mathbf{0}$$</p>
+<p>We want to factor out vector $\mathbf{v}$. However, we cannot directly subtract a scalar number $\lambda$ from a matrix $\mathbf{A}$. To fix this, we insert the Identity matrix $\mathbf{I}$ (since $\lambda\mathbf{v} = \lambda\mathbf{I}\mathbf{v}$):</p>
+<p>$$(\mathbf{A} - \lambda\mathbf{I})\mathbf{v} = \mathbf{0}$$</p>
+<hr />
+<h3 id="step-2-why-must-the-determinant-equal-zero-the-why">Step 2: Why Must the Determinant Equal Zero? (The "Why")</h3>
+<p>Let $\mathbf{B} = (\mathbf{A} - \lambda\mathbf{I})$. Our equation is now:</p>
+<p>$$\mathbf{B}\mathbf{v} = \mathbf{0}$$</p>
+<p>Notice the fundamental dilemma:
+- If $\mathbf{v} = \mathbf{0}$, the equation is trivially true ($\mathbf{B}\mathbf{0} = \mathbf{0}$). But the zero vector has no direction—it tells us nothing about space (the <strong>trivial solution</strong>).
+- We demand a <strong>real, non-zero vector</strong> ($\mathbf{v} \ne \mathbf{0}$) that satisfies the equation.</p>
+<p><strong>What does it mean geometrically when a matrix squashes a non-zero vector down into $(0, 0)$?</strong>
+It means the matrix <strong>collapses space!</strong> It squashes 2-dimensional area down into a 1-dimensional line (or point).</p>
+<ul>
+<li>The <strong>determinant</strong> measures how much a matrix scales area. If 2D space is crushed into a 1D line, its 2D area becomes <strong>zero</strong>!</li>
+<li>If $\det(\mathbf{B}) \ne 0$, the matrix $\mathbf{B}$ would be invertible, which would force $\mathbf{v} = \mathbf{B}^{-1}\mathbf{0} = \mathbf{0}$ (only the useless zero solution would exist).</li>
+<li>Therefore, for a non-zero eigenvector to exist, the matrix <strong>must collapse space</strong>:</li>
+</ul>
+<p>$$\det(\mathbf{A} - \lambda\mathbf{I}) = 0 \quad \text{(The Characteristic Equation)}$$</p>
+<hr />
+<h3 id="step-3-the-characteristic-equation">Step 3: The Characteristic Equation</h3>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  For any general $2 \times 2$ matrix $\mathbf{A}$:</li>
+</ul>
+<p>$$\mathbf{A} = \begin{bmatrix} a & b \\\\ c & d \end{bmatrix}$$</p>
+<p>$$\det\begin{bmatrix} a - \lambda & b \\\\ c & d - \lambda \end{bmatrix} = (a - \lambda)(d - \lambda) - bc = 0$$</p>
+<p>$$\lambda^2 - (a + d)\lambda + (ad - bc) = 0$$</p>
+<p>Notice the two fundamental matrix invariants that appear naturally:
+  1. <strong>The Trace:</strong> $\text{Tr}(\mathbf{A}) = a + d$ (sum of diagonal entries)
+  2. <strong>The Determinant:</strong> $\det(\mathbf{A}) = ad - bc$</p>
+<p>This yields the universal $2 \times 2$ characteristic formula:</p>
+<p>$$\lambda^2 - \text{Tr}(\mathbf{A})\lambda + \det(\mathbf{A}) = 0$$</p>
+<p>where $\lambda_1 + \lambda_2 = \text{Tr}(\mathbf{A})$ and $\lambda_1 \lambda_2 = \det(\mathbf{A})$.</p>
+<ul>
+<li><strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  For any $n \times n$ matrix $\mathbf{A} \in \mathbb{R}^{n \times n}$, expanding $\det(\mathbf{A} - \lambda\mathbf{I}) = 0$ yields an <strong>$n$-th degree characteristic polynomial</strong> in $\lambda$:</li>
+</ul>
+<p>$$p(\lambda) = (-1)^n \lambda^n + (-1)^{n-1}\text{Tr}(\mathbf{A})\lambda^{n-1} + \dots + \det(\mathbf{A}) = 0$$</p>
+<p>By the Fundamental Theorem of Algebra, it has exactly $n$ roots (eigenvalues $\lambda_1, \lambda_2, \dots, \lambda_n$, counted with algebraic multiplicity). The trace and determinant invariant identities generalize universally to $\mathbb{R}^n$:</p>
+<p>$$\sum_{i=1}^n \lambda_i = \text{Tr}(\mathbf{A}) = \sum_{i=1}^n A_{ii}, \qquad \prod_{i=1}^n \lambda_i = \det(\mathbf{A})$$</p>
+<hr />
+<h3 id="step-4-applying-the-machinery-to-our-example">Step 4: Applying the Machinery to Our Example</h3>
+<p>Now we can solve our non-diagonal matrix $\mathbf{A}$:</p>
+<ol>
+<li><strong>Calculate Trace &amp; Determinant:</strong></li>
+<li>$\text{Tr}(\mathbf{A}) = 1 + 4 = 5$</li>
+<li>
+<p>$\det(\mathbf{A}) = (1)(4) - (1)(-2) = 4 + 2 = 6$</p>
+</li>
+<li>
+<p><strong>Characteristic Equation:</strong></p>
+</li>
+</ol>
+<p>$$\lambda^2 - 5\lambda + 6 = 0$$</p>
+<p>$$(\lambda - 3)(\lambda - 2) = 0 \implies \lambda_1 = 3, \quad \lambda_2 = 2$$</p>
+<ol>
+<li>
+<p><strong>Finding the Direction Lines (Eigenvectors):</strong><br />
+   Substitute each $\lambda$ back into $(\mathbf{A} - \lambda\mathbf{I})\mathbf{v} = \mathbf{0}$. Because the matrix collapsed space, the two row equations are redundant multiples of each other—they reduce to a single invariant line:</p>
+</li>
+<li>
+<p><strong>For $\lambda_1 = 3$:</strong></p>
+</li>
+</ol>
+<p>$$\begin{bmatrix} 1 - 3 & 1 \\\\ -2 & 4 - 3 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} -2 & 1 \\\\ -2 & 1 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix}$$</p>
+<p>Both rows state: $-2x + y = 0 \implies y = 2x$.<br />
+Any vector along the line $y = 2x$ is an eigenvector! We choose the simple integer representative:</p>
+<p>$$\mathbf{v}_1 = \begin{bmatrix} 1 \\\\ 2 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_1 = 3)$$</p>
+<ul>
+<li><strong>For $\lambda_2 = 2$:</strong></li>
+</ul>
+<p>$$\begin{bmatrix} 1 - 2 & 1 \\\\ -2 & 4 - 2 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} -1 & 1 \\\\ -2 & 2 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix}$$</p>
+<p>Both rows state: $-x + y = 0 \implies y = x$.<br />
+Any vector along the line $y = x$ is an eigenvector:</p>
+<p>$$\mathbf{v}_2 = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix} \quad (\text{Eigenvalue } \lambda_2 = 2)$$</p>
+<div class="interactive-box" id="fig_card_5" ondblclick="toggleFullscreen('fig_card_5')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 2.4 Non-Diagonal Transformation</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_5')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/2_4_fig_nondiagonal_transform.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_5', './assets/2_4_fig_nondiagonal_transform.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_5" src="./assets/2_4_fig_nondiagonal_transform.html" title="Figure 2.4 Non-Diagonal Transformation" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 2.4: Side-by-side transformation by non-diagonal matrix $\mathbf{A}$. Notice where each of the 5 vectors land. Eigenvectors $\mathbf{v}_1$ (Red) and $\mathbf{v}_2$ (Green) strictly preserve their directional lines, but are NOT perpendicular ($\theta \approx 18.4^\circ$).</em></p>
+</div>
+
+<h3 id="tracking-our-5-vectors-under-">Tracking our 5 vectors under $\mathbf{A}$:</h3>
+<ol>
+<li>🔵 $\mathbf{e}_1 = [1, 0]^T$ (Medium Blue) $\to \mathbf{A}\mathbf{e}_1 = [1, -2]^T$: <strong>Direction changed!</strong></li>
+<li>🔷 $\mathbf{e}_2 = [0, 1]^T$ (Light Blue) $\to \mathbf{A}\mathbf{e}_2 = [1, 4]^T$: <strong>Direction changed!</strong></li>
+<li>🟦 $\mathbf{d} = [1, 1]^T$ (Dark Navy Blue) $\to \mathbf{A}\mathbf{d} = [2, 2]^T$: Lands on line $y = x$ (coincides with $\mathbf{v}_2$).</li>
+<li>🔴 $\mathbf{v}_1 = [1, 2]^T$ (Red) $\to \mathbf{A}\mathbf{v}_1 = [3, 6]^T$: <strong>Direction strictly preserved on line $y = 2x$!</strong> Stretched by $\lambda_1 = 3\times$.</li>
+<li>🟢 $\mathbf{v}_2 = [1, 1]^T$ (Green) $\to \mathbf{A}\mathbf{v}_2 = [2, 2]^T$: <strong>Direction strictly preserved on line $y = x$!</strong> Stretched by $\lambda_2 = 2\times$.</li>
+</ol>
+<h3 id="the-critical-eye-opener">The Critical Eye-Opener:</h3>
+<p>Look at the angle between the two eigenvectors:</p>
+<p>$$\mathbf{v}_1 \cdot \mathbf{v}_2 = (1)(1) + (2)(1) = 3 \ne 0$$</p>
+<p>$$\cos(\theta) = \frac{\mathbf{v}_1 \cdot \mathbf{v}_2}{\|\mathbf{v}_1\| \|\mathbf{v}_2\|} = \frac{3}{\sqrt{5}\sqrt{2}} = \frac{3}{\sqrt{10}} \approx 0.9487 \implies \theta \approx 18.4^\circ$$</p>
+<blockquote>
+<p><strong>Key Insight:</strong> In general non-diagonal matrices, eigenvectors are <strong>tilted</strong> away from the standard axes, but they are <strong>NOT orthogonal ($90^\circ$)</strong>. The transformation shears space along non-perpendicular directions.</p>
+</blockquote>
+<hr />
+<h2 id="25-the-power-of-symmetry-strictly-orthogonal-eigenvectors">2.5 The Power of Symmetry: Strictly Orthogonal Eigenvectors</h2>
+<p>Now consider a <strong>symmetric matrix</strong> $\mathbf{S}$ (where $\mathbf{S}^T = \mathbf{S}$):</p>
+<p>$$\mathbf{S}$$</p>
+<blockquote>
+<p><strong>Pedagogical Notation Note:</strong><br />
+In Section 2.4, we denoted the eigenvectors of general matrices by $\mathbf{v}_1, \mathbf{v}_2$. For symmetric matrices, we transition to the symbol $\mathbf{q}_1, \mathbf{q}_2$—the universal mathematical convention reserving the letter $\mathbf{q}$ for strictly <strong>orthogonal/orthonormal</strong> vectors (as in the orthogonal matrix $\mathbf{Q}$).</p>
+</blockquote>
+<h3 id="step-1-characteristic-equation-using-trace-determinant">Step 1: Characteristic Equation (Using Trace &amp; Determinant)</h3>
+<p>For $\mathbf{S}$:
+- $\text{Tr}(\mathbf{S}) = 3 + 3 = 6$
+- $\det(\mathbf{S}) = (3)(3) - (1)(1) = 8$</p>
+<p>Using our formula $\lambda^2 - \text{Tr}(\mathbf{S})\lambda + \det(\mathbf{S}) = 0$:</p>
+<p>$$\lambda^2 - 6\lambda + 8 = 0 \implies (\lambda - 4)(\lambda - 2) = 0 \implies \lambda_1 = 4, \quad \lambda_2 = 2$$</p>
+<h3 id="step-2-finding-the-eigenvectors">Step 2: Finding the Eigenvectors</h3>
+<ul>
+<li><strong>For $\lambda_1 = 4$:</strong></li>
+</ul>
+<p>$$(\mathbf{S} - 4\mathbf{I})\mathbf{q}_1 = \begin{bmatrix} -1 & 1 \\\\ 1 & -1 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix} \implies y = x \implies \mathbf{q}_1 = \begin{bmatrix} 1 \\\\ 1 \end{bmatrix}$$</p>
+<ul>
+<li><strong>For $\lambda_2 = 2$:</strong></li>
+</ul>
+<p>$$(\mathbf{S} - 2\mathbf{I})\mathbf{q}_2 = \begin{bmatrix} 1 & 1 \\\\ 1 & 1 \end{bmatrix} \begin{bmatrix} x \\\\ y \end{bmatrix} = \begin{bmatrix} 0 \\\\ 0 \end{bmatrix} \implies y = -x \implies \mathbf{q}_2 = \begin{bmatrix} -1 \\\\ 1 \end{bmatrix}$$</p>
+<div class="interactive-box" id="fig_card_6" ondblclick="toggleFullscreen('fig_card_6')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 2.5 Symmetric Transformation</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_6')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/2_5_fig_symmetric_transform.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_6', './assets/2_5_fig_symmetric_transform.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_6" src="./assets/2_5_fig_symmetric_transform.html" title="Figure 2.5 Symmetric Transformation" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 2.5: Side-by-side transformation by symmetric matrix $\mathbf{S}$. Notice the $90^\circ$ right-angle marker in both panels: Eigenvectors $\mathbf{q}_1$ (Red) and $\mathbf{q}_2$ (Green) are STRICTLY PERPENDICULAR ($\mathbf{q}_1 \cdot \mathbf{q}_2 = 0$).</em></p>
+</div>
+
+<h3 id="tracking-our-5-vectors-under-">Tracking our 5 vectors under $\mathbf{S}$:</h3>
+<ol>
+<li>🔵 $\mathbf{e}_1 = [1, 0]^T$ (Medium Blue) $\to \mathbf{S}\mathbf{e}_1 = [3, 1]^T$: <strong>Direction changed!</strong></li>
+<li>🔷 $\mathbf{e}_2 = [0, 1]^T$ (Light Blue) $\to \mathbf{S}\mathbf{e}_2 = [1, 3]^T$: <strong>Direction changed!</strong></li>
+<li>🟦 $\mathbf{d} = [1, 1]^T$ (Dark Navy Blue) $\to \mathbf{S}\mathbf{d} = [4, 4]^T$: Diagonal benchmark vector (coincides with $\mathbf{q}_1$).</li>
+<li>🔴 $\mathbf{q}_1 = [1, 1]^T$ (Red) $\to \mathbf{S}\mathbf{q}_1 = [4, 4]^T$: <strong>Direction strictly preserved on line $y = x$!</strong> Stretched by $\lambda_1 = 4\times$.</li>
+<li>🟢 $\mathbf{q}_2 = [-1, 1]^T$ (Green) $\to \mathbf{S}\mathbf{q}_2 = [-2, 2]^T$: <strong>Direction strictly preserved on line $y = -x$!</strong> Stretched by $\lambda_2 = 2\times$.</li>
+</ol>
+<h3 id="the-miracle-of-symmetry">The Miracle of Symmetry:</h3>
+<p>Look at the dot product between the eigenvectors:</p>
+<p>$$\mathbf{q}_1 \cdot \mathbf{q}_2 = (1)(-1) + (1)(1) = 0$$</p>
+<p>The angle between them is <strong>exactly $90^\circ$</strong> on both the input and output sides!</p>
+<blockquote>
+<p><strong>The Fundamental Discovery:</strong><br />
+While non-diagonal matrices have skewed eigenvectors, a <strong>symmetric matrix always stretches space along mutually perpendicular ($90^\circ$) axes</strong>. It produces a rigid, rotated orthogonal coordinate frame.</p>
+</blockquote>
+<hr />
+<h2 id="26-special-properties-of-symmetric-matrices">2.6 Special Properties of Symmetric Matrices</h2>
+<p>Symmetric matrices ($\mathbf{S}^T = \mathbf{S}$) possess fundamental mathematical properties that set them apart from all other square matrices:</p>
+<h3 id="1-all-eigenvalues-are-real-numbers">1. All Eigenvalues are Real Numbers</h3>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  For any $2 \times 2$ symmetric matrix $\mathbf{S}$ with entries $a, b, c$:</li>
+</ul>
+<p>$$\mathbf{S} = \begin{bmatrix} a & b \\\\ b & c \end{bmatrix}$$</p>
+<p>The characteristic equation is $\lambda^2 - (a + c)\lambda + (ac - b^2) = 0$. Its discriminant is:</p>
+<p>$$\Delta = (a + c)^2 - 4(ac - b^2) = (a - c)^2 + 4b^2 \ge 0$$</p>
+<p>Because $\Delta$ is the sum of two squares, it is never negative. A $2 \times 2$ symmetric matrix can never yield complex or imaginary eigenvalues.
+- <strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  For any real symmetric matrix $\mathbf{S} \in \mathbb{R}^{n \times n}$, every eigenvalue is guaranteed to be a real number:</p>
+<p>$$\lambda_i \in \mathbb{R} \quad \forall i \in \{1, 2, \dots, n\}$$</p>
+<hr />
+<h3 id="2-eigenvectors-are-strictly-orthogonal">2. Eigenvectors are Strictly Orthogonal</h3>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  The two eigenvectors $\mathbf{q}_1$ and $\mathbf{q}_2$ are strictly perpendicular at $90^\circ$:</li>
+</ul>
+<p>$$\mathbf{q}_1 \cdot \mathbf{q}_2 = 0 \quad (\mathbf{q}_1 \perp \mathbf{q}_2)$$</p>
+<p>As demonstrated in Figure 2.5, the symmetric matrix stretches space along this rigid $90^\circ$ coordinate frame.
+- <strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  By the <strong>Spectral Theorem</strong>, eigenvectors corresponding to distinct eigenvalues of any symmetric matrix are always mutually orthogonal. Furthermore, even if eigenvalues repeat, one can always construct a complete orthonormal basis $\{\mathbf{q}_1, \mathbf{q}_2, \dots, \mathbf{q}_n\}$ spanning $\mathbb{R}^n$:</p>
+<p>$$\mathbf{q}_i \cdot \mathbf{q}_j = \delta_{ij} = \begin{cases} 1 & \text{if } i = j \\\\ 0 & \text{if } i \ne j \end{cases}$$</p>
+<blockquote>
+<p><strong>Side Note on Repeated Eigenvalues &amp; Multiplicity:</strong><br />
+What happens if an eigenvalue repeats (e.g., $(\lambda - 3)^2 = 0$)?
+- <strong>Algebraic Multiplicity (AM):</strong> How many times a root $\lambda$ repeats in the characteristic polynomial.
+- <strong>Geometric Multiplicity (GM):</strong> The dimension of the eigenspace $\dim(\text{null}(\mathbf{S} - \lambda\mathbf{I}))$.
+- While general non-symmetric matrices can be "defective" ($\text{GM} < \text{AM}$, lacking enough independent eigenvectors), <strong>symmetric matrices always satisfy $\mathbf{GM = AM}$</strong>.
+- If an eigenvalue repeats $k$ times ($\text{AM} = k$), its eigenspace is guaranteed to be a full <strong>$k$-dimensional subspace</strong> where every single vector scales by $\lambda$. Within that $k$-dimensional subspace, one can always pick $k$ mutually perpendicular unit vectors (e.g., via Gram-Schmidt) to construct a full orthonormal basis spanning $\mathbb{R}^n$.</p>
+</blockquote>
+<hr />
+<h3 id="3-rank-of-a-symmetric-matrix">3. Rank of a Symmetric Matrix</h3>
+<p>Is the rank of a symmetric matrix guaranteed to equal its dimension? <strong>No.</strong></p>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  For a $2 \times 2$ symmetric matrix:</li>
+<li><strong>Rank 2 (Full Rank):</strong> Both $\lambda_1 \ne 0$ and $\lambda_2 \ne 0$ (e.g., our benchmark matrix $\mathbf{S}$ with $\lambda_1 = 4, \lambda_2 = 2$). The matrix is invertible and spans all of $\mathbb{R}^2$.</li>
+<li><strong>Rank 1:</strong> Exactly one eigenvalue is 0 (e.g., a line projector with $\lambda_1 = 2, \lambda_2 = 0$). Space collapses completely from 2D onto a 1D line.</li>
+<li><strong>Rank 0:</strong> Both eigenvalues are 0 (only the zero matrix $\mathbf{S} = \mathbf{0}$).</li>
+<li><strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  The rank of any symmetric matrix $\mathbf{S}$ is <strong>strictly equal to the number of non-zero eigenvalues</strong>:</li>
+</ul>
+<p>$$\text{rank}(\mathbf{S}) = r = \text{Count of } \{\lambda_i \ne 0\} \le n$$</p>
+<p>An $n \times n$ symmetric matrix is full rank ($r = n$) if and only if zero is not an eigenvalue.</p>
+<hr />
+<h3 id="4-spectral-decomposition-sum-of-rank-1-projections">4. Spectral Decomposition (Sum of Rank-1 Projections)</h3>
+<p>Because the eigenvectors form an orthonormal basis ($\mathbf{Q}^T \mathbf{Q} = \mathbf{I}$), any symmetric matrix $\mathbf{S}$ can be factored as $\mathbf{S} = \mathbf{Q} \mathbf{\Lambda} \mathbf{Q}^T$:</p>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong>  </li>
+</ul>
+<p>$$\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T) + \lambda_2 (\mathbf{q}_2 \mathbf{q}_2^T)$$</p>
+<p>Each outer product $(\mathbf{q}_i \mathbf{q}_i^T)$ is an $n \times n$ matrix of <strong>rank 1</strong>—the exact 1D orthogonal projection matrix onto line $\text{span}(\mathbf{q}_i)$ from Section 1.2!
+  - If $\mathbf{S}$ is <strong>Full Rank</strong> ($\text{rank} = 2$), $\mathbf{S}$ is a weighted sum of <strong>two active rank-1 projection matrices</strong>.
+  - If $\mathbf{S}$ is <strong>Rank 1</strong> ($\lambda_2 = 0$), the second term vanishes, leaving $\mathbf{S} = \lambda_1 (\mathbf{q}_1 \mathbf{q}_1^T)$ as a single active rank-1 projection matrix.</p>
+<ul>
+<li><strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  For any symmetric $\mathbf{S} \in \mathbb{R}^{n \times n}$ with rank $r \le n$:</li>
+</ul>
+<p>$$\mathbf{S} = \sum_{i=1}^n \lambda_i (\mathbf{q}_i \mathbf{q}_i^T) = \sum_{i=1}^r \lambda_i (\mathbf{q}_i \mathbf{q}_i^T)$$</p>
+<p>where each $\mathbf{P}_i = \mathbf{q}_i \mathbf{q}_i^T$ is a <strong>rank-1</strong> orthogonal projector, satisfying $\mathbf{P}_i^2 = \mathbf{P}_i$ and $\mathbf{P}_i \mathbf{P}_j = \mathbf{0}$ for $i \ne j$.</p>
+<blockquote>
+<p><strong>Key Geometric Takeaway:</strong><br />
+Any symmetric matrix is nothing more than a <strong>weighted linear combination of $r$ orthogonal rank-1 projection matrices</strong>, where the weights are its non-zero eigenvalues!</p>
+</blockquote>
+<hr />
+<h3 id="5-always-orthogonally-diagonalizable">5. Always Orthogonally Diagonalizable</h3>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  $\mathbf{S} = \mathbf{Q}\mathbf{\Lambda}\mathbf{Q}^T$, where $\mathbf{Q}$ is a $2 \times 2$ rotation/reflection matrix.</li>
+<li><strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  Every symmetric matrix in $\mathbb{R}^{n \times n}$ is orthogonally diagonalizable ($\mathbf{Q}^T \mathbf{S} \mathbf{Q} = \mathbf{\Lambda}$). Unlike general matrices (which may lack enough eigenvectors or produce skewed, sheared axes), a symmetric matrix <strong>never shears space</strong>—it purely rotates the coordinate frame to line up with its eigenvectors and scales each perpendicular axis by $\lambda_i$.</li>
+</ul>
+<hr />
+<h3 id="6-positive-semi-definite-psd-positive-definite-pd-symmetric-matrices">6. Positive Semi-Definite (PSD) &amp; Positive Definite (PD) Symmetric Matrices</h3>
+<p>What happens when a symmetric matrix acts on space? Can it flip vectors backwards into the opposite direction?</p>
+<p>To measure whether a transformation preserves or reverses orientation, we evaluate the <strong>quadratic form</strong> $\mathbf{v}^T \mathbf{S} \mathbf{v}$ for an arbitrary non-zero vector $\mathbf{v}$:</p>
+<p>$$\mathbf{v}^T \mathbf{S} \mathbf{v} = \mathbf{v} \cdot (\mathbf{S}\mathbf{v}) = \|\mathbf{v}\| \|\mathbf{S}\mathbf{v}\| \cos(\theta)$$</p>
+<p>where $\theta$ is the angle between the original vector $\mathbf{v}$ and the transformed vector $\mathbf{S}\mathbf{v}$.</p>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  Take our symmetric matrix $\mathbf{S}$ from Figure 2.5 and an arbitrary vector $\mathbf{v} = \begin{bmatrix} v_1 \\\\ v_2 \end{bmatrix}$:</li>
+</ul>
+<p>$$\mathbf{v}^T \mathbf{S} \mathbf{v} = \begin{bmatrix} v_1 & v_2 \end{bmatrix} \begin{bmatrix} 3 & 1 \\\\ 1 & 3 \end{bmatrix} \begin{bmatrix} v_1 \\\\ v_2 \end{bmatrix} = 3v_1^2 + 2v_1 v_2 + 3v_2^2$$</p>
+<p>Notice how this quadratic expression rewrites:</p>
+<p>$$3v_1^2 + 2v_1 v_2 + 3v_2^2 = 2(v_1^2 + v_2^2) + (v_1 + v_2)^2$$</p>
+<p>Because $v_1^2 + v_2^2 > 0$ for any non-zero vector and $(v_1 + v_2)^2 \ge 0$, <strong>this value is strictly positive for every possible vector</strong>!
+  - <strong>Geometric Meaning:</strong> $\mathbf{v} \cdot (\mathbf{S}\mathbf{v}) > 0 \implies \cos(\theta) > 0 \implies \theta < 90^\circ$.<br />
+The matrix $\mathbf{S}$ <strong>never flips any vector backwards</strong>! Every vector is rotated by less than $90^\circ$.
+  - <strong>Connection to Eigenvalues:</strong><br />
+If we test the quadratic form on an eigenvector $\mathbf{q}_i$:</p>
+<p>$$\mathbf{q}_i^T \mathbf{S} \mathbf{q}_i = \mathbf{q}_i^T (\lambda_i \mathbf{q}_i) = \lambda_i \|\mathbf{q}_i\|^2 = \lambda_i$$</p>
+<p>Because $\mathbf{v}^T \mathbf{S} \mathbf{v} > 0$ for all non-zero vectors, <strong>all eigenvalues must be strictly positive</strong>: $\lambda_1 = 4 > 0, \lambda_2 = 2 > 0$.</p>
+<ul>
+<li><strong>Generic ($\mathbb{R}^n \to \mathbb{R}^n, n \times n$):</strong><br />
+  For any real symmetric matrix $\mathbf{S} \in \mathbb{R}^{n \times n}$:</li>
+<li><strong>Positive Definite (PD):</strong><br />
+$\mathbf{v}^T \mathbf{S} \mathbf{v} > 0$ for all $\mathbf{v} \ne \mathbf{0} \iff$ <strong>All eigenvalues are strictly positive ($\lambda_i > 0$)</strong>.<br />
+Space stretches outward along all axes; the matrix is full rank and invertible.</li>
+<li><strong>Positive Semi-Definite (PSD):</strong><br />
+$\mathbf{v}^T \mathbf{S} \mathbf{v} \ge 0$ for all $\mathbf{v} \iff$ <strong>All eigenvalues are non-negative ($\lambda_i \ge 0$)</strong>.<br />
+Space may collapse flat along axes where $\lambda_i = 0$, but it never inverts or reflects backwards.</li>
+<li><strong>Indefinite:</strong><br />
+Has both positive and negative eigenvalues ($\lambda_1 > 0, \lambda_2 < 0$). Space stretches along some axes and flips backwards along others (forming a saddle shape).</li>
+</ul>
+<blockquote>
+<p><strong>Crucial Preview for Part 3:</strong><br />
+In Part 3, we will see that the Covariance Matrix $\mathbf{\Sigma} = \frac{1}{N-1}\mathbf{X}_c^T \mathbf{X}_c$ is <strong>guaranteed to be Positive Semi-Definite</strong>. Why? Because $\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}$ represents the <strong>variance</strong> of data along direction $\mathbf{u}$, and physical variance (a sum of squared deviations) can never be negative!</p>
+</blockquote>
+<hr />
+<h1 id="part-3-from-data-cloud-to-principal-components-the-geometry-of-pca">Part 3: From Data Cloud to Principal Components (The Geometry of PCA)</h1>
+<p>In Part 1, we answered:</p>
+<blockquote>
+<p><em>"If someone hands you a direction $\mathbf{u}$, how do you project data onto it?"</em><br />
+Answer: Use the orthogonal projection matrix $\mathbf{P} = \mathbf{u}\mathbf{u}^T$.</p>
+</blockquote>
+<p>In Part 2, we answered:</p>
+<blockquote>
+<p><em>"What mathematical machines possess rigid, mutually perpendicular axes of variation?"</em><br />
+Answer: <strong>Symmetric matrices</strong>, whose eigenvectors are strictly orthogonal ($90^\circ$).</p>
+</blockquote>
+<p>Now, in Part 3, we unite these two pillars to answer the central question of modern Data Science:</p>
+<blockquote>
+<p><strong>"In a cloud of real-world data, who chooses the best direction $\mathbf{u}$? How do we discover the natural spine of the data?"</strong></p>
+</blockquote>
+<hr />
+<h2 id="31-the-real-world-data-cloud-centering-height-vs-weight">3.1 The Real-World Data Cloud &amp; Centering (Height vs. Weight)</h2>
+<p>In real-world data science, observations rarely come as isolated mathematical vectors—they come as collections of measurements on individuals.</p>
+<p>Consider a dataset of $N = 40$ individuals measured on $D = 2$ physical attributes (Height and Weight).</p>
+<p>In linear algebra, our raw data matrix $\mathbf{X}_{40 \times 2}$ is a $40 \times 2$ matrix that unites two clean geometric viewpoints:
+- <strong>Every row is an individual observation vector in $\mathbb{R}^2$:</strong>  </p>
+<p>$$\mathbf{r}_{i, 2 \times 1} = \begin{bmatrix} x_{i1} \\\\ x_{i2} \end{bmatrix}_{2 \times 1} \in \mathbb{R}^2 \quad (\text{represented as row } \mathbf{r}_{i, 1 \times 2}^T \text{ in } \mathbf{X}_{40 \times 2})$$</p>
+<ul>
+<li><strong>Every column is a feature vector across all 40 individuals in $\mathbb{R}^{40}$:</strong>  </li>
+</ul>
+<p>$$\mathbf{x}_{1, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Height column}), \qquad \mathbf{x}_{2, 40 \times 1} \in \mathbb{R}^{40} \quad (\text{Weight column})$$</p>
+<p>$$\mathbf{X}_{40 \times 2} = \underbrace{\begin{bmatrix} (\mathbf{x}_1)_{40 \times 1} & (\mathbf{x}_2)_{40 \times 1} \end{bmatrix}}_{2 \text{ column vectors in } \mathbb{R}^{40}} = \underbrace{\begin{bmatrix} (\mathbf{r}_1^T)_{1 \times 2} \\\\ (\mathbf{r}_2^T)_{1 \times 2} \\\\ \vdots \\\\ (\mathbf{r}_{40}^T)_{1 \times 2} \end{bmatrix}}_{40 \text{ row vectors from } \mathbb{R}^2}$$</p>
+<p>To keep calculations completely transparent and verifiable by hand with pencil and paper, we focus our step-by-step arithmetic on <strong>5 clean benchmark individuals (Persons A through E)</strong>, accompanied by 35 peer observations that form the realistic data cloud (all sharing the exact same center of mass $\mathbf{\mu}_{2 \times 1} = [4, 3]^T$):</p>
+<p>$$\mathbf{X}_{\text{bench}, 5 \times 2} = \begin{bmatrix} (\mathbf{r}_A^T)_{1 \times 2} \\\\ (\mathbf{r}_B^T)_{1 \times 2} \\\\ (\mathbf{r}_C^T)_{1 \times 2} \\\\ (\mathbf{r}_D^T)_{1 \times 2} \\\\ (\mathbf{r}_E^T)_{1 \times 2} \end{bmatrix}_{5 \times 2} = \begin{bmatrix} 6 & 4 \\\\ 2 & 2 \\\\ 5 & 5 \\\\ 3 & 1 \\\\ 4 & 3 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A} \\\\ \leftarrow \text{Person B} \\\\ \leftarrow \text{Person C} \\\\ \leftarrow \text{Person D} \\\\ \leftarrow \text{Person E} \end{matrix}$$</p>
+<h3 id="calculating-the-center-of-mass-mean-vector-">Calculating the Center of Mass (Mean Vector $\mathbf{\mu}$)</h3>
+<p>Before analyzing how features vary, we compute the sample average for each feature column:</p>
+<p>$$\bar{x}_1 = \frac{1}{N} \sum_{i=1}^N x_{i1} = 4.0, \qquad \bar{x}_2 = \frac{1}{N} \sum_{i=1}^N x_{i2} = 3.0$$</p>
+<p>As demonstrated by our 5 benchmark individuals:</p>
+<p>$$\bar{x}_1 = \frac{6 + 2 + 5 + 3 + 4}{5} = \frac{20}{5} = 4.0, \qquad \bar{x}_2 = \frac{4 + 2 + 5 + 1 + 3}{5} = \frac{15}{5} = 3.0$$</p>
+<p>The <strong>Center of Mass</strong> (mean vector $\mathbf{\mu}_{2 \times 1} \in \mathbb{R}^2$) is:</p>
+<p>$$\mathbf{\mu}_{2 \times 1} = \begin{bmatrix} \bar{x}_1 \\\\ \bar{x}_2 \end{bmatrix}_{2 \times 1} = \begin{bmatrix} 4.0 \\\\ 3.0 \end{bmatrix}_{2 \times 1}$$</p>
+<p>Notice that the raw data cloud is offset into Quadrant 1, centered around the point $(4, 3)$.</p>
+<hr />
+<h3 id="why-centering-is-mandatory-">Why Centering is Mandatory ($(\mathbf{X}_c)_{40 \times 2} = \mathbf{X}_{40 \times 2} - \mathbf{1}_{40 \times 1} \mathbf{\mu}_{1 \times 2}^T$)</h3>
+<p>To analyze pure variation, we subtract the mean vector $\mathbf{\mu}_{2 \times 1}$ from every individual observation vector:</p>
+<p>$$\tilde{\mathbf{r}}_{i, 2 \times 1} = \mathbf{r}_{i, 2 \times 1} - \mathbf{\mu}_{2 \times 1} = \begin{bmatrix} x_{i1} - \bar{x}_1 \\\\ x_{i2} - \bar{x}_2 \end{bmatrix}_{2 \times 1} \in \mathbb{R}^2$$</p>
+<p>This centers every individual observation vector in $\mathbb{R}^2$, producing the centered $40 \times 2$ data matrix $(\mathbf{X}_c)_{40 \times 2}$ where every column is a centered feature vector $\tilde{\mathbf{x}}_{1, 40 \times 1}, \tilde{\mathbf{x}}_{2, 40 \times 1} \in \mathbb{R}^{40}$:</p>
+<p>$$(\mathbf{X}_c)_{40 \times 2} = \begin{bmatrix} (\tilde{\mathbf{x}}_1)_{40 \times 1} & (\tilde{\mathbf{x}}_2)_{40 \times 1} \end{bmatrix}_{40 \times 2} = \begin{bmatrix} (\tilde{\mathbf{r}}_1^T)_{1 \times 2} \\\\ (\tilde{\mathbf{r}}_2^T)_{1 \times 2} \\\\ \vdots \\\\ (\tilde{\mathbf{r}}_{40}^T)_{1 \times 2} \end{bmatrix}_{40 \times 2}$$</p>
+<p>For our 5 benchmark individuals:</p>
+<p>$$\mathbf{X}_{c,\text{bench}, 5 \times 2} = \begin{bmatrix} 6 - 4 & 4 - 3 \\\\ 2 - 4 & 2 - 3 \\\\ 5 - 4 & 5 - 3 \\\\ 3 - 4 & 1 - 3 \\\\ 4 - 4 & 3 - 3 \end{bmatrix}_{5 \times 2} = \begin{bmatrix} +2 & +1 \\\\ -2 & -1 \\\\ +1 & +2 \\\\ -1 & -2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A: } \tilde{\mathbf{r}}_{A, 2 \times 1} = [+2, +1]^T \\\\ \leftarrow \text{Person B: } \tilde{\mathbf{r}}_{B, 2 \times 1} = [-2, -1]^T \\\\ \leftarrow \text{Person C: } \tilde{\mathbf{r}}_{C, 2 \times 1} = [+1, +2]^T \\\\ \leftarrow \text{Person D: } \tilde{\mathbf{r}}_{D, 2 \times 1} = [-1, -2]^T \\\\ \leftarrow \text{Person E: } \tilde{\mathbf{r}}_{E, 2 \times 1} = [0, 0]^T \end{matrix}$$</p>
+<ul>
+<li><strong>Specific ($\mathbb{R}^2 \to \mathbb{R}^2, 2 \times 2$):</strong><br />
+  Every centered coordinate now tells a direct physical story relative to the average:</li>
+<li>$\tilde{r}_{i1} = +2 \implies$ "2 units taller than average."</li>
+<li>$\tilde{r}_{i1} = -2 \implies$ "2 units shorter than average."</li>
+<li>$\tilde{r}_{i2} = +1 \implies$ "1 unit heavier than average."</li>
+<li>
+<p>$\tilde{r}_{i2} = -1 \implies$ "1 unit lighter than average."</p>
+</li>
+<li>
+<p><strong>Generic ($\mathbb{R}^D \to \mathbb{R}^D, D \times D$):</strong><br />
+  Centering anchors the data cloud's center of mass at the origin:</p>
+</li>
+</ul>
+<p>$$\mathbf{0}_{D \times 1} = [0, 0, \dots, 0]^T \in \mathbb{R}^D$$</p>
+<p>Centering does <strong>not</strong> alter the shape of the data, the distances between points, or the variances. However, it is mathematically essential because linear transformations require $T(\mathbf{0}) = \mathbf{0}$ (from Section 2.1). Anchoring the mean at the origin ensures that linear matrix operations act purely on data spread without being distorted by arbitrary coordinate offsets.</p>
+<div class="interactive-box" id="fig_card_7" ondblclick="toggleFullscreen('fig_card_7')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.1 Data Centering</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_7')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_1_fig_centering.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_7', './assets/3_1_fig_centering.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_7" src="./assets/3_1_fig_centering.html" title="Figure 3.1 Data Centering" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.1: The Geometry of Centering. Left: Raw data cloud offset by mean vector $\mathbf{\mu}_{2 \times 1} = [4, 3]^T$. Right: Centered data space $\mathbb{R}^2$ with center of mass anchored at $(0, 0)$.</em></p>
+</div>
+
+<hr />
+<h2 id="32-where-covariance-is-born-the-4-quadrant-deviation-story">3.2 Where Covariance is Born: The 4-Quadrant Deviation Story</h2>
+<p>Now we ask the fundamental data science question: <strong>How do Height ($\mathbf{x}_{1, 40 \times 1}$) and Weight ($\mathbf{x}_{2, 40 \times 1}$) vary together?</strong></p>
+<p>Before looking at matrices, let's understand how statistics packages individual and joint variation using vector dot products:
+1. <strong>Individual Spread (Sample Variance):</strong><br />
+   The variance of Feature 1 ($\mathbf{x}_{1, 40 \times 1}$) is the average squared deviation across all $N$ individuals:</p>
+<p>$$s_1^2 = \text{Var}(\mathbf{x}_1) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{1, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$</p>
+<p>The variance of Feature 2 ($\mathbf{x}_{2, 40 \times 1}$) is:</p>
+<p>$$s_2^2 = \text{Var}(\mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i2}^2 = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{2, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$</p>
+<ol>
+<li><strong>Joint Spread (Sample Covariance):</strong><br />
+   The degree to which deviations in Feature 1 correspond to deviations in Feature 2 is the <strong>sample covariance</strong>, denoted by $s_{12}$:</li>
+</ol>
+<p>$$s_{12} = \text{Cov}(\mathbf{x}_1, \mathbf{x}_2) = \frac{1}{N - 1} \sum_{i=1}^N \tilde{r}_{i1} \tilde{r}_{i2} = \frac{1}{N - 1} \underbrace{\tilde{\mathbf{x}}_{1, 1 \times 40}^T}_{1 \times 40} \underbrace{\tilde{\mathbf{x}}_{2, 40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar}$$</p>
+<h3 id="packaging-the-spread-the-covariance-matrix-">Packaging the Spread: The Covariance Matrix $\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N-1}(\mathbf{X}_c^T)_{2 \times 40} (\mathbf{X}_c)_{40 \times 2}$</h3>
+<p>To analyze all features together in a single operation, we evaluate the matrix product:</p>
+<p>$$\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N - 1} \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} \, \underbrace{\mathbf{X}_{c, 40 \times 2}}_{40 \times 2} = \frac{1}{N - 1} \begin{bmatrix} \tilde{\mathbf{x}}_1^T \\\\ \tilde{\mathbf{x}}_2^T \end{bmatrix}_{2 \times 40} \begin{bmatrix} \tilde{\mathbf{x}}_1 & \tilde{\mathbf{x}}_2 \end{bmatrix}_{40 \times 2} = \begin{bmatrix} s_1^2 & s_{12} \\\\ s_{12} & s_2^2 \end{bmatrix}_{2 \times 2}$$</p>
+<h4 id="dimension-verification">Dimension Verification:</h4>
+<p>$$\mathbf{\Sigma}_{2 \times 2} = \frac{1}{39} \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} \, \underbrace{\mathbf{X}_{c, 40 \times 2}}_{40 \times 2} = (2 \times 2) \text{ Symmetric Matrix}$$</p>
+<p>Notice that because dot products commute ($\tilde{\mathbf{x}}_{1, 1 \times 40}^T \tilde{\mathbf{x}}_{2, 40 \times 1} = \tilde{\mathbf{x}}_{2, 1 \times 40}^T \tilde{\mathbf{x}}_{1, 40 \times 1}$), the off-diagonal covariances are identical ($s_{12} = s_{21}$).<br />
+Therefore, <strong>$\mathbf{\Sigma}_{2 \times 2}$ is strictly a symmetric matrix ($\mathbf{\Sigma}_{2 \times 2}^T = \mathbf{\Sigma}_{2 \times 2}$)</strong>! Everything we proved about symmetric matrices in Section 2.5 and 2.6 applies directly to covariance matrices.</p>
+<blockquote>
+<p><strong>Crucial Pedagogical Note for Students:</strong><br />
+Do <strong>not</strong> confuse the bold matrix symbol $\mathbf{\Sigma}$ with the summation operator $\sum_{i=1}^N$.<br />
+- $\sum$ is an operation: it means "add up a list of numbers."<br />
+- $\mathbf{\Sigma}_{2 \times 2}$ is a matrix object: it is a $2 \times 2$ table holding the geometric variances and covariances of your dataset.</p>
+</blockquote>
+<hr />
+<h3 id="the-4-quadrant-product-breakdown">The 4-Quadrant Product Breakdown</h3>
+<p>Look closely at the sign of the deviation product $(\tilde{r}_{i1} \cdot \tilde{r}_{i2})$ across the 4 quadrants of our centered coordinate plane:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: left;">Quadrant</th>
+<th style="text-align: left;">Physical Meaning (Height, Weight)</th>
+<th style="text-align: left;">Deviation Signs</th>
+<th style="text-align: left;">Product $(\tilde{r}_{i1} \cdot \tilde{r}_{i2})$</th>
+<th style="text-align: left;">Contribution to Covariance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Quadrant 1</strong></td>
+<td style="text-align: left;">Taller than average, Heavier than average</td>
+<td style="text-align: left;">$(+) \times (+)$</td>
+<td style="text-align: left;"><strong>Positive ($+$)</strong></td>
+<td style="text-align: left;">Increases Covariance</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Quadrant 3</strong></td>
+<td style="text-align: left;">Shorter than average, Lighter than average</td>
+<td style="text-align: left;">$(-) \times (-)$</td>
+<td style="text-align: left;"><strong>Positive ($+$)</strong></td>
+<td style="text-align: left;">Increases Covariance</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Quadrant 2</strong></td>
+<td style="text-align: left;">Shorter than average, Heavier than average</td>
+<td style="text-align: left;">$(-) \times (+)$</td>
+<td style="text-align: left;"><strong>Negative ($-$)</strong></td>
+<td style="text-align: left;">Decreases Covariance</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Quadrant 4</strong></td>
+<td style="text-align: left;">Taller than average, Lighter than average</td>
+<td style="text-align: left;">$(+) \times (-)$</td>
+<td style="text-align: left;"><strong>Negative ($-$)</strong></td>
+<td style="text-align: left;">Decreases Covariance</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h3 id="deriving-the-three-stories-from-three-simulated-datasets-each">Deriving the Three Stories from Three Simulated Datasets ($N = 40$ each)</h3>
+<p>To see how covariance directly controls the geometric tilt of data, we examine our <strong>three simulated datasets ($N = 40$ points each)</strong>. Because our data generator carefully anchored the 5 clean benchmark individuals, you can verify the exact covariance values $\mathbf{\Sigma}_{2 \times 2}$ by calculating the sums on just these 5 individuals (divided by $5 - 1 = 4$), which yields the exact same sample covariance as the full 40-point cloud (divided by $40 - 1 = 39$):</p>
+<h4 id="dataset-1-positive-covariance-height-vs-weight">Dataset 1: Positive Covariance (Height vs. Weight)</h4>
+<p>Consider our centered benchmark individuals where taller people are generally heavier:</p>
+<p>$$\mathbf{X}_{c1,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & +1 \\\\ -2 & -1 \\\\ +1 & +2 \\\\ -1 & -2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2} \begin{matrix} \leftarrow \text{Person A: } \tilde{\mathbf{r}}_{A, 2 \times 1} = [+2, +1]^T \\\\ \leftarrow \text{Person B: } \tilde{\mathbf{r}}_{B, 2 \times 1} = [-2, -1]^T \\\\ \leftarrow \text{Person C: } \tilde{\mathbf{r}}_{C, 2 \times 1} = [+1, +2]^T \\\\ \leftarrow \text{Person D: } \tilde{\mathbf{r}}_{D, 2 \times 1} = [-1, -2]^T \\\\ \leftarrow \text{Person E: } \tilde{\mathbf{r}}_{E, 2 \times 1} = [0, 0]^T \end{matrix}$$</p>
+<ul>
+<li>$\sum \tilde{r}_{i1}^2 = 2^2 + (-2)^2 + 1^2 + (-1)^2 + 0^2 = 10 \implies s_1^2 = \frac{10}{4} = 2.5$</li>
+<li>$\sum \tilde{r}_{i2}^2 = 1^2 + (-1)^2 + 2^2 + (-2)^2 + 0^2 = 10 \implies s_2^2 = \frac{10}{4} = 2.5$</li>
+<li>$\sum \tilde{r}_{i1} \tilde{r}_{i2} = (+2)(+1) + (-2)(-1) + (+1)(+2) + (-1)(-2) + 0 = 2 + 2 + 2 + 2 = +8 \implies s_{12} = \frac{+8}{4} = \mathbf{+2.0}$</li>
+</ul>
+<p>$$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{+2.0} \\\\ \mathbf{+2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$</p>
+<ul>
+<li><strong>The Story:</strong> Observations fall strictly in <strong>Q1 and Q3</strong>. Positive products dominate. The data cloud <strong>tilts upward to the right</strong> along the positive diagonal ($y \approx x$).</li>
+</ul>
+<hr />
+<h4 id="dataset-2-negative-covariance-elevation-vs-temperature">Dataset 2: Negative Covariance (Elevation vs. Temperature)</h4>
+<p>Consider 5 centered benchmark observations where higher elevation corresponds to colder temperature:</p>
+<p>$$\mathbf{X}_{c2,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & -1 \\\\ -2 & +1 \\\\ +1 & -2 \\\\ -1 & +2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2}$$</p>
+<ul>
+<li>$\sum \tilde{r}_{i1}^2 = 10 \implies s_1^2 = \frac{10}{4} = 2.5$</li>
+<li>$\sum \tilde{r}_{i2}^2 = 10 \implies s_2^2 = \frac{10}{4} = 2.5$</li>
+<li>$\sum \tilde{r}_{i1} \tilde{r}_{i2} = (+2)(-1) + (-2)(+1) + (+1)(-2) + (-1)(+2) + 0 = -2 - 2 - 2 - 2 = -8 \implies s_{12} = \frac{-8}{4} = \mathbf{-2.0}$</li>
+</ul>
+<p>$$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & \mathbf{-2.0} \\\\ \mathbf{-2.0} & 2.5 \end{bmatrix}_{2 \times 2}$$</p>
+<ul>
+<li><strong>The Story:</strong> Observations fall strictly in <strong>Q2 and Q4</strong>. Negative products dominate. The data cloud <strong>tilts downward to the right</strong> along the negative diagonal ($y \approx -x$).</li>
+</ul>
+<hr />
+<h4 id="dataset-3-zero-covariance-height-vs-shoe-brand-uncorrelated">Dataset 3: Zero Covariance (Height vs. Shoe Brand / Uncorrelated)</h4>
+<p>Consider 5 centered benchmark observations distributed symmetrically along the standard axes:</p>
+<p>$$\mathbf{X}_{c3,\text{bench}, 5 \times 2} = \begin{bmatrix} +2 & 0 \\\\ -2 & 0 \\\\ 0 & +2 \\\\ 0 & -2 \\\\ 0 & 0 \end{bmatrix}_{5 \times 2}$$</p>
+<ul>
+<li>$\sum \tilde{r}_{i1}^2 = 2^2 + (-2)^2 + 0 + 0 + 0 = 8 \implies s_1^2 = \frac{8}{4} = 2.0$</li>
+<li>$\sum \tilde{r}_{i2}^2 = 0 + 0 + 2^2 + (-2)^2 + 0 = 8 \implies s_2^2 = \frac{8}{4} = 2.0$</li>
+<li>$\sum \tilde{r}_{i1} \tilde{r}_{i2} = (2)(0) + (-2)(0) + (0)(2) + (0)(-2) + 0 = 0 \implies s_{12} = \frac{0}{4} = \mathbf{0.0}$</li>
+</ul>
+<p>$$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & \mathbf{0.0} \\\\ \mathbf{0.0} & 2.0 \end{bmatrix}_{2 \times 2}$$</p>
+<ul>
+<li><strong>The Story:</strong> Positive and negative products cancel out completely. Knowing $\mathbf{x}_1$ provides zero predictive information about $\mathbf{x}_2$.</li>
+<li><em>Direct Connection to Section 2.3:</em> This is a <strong>diagonal matrix</strong>! There is no tilt; its eigenvectors are already the standard coordinate axes.</li>
+</ul>
+<div class="interactive-box" id="fig_card_8" ondblclick="toggleFullscreen('fig_card_8')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.2 Covariance Quadrants</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_8')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_2_fig_covariance_quadrants.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_8', './assets/3_2_fig_covariance_quadrants.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_8" src="./assets/3_2_fig_covariance_quadrants.html" title="Figure 3.2 Covariance Quadrants" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.2: The Three Stories of Covariance. Panel 1: Positive Covariance ($\mathbf{\Sigma}_{1, 2 \times 2}$, upward tilt along $y = x$). Panel 2: Negative Covariance ($\mathbf{\Sigma}_{2, 2 \times 2}$, downward tilt along $y = -x$). Panel 3: Zero Covariance ($\mathbf{\Sigma}_{3, 2 \times 2}$, un-tilted diagonal matrix).</em></p>
+</div>
+
+<hr />
+<h2 id="33-the-core-question-of-pca-projecting-onto-which-line-maximizes-spread">3.3 The Core Question of PCA: Projecting onto Which Line $\mathbf{u}$ Maximizes Spread?</h2>
+<p>Now we arrive at the central problem of Principal Component Analysis:<br />
+Suppose we want to compress our 40 individuals (where each centered observation is a vector in $\mathbb{R}^2$) down onto a <strong>single 1D straight line</strong> passing through the origin along a unit direction vector $\mathbf{u}_{2 \times 1} \in \mathbb{R}^2$ (with $\|\mathbf{u}\| = 1 \iff \mathbf{u}_{1 \times 2}^T \mathbf{u}_{2 \times 1} = 1$).</p>
+<p><strong>Which line $\mathbf{u}_{2 \times 1}$ should we choose?</strong></p>
+<p>In data science, <strong>variance represents information</strong>. If you project your data onto a line where all the points collapse on top of each other into a dense clump, you lose the ability to distinguish between individuals. But if you project onto a line where the points spread out as widely as possible, you retain the maximum possible amount of individual differences!</p>
+<p>Therefore, the objective of PCA is:<br />
+<strong>Find the unit direction vector $\mathbf{u}_{2 \times 1} \in \mathbb{R}^2$ that maximizes the sample variance of the projected data points.</strong></p>
+<hr />
+<h3 id="the-three-line-derivation-of-the-variance-machine">The Three-Line Derivation of the Variance Machine</h3>
+<p>How do we calculate the variance of our data along <em>any</em> arbitrary unit direction $\mathbf{u}_{2 \times 1}$? It takes just three simple, rigorous steps:</p>
+<h4 id="step-1-projecting-each-point-onto-direction-">Step 1: Projecting Each Point onto Direction $\mathbf{u}$</h4>
+<p>From Section 1.2, the 1D shadow coordinate (scalar projection) of an individual centered observation vector $\tilde{\mathbf{r}}_{i, 2 \times 1} \in \mathbb{R}^2$ onto a unit vector $\mathbf{u}_{2 \times 1} \in \mathbb{R}^2$ is simply their dot product:</p>
+<p>$$z_{i, 1 \times 1} = \underbrace{\tilde{\mathbf{r}}_{i, 1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = (1 \times 1) \text{ Scalar} \in \mathbb{R}$$</p>
+<p>Physical meaning: $z_{i, 1 \times 1} \in \mathbb{R}$ is a single real number representing the exact 1D coordinate of Person $i$ along the line $\mathbf{u}_{2 \times 1}$.</p>
+<p>Stacking the shadow coordinates of all 40 individuals gives a score vector $\mathbf{z}_{40 \times 1} \in \mathbb{R}^{40}$, computed for the entire dataset in a single matrix-vector multiplication $\mathbf{z}_{40 \times 1} = (\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}$:</p>
+<p>$$\mathbf{z}_{40 \times 1} = \begin{bmatrix} z_1 \\\\ z_2 \\\\ \vdots \\\\ z_{40} \end{bmatrix}_{40 \times 1} = \begin{bmatrix} \tilde{\mathbf{r}}_{1, 1 \times 2}^T \mathbf{u}_{2 \times 1} \\\\ \tilde{\mathbf{r}}_{2, 1 \times 2}^T \mathbf{u}_{2 \times 1} \\\\ \vdots \\\\ \tilde{\mathbf{r}}_{40, 1 \times 2}^T \mathbf{u}_{2 \times 1} \end{bmatrix}_{40 \times 1} = \underbrace{\begin{bmatrix} \tilde{\mathbf{r}}_{1, 1 \times 2}^T \\\\ \tilde{\mathbf{r}}_{2, 1 \times 2}^T \\\\ \vdots \\\\ \tilde{\mathbf{r}}_{40, 1 \times 2}^T \end{bmatrix}}_{40 \times 2} \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \underbrace{(\mathbf{X}_c)_{40 \times 2}}_{40 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = (40 \times 1) \text{ Column Vector} \in \mathbb{R}^{40}$$</p>
+<div class="interactive-box" id="fig_card_9" ondblclick="toggleFullscreen('fig_card_9')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.3a Step 1 Projection</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_9')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_3_1_fig_step1_projection.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_9', './assets/3_3_1_fig_step1_projection.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_9" src="./assets/3_3_1_fig_step1_projection.html" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Figure 3.3a: Step 1 - Projecting All 40 Points onto Direction u&lt;/title&gt;
+  &lt;script src=&quot;https://cdn.plot.ly/plotly-2.29.1.min.js&quot;&gt;&lt;/script&gt;
+  &lt;style&gt;
+body {
+font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Helvetica, Arial, sans-serif;
+margin: 0; padding: 20px; background: #f8fafc; color: #1e293b;
+}
+.container {
+max-width: 900px; margin: 0 auto; background: #ffffff;
+border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 24px;
+}
+h1 { font-size: 22px; margin-top: 0; color: #0f172a; }
+p { line-height: 1.6; color: #475569; font-size: 14px; }
+.chart { height: 600px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 15px; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=&quot;container&quot;&gt;
+&lt;h1&gt;Figure 3.3a: Step 1 — Projecting All 40 Points onto Direction u&lt;/h1&gt;
+&lt;p&gt;
+Each centered observation vector &lt;b&gt;r̃_i ∈ R²&lt;/b&gt; drops perpendicularly onto the line &lt;b&gt;u&lt;/b&gt; at θ = 15°.&lt;br&gt;
+The scalar dot product &lt;b&gt;z_i = r̃_iᵀ u&lt;/b&gt; yields the 1D shadow coordinate. Stacking all 40 points gives the score vector &lt;b&gt;z = X_c u ∈ R⁴⁰&lt;/b&gt;.
+&lt;/p&gt;
+&lt;div id=&quot;plot&quot; class=&quot;chart&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script&gt;
+const u = [Math.cos(15 * Math.PI / 180), Math.sin(15 * Math.PI / 180)];
+
+const traceCloud = {
+x: [-1.113621740066637, -2.35538689600933, 0.23049212880411787, -3.552960793632614, 0.18894721527766034, 0.7704844859690567, 0.37779494641671824, 3.0499866001406426, 1.2804505036180238, 2.109851386014024, -2.7695056269886016, 0.39821685421982345, 0.5744553839616585, 1.487803197296132, 0.9100524061862605, -0.34730713818879844, 0.32540957417304733, -1.051899861731073, 0.46336216048300594, 1.9050581268829987, -1.72145432411183, 0.0610159266357264, 2.7083713293789184, -0.1288444617174227, 0.110432832021352, -0.664477557322027, 0.5138795239794826, -2.6832304265287066, 1.3407227352542062, -1.476279310980547, 0.6337509797187301, 2.332356834083104, -2.547871267914151, -0.7821411579280875, -0.5779145673948641], y: [-1.2378194271699987, -0.7952845817097002, 0.1432529216141539, -2.944728328008923, 0.9459905904315584, 0.48712713676891717, -1.5286399779250703, 2.9014601800593782, 1.903107348486983, 0.9334279810234556, -3.1639091109631177, -0.9722673353157683, 0.9005128061024386, 2.199466389765695, 0.8315716802523427, 1.7842688386200987, -0.6517053881836612, -2.3524770541444844, -1.484739321402928, 2.4653067542394607, -1.5714158304612602, -0.11726333489279725, 2.3516720077196704, 1.1569326578129726, -1.6600301905361012, -1.0110076976440057, 1.3807018722477444, -1.8042727542025823, 1.2885071587166317, -0.42170238935623733, 0.6419984414842789, 1.415512720880175, -1.1903071527682791, 0.3762020366131395, -1.1994496481541814],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#90caf9&#x27;, size: 7, opacity: 0.6 }, name: &#x27;Cloud Points (N=35)&#x27;
+};
+const traceData = {
+x: [2.0, -2.0, 1.0, -1.0, 0.0], y: [1.0, -1.0, 2.0, -2.0, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#1976d2&#x27;, size: 10 }, name: &#x27;Benchmark Points (N=5)&#x27;
+};
+const traceProjCloud = {
+x: [-1.3484780853779874, -2.3964270372746177, 0.2508653142639579, -4.05113963178652, 0.4127877994491103, 0.8406535962122568, -0.02967251076377905, 3.57104128354713, 1.670453421141651, 2.2018751375118524, -3.3749612056831197, 0.12847454926571544, 0.761102371432209, 1.9380058784345704, 1.056983374422444, 0.12202523826703941, 0.1406849189748762, -1.5695551956498814, 0.06113795095613354, 2.393770118784702, -1.9989927077389376, 0.027612800845657214, 3.114862853681165, 0.16901964510242193, -0.311972312652174, -0.8727179255147679, 0.8246315911771206, -2.9545562586056064, 1.5730381313870114, -1.4828129460246036, 0.7517973242852831, 2.5299967317647036, -2.6747730439422064, -0.635697125866309, -0.8390640440265006], y: [-0.3613236139880982, -0.6421206893578418, 0.06721915836600732, -1.0854995927629136, 0.11060615750780933, 0.22525245221939327, -0.007950725296558391, 0.9568576280646531, 0.44759664518871145, 0.589990664930468, -0.90431812954916, 0.03442465172370094, 0.20393676578267278, 0.5192871100533116, 0.2832178415896168, 0.03269656404986854, 0.037696410426556005, -0.42056104715045844, 0.016381864585589566, 0.6414087701941136, -0.5356284817143516, 0.007398827687355272, 0.8346249861775703, 0.04528867741018892, -0.08359272923601975, -0.2338440633618467, 0.22095936890910117, -0.7916709634856914, 0.421494296968512, -0.3973185314137064, 0.20144348591412045, 0.677910581129732, -0.71670327706085, -0.17033453150666325, -0.2248265329948928],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#ffb74d&#x27;, size: 6, symbol: &#x27;diamond&#x27;, opacity: 0.7 }, name: &#x27;Cloud Shadows&#x27;
+};
+const traceProjBench = {
+x: [2.1160254037844384, -2.1160254037844384, 1.4330127018922192, -1.4330127018922192, 0.0], y: [0.5669872981077806, -0.5669872981077806, 0.3839745962155613, -0.3839745962155613, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#e65100&#x27;, size: 9, symbol: &#x27;diamond&#x27; }, name: &#x27;Benchmark Shadows (z = X_c u)&#x27;
+};
+const traceLineU = {
+x: [-4.5 * u[0], 4.5 * u[0]], y: [-4.5 * u[1], 4.5 * u[1]],
+mode: &#x27;lines&#x27;, line: { color: &#x27;#e65100&#x27;, width: 2.5 }, name: &#x27;Line u (15°)&#x27;
+};
+
+Plotly.newPlot(&#x27;plot&#x27;, [traceCloud, traceData, traceProjCloud, traceProjBench, traceLineU], {
+title: &#x27;Step 1: All 40 Observations Projected onto Direction u (θ = 15°)&#x27;,
+xaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27;, scaleanchor: &#x27;y&#x27;, title: &#x27;Centered x₁ (Height deviation)&#x27; },
+yaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27;, title: &#x27;Centered x₂ (Weight deviation)&#x27; },
+margin: { l: 50, r: 30, b: 50, t: 50 }, showlegend: true, legend: { x: 0.7, y: 0.15 }
+}, {responsive: true});
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" title="Figure 3.3a Step 1 Projection" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.3a: Step 1 of the Variance Machine — Projecting All 40 Observations onto Direction $\mathbf{u}_{2 \times 1}$ ($\theta = 15^\circ$). Each centered observation $\tilde{\mathbf{r}}_{i, 2 \times 1} \in \mathbb{R}^2$ drops perpendicularly onto line $\mathbf{u}_{2 \times 1}$, producing a 1D shadow coordinate $z_{i, 1 \times 1} = \tilde{\mathbf{r}}_{i, 1 \times 2}^T \mathbf{u}_{2 \times 1}$. Together, all 40 points form the score vector $\mathbf{z}_{40 \times 1} = (\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1} \in \mathbb{R}^{40}$.</em></p>
+</div>
+
+<hr />
+<h4 id="step-2-calculating-the-variance-of-the-shadows">Step 2: Calculating the Variance of the Shadows</h4>
+<p>First, what is the sample mean of the projected coordinates $\mathbf{z}_{40 \times 1}$?</p>
+<p>$$\bar{z}_{1 \times 1} = \frac{1}{N} \sum_{i=1}^N z_{i, 1 \times 1} = \frac{1}{N} \sum_{i=1}^N (\tilde{\mathbf{r}}_{i, 1 \times 2}^T \mathbf{u}_{2 \times 1}) = \left( \frac{1}{N} \sum_{i=1}^N \tilde{\mathbf{r}}_{i, 2 \times 1} \right)^T \mathbf{u}_{2 \times 1} = \mathbf{0}_{1 \times 2}^T \mathbf{u}_{2 \times 1} = 0$$</p>
+<p>Because our data was centered in Section 3.1, the average shadow coordinate is strictly zero ($\bar{z} = 0$).<br />
+Therefore, the sample variance of $\mathbf{z}_{40 \times 1}$ is simply the average of the squared scores:</p>
+<p>
+$$
+\text{Var}(\mathbf{z})_{1 \times 1} = \frac{1}{N - 1} \sum_{i=1}^N (z_i - \bar{z})^2 = \frac{1}{N - 1} \sum_{i=1}^N z_i^2 = \frac{1}{N - 1} \underbrace{\mathbf{z}_{1 \times 40}^T}_{1 \times 40} \underbrace{\mathbf{z}_{40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar (Variance)}
+$$
+</p>
+<p>For our test direction at $\theta = 15^\circ$, the sum of squared scores is $\mathbf{z}_{1 \times 40}^T \mathbf{z}_{40 \times 1} = 136.50$, yielding sample variance:</p>
+<p>$$\text{Var}(\mathbf{z})_{1 \times 1} = \frac{136.50}{39} = \mathbf{3.50}$$</p>
+<div class="interactive-box" id="fig_card_10" ondblclick="toggleFullscreen('fig_card_10')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.3b Step 2 Variance</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_10')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_3_2_fig_step2_variance.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_10', './assets/3_3_2_fig_step2_variance.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_10" src="./assets/3_3_2_fig_step2_variance.html" title="Figure 3.3b Step 2 Variance" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.3b: Step 2 of the Variance Machine — 1D Score Distribution and Squared Deviations along Line $\mathbf{u}_{2 \times 1}$. Top: The 40 shadow coordinates balance exactly at $\bar{z} = 0.0$ (guaranteed by centering). Bottom: Squared deviations $z_i^2 = (z_i - \bar{z})^2$ contribute to the total sum of squares $\mathbf{z}_{1 \times 40}^T \mathbf{z}_{40 \times 1} = 136.50$, yielding sample variance $\text{Var}(\mathbf{z})_{1 \times 1} = \frac{136.50}{39} = 3.50$.</em></p>
+</div>
+
+<hr />
+<h4 id="step-3-the-matrix-substitution">Step 3: The Matrix Substitution</h4>
+<p><strong>1. The General Formula for Variance of Any Centered Column Vector:</strong><br />
+Recall from Section 1.1 (dot products as sum of squares) and Section 3.2 (feature variances) that for <strong>any</strong> centered column vector $\mathbf{w} \in \mathbb{R}^N$ with sample mean $\bar{w} = 0$, the sample variance is simply the sum of squared elements divided by $N - 1$:</p>
+<p>$$\text{Var}(\mathbf{w})_{1 \times 1} = \frac{1}{N - 1} \sum_{i=1}^N w_i^2 = \frac{1}{N - 1} \underbrace{\mathbf{w}_{1 \times N}^T}_{1 \times N} \, \underbrace{\mathbf{w}_{N \times 1}}_{N \times 1} = (1 \times 1) \text{ Scalar}$$</p>
+<p><strong>2. Generalizing to the Projected Score Vector ($\mathbf{w} = \mathbf{z} = \mathbf{X}_c \mathbf{u}$):</strong><br />
+In Step 1, we found that our 1D shadow score vector is $\mathbf{z}_{40 \times 1} = (\mathbf{X}_c)_{40 \times 2} \, \mathbf{u}_{2 \times 1}$. Since centering guarantees that $\bar{z} = 0$ (proved in Step 2), we directly apply the general variance formula by substituting $\mathbf{w}_{40 \times 1} = (\mathbf{X}_c)_{40 \times 2} \, \mathbf{u}_{2 \times 1}$:</p>
+<p>$$\text{Var}(\mathbf{z})_{1 \times 1} = \text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}) = \frac{1}{N - 1} \underbrace{\left((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}\right)^T}_{1 \times 40} \, \underbrace{\left((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}\right)}_{40 \times 1}$$</p>
+<p>Apply the transpose rule $(\mathbf{A}\mathbf{B})^T = \mathbf{B}^T \mathbf{A}^T$:</p>
+<p>$$\left((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}\right)^T = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} = (1 \times 40)$$</p>
+<p>Substitute this back into the variance expression:</p>
+<p>$$\text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1})_{1 \times 1} = \frac{1}{N - 1} \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{X}_{c, 2 \times 40}^T}_{2 \times 40} \, \underbrace{(\mathbf{X}_c)_{40 \times 2}}_{40 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$</p>
+<p>Regroup the scalar factor $\frac{1}{N - 1}$ with the center matrices:</p>
+<p>$$\text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1})_{1 \times 1} = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \underbrace{\left( \frac{1}{N - 1} \mathbf{X}_{c, 2 \times 40}^T (\mathbf{X}_c)_{40 \times 2} \right)}_{2 \times 2 \, (\mathbf{\Sigma}_{2 \times 2})} \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$</p>
+<p>Notice that the grouped center term is literally the <strong>Sample Covariance Matrix</strong> $\mathbf{\Sigma}_{2 \times 2}$ from Section 3.2:</p>
+<p>$$\text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1})_{1 \times 1} = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = (1 \times 1) \text{ Scalar}$$</p>
+<blockquote>
+<p><strong>The Big Discovery:</strong><br />
+To calculate the variance of your data cloud along <strong>any direction $\mathbf{u}_{2 \times 1}$ in the universe</strong>, you do not need to project the raw points over and over again. You simply evaluate the compact quadratic form $\mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1}$!</p>
+</blockquote>
+<div class="interactive-box" id="fig_card_11" ondblclick="toggleFullscreen('fig_card_11')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.3c Step 3 Machine</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_11')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_3_3_fig_step3_machine.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_11', './assets/3_3_3_fig_step3_machine.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_11" src="./assets/3_3_3_fig_step3_machine.html" title="Figure 3.3c Step 3 Machine" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.3c: Step 3 of the Variance Machine — The Matrix Substitution $\text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1}) = \mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1}$. Left: The continuous variance landscape across orientation angles $\theta \in [0^\circ, 180^\circ]$ peaking at $\theta = 45^\circ$ (PC1, $\lambda_1 = 4.50$) and bottoming at $\theta = 135^\circ$ (PC2, $\lambda_2 = 0.50$). Right: The 2D spread envelope $\sigma(\mathbf{u}) = \sqrt{\mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1}}$ showing that the compact $2 \times 2$ covariance matrix $\mathbf{\Sigma}_{2 \times 2}$ instantaneously predicts data spread in any direction without re-projecting the 40 raw points.</em></p>
+</div>
+
+<hr />
+<h3 id="step-4-the-ultimate-contrast-worst-direction-vs-optimal-direction">Step 4: The Ultimate Contrast (Worst Direction vs. Optimal Direction)</h3>
+<p>To see why maximizing variance is the defining principle of PCA, consider the two extreme directions revealed by our variance machine:
+1. <strong>The Worst Direction ($\mathbf{q}_{2, 2 \times 1}$ at $135^\circ$, PC2):</strong> Variance collapses to its absolute minimum $\lambda_2 = 0.50$. Points collide and distinguishability is destroyed.
+2. <strong>The Optimal Direction ($\mathbf{q}_{1, 2 \times 1}$ at $45^\circ$, PC1):</strong> Variance reaches its absolute maximum $\lambda_1 = 4.50$, cleanly separating individuals across an 8.8-unit span while preserving 90% of total information.</p>
+<div class="interactive-box" id="fig_card_12" ondblclick="toggleFullscreen('fig_card_12')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.3d Variance Comparison</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_12')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_3_fig_variance_direction.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_12', './assets/3_3_fig_variance_direction.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_12" src="./assets/3_3_fig_variance_direction.html" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Figure 3.3: Worst Direction (PC2 Clump) vs. Optimal Direction (PC1 Spread)&lt;/title&gt;
+  &lt;script src=&quot;https://cdn.plot.ly/plotly-2.29.1.min.js&quot;&gt;&lt;/script&gt;
+  &lt;style&gt;
+body {
+font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Helvetica, Arial, sans-serif;
+margin: 0; padding: 20px; background: #f8fafc; color: #1e293b;
+}
+.container {
+max-width: 1200px; margin: 0 auto; background: #ffffff;
+border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 24px;
+}
+h1 { font-size: 22px; margin-top: 0; color: #0f172a; }
+p { line-height: 1.6; color: #475569; font-size: 14px; }
+.charts-row { display: flex; gap: 20px; margin-top: 15px; }
+.chart-col { flex: 1; height: 500px; border: 1px solid #e2e8f0; border-radius: 8px; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=&quot;container&quot;&gt;
+&lt;h1&gt;Figure 3.3: Why Maximize Variance? Worst Line (PC2 Clumping) vs. Best Line (PC1 Spread)&lt;/h1&gt;
+&lt;p&gt;
+&lt;b&gt;Left (Worst Direction - PC2 at 135°):&lt;/b&gt; Points collapse into a dense, uninformative clump with &lt;b&gt;Var = λ₂ = 0.50&lt;/b&gt;. Individuals collide (Person A &amp; D both get -0.71; Person B &amp; C both get +0.71), destroying individual distinguishability.&lt;br&gt;
+&lt;b&gt;Right (Optimal Direction - PC1 at 45°):&lt;/b&gt; Data spreads widely across 9 units with &lt;b&gt;Var = λ₁ = 4.50&lt;/b&gt; (retaining 90% of total variance). Every individual is distinctly separated with minimal error drop lines!
+&lt;/p&gt;
+&lt;div class=&quot;charts-row&quot;&gt;
+&lt;div id=&quot;plot1&quot; class=&quot;chart-col&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;plot2&quot; class=&quot;chart-col&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script&gt;
+const q1 = [Math.SQRT1_2, Math.SQRT1_2];
+const q2 = [-Math.SQRT1_2, Math.SQRT1_2];
+
+const traceCloudLeft = {
+x: [-1.113621740066637, -2.35538689600933, 0.23049212880411787, -3.552960793632614, 0.18894721527766034, 0.7704844859690567, 0.37779494641671824, 3.0499866001406426, 1.2804505036180238, 2.109851386014024, -2.7695056269886016, 0.39821685421982345, 0.5744553839616585, 1.487803197296132, 0.9100524061862605, -0.34730713818879844, 0.32540957417304733, -1.051899861731073, 0.46336216048300594, 1.9050581268829987, -1.72145432411183, 0.0610159266357264, 2.7083713293789184, -0.1288444617174227, 0.110432832021352, -0.664477557322027, 0.5138795239794826, -2.6832304265287066, 1.3407227352542062, -1.476279310980547, 0.6337509797187301, 2.332356834083104, -2.547871267914151, -0.7821411579280875, -0.5779145673948641], y: [-1.2378194271699987, -0.7952845817097002, 0.1432529216141539, -2.944728328008923, 0.9459905904315584, 0.48712713676891717, -1.5286399779250703, 2.9014601800593782, 1.903107348486983, 0.9334279810234556, -3.1639091109631177, -0.9722673353157683, 0.9005128061024386, 2.199466389765695, 0.8315716802523427, 1.7842688386200987, -0.6517053881836612, -2.3524770541444844, -1.484739321402928, 2.4653067542394607, -1.5714158304612602, -0.11726333489279725, 2.3516720077196704, 1.1569326578129726, -1.6600301905361012, -1.0110076976440057, 1.3807018722477444, -1.8042727542025823, 1.2885071587166317, -0.42170238935623733, 0.6419984414842789, 1.415512720880175, -1.1903071527682791, 0.3762020366131395, -1.1994496481541814],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#90caf9&#x27;, size: 6, opacity: 0.6 }, name: &#x27;Cloud Points (N=35)&#x27;
+};
+const traceDataLeft = {
+x: [2.0, -2.0, 1.0, -1.0, 0.0], y: [1.0, -1.0, 2.0, -2.0, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#1976d2&#x27;, size: 9 }, name: &#x27;Benchmark Points (N=5)&#x27;
+};
+const traceProjLeft = {
+x: [0.4999999999999999, -0.4999999999999999, -0.4999999999999999, 0.4999999999999999, -0.0], y: [-0.4999999999999999, 0.4999999999999999, 0.4999999999999999, -0.4999999999999999, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#2e7d32&#x27;, size: 8, symbol: &#x27;diamond&#x27; }, name: &#x27;Shadows on PC2&#x27;
+};
+const traceLinePC2 = {
+x: [-4.5 * q2[0], 4.5 * q2[0]], y: [-4.5 * q2[1], 4.5 * q2[1]],
+mode: &#x27;lines&#x27;, line: { color: &#x27;#2e7d32&#x27;, width: 2.5 }, name: &#x27;PC2 Line (λ₂ = 0.50)&#x27;
+};
+
+Plotly.newPlot(&#x27;plot1&#x27;, [traceCloudLeft, traceDataLeft, traceProjLeft, traceLinePC2], {
+title: &#x27;Worst Direction: PC2 Clump (Variance = 0.50)&#x27;,
+xaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27;, scaleanchor: &#x27;y&#x27; },
+yaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27; },
+margin: { l: 40, r: 20, b: 40, t: 40 }, showlegend: false
+}, {responsive: true});
+
+const traceCloudRight = {
+x: [-1.113621740066637, -2.35538689600933, 0.23049212880411787, -3.552960793632614, 0.18894721527766034, 0.7704844859690567, 0.37779494641671824, 3.0499866001406426, 1.2804505036180238, 2.109851386014024, -2.7695056269886016, 0.39821685421982345, 0.5744553839616585, 1.487803197296132, 0.9100524061862605, -0.34730713818879844, 0.32540957417304733, -1.051899861731073, 0.46336216048300594, 1.9050581268829987, -1.72145432411183, 0.0610159266357264, 2.7083713293789184, -0.1288444617174227, 0.110432832021352, -0.664477557322027, 0.5138795239794826, -2.6832304265287066, 1.3407227352542062, -1.476279310980547, 0.6337509797187301, 2.332356834083104, -2.547871267914151, -0.7821411579280875, -0.5779145673948641], y: [-1.2378194271699987, -0.7952845817097002, 0.1432529216141539, -2.944728328008923, 0.9459905904315584, 0.48712713676891717, -1.5286399779250703, 2.9014601800593782, 1.903107348486983, 0.9334279810234556, -3.1639091109631177, -0.9722673353157683, 0.9005128061024386, 2.199466389765695, 0.8315716802523427, 1.7842688386200987, -0.6517053881836612, -2.3524770541444844, -1.484739321402928, 2.4653067542394607, -1.5714158304612602, -0.11726333489279725, 2.3516720077196704, 1.1569326578129726, -1.6600301905361012, -1.0110076976440057, 1.3807018722477444, -1.8042727542025823, 1.2885071587166317, -0.42170238935623733, 0.6419984414842789, 1.415512720880175, -1.1903071527682791, 0.3762020366131395, -1.1994496481541814],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#90caf9&#x27;, size: 6, opacity: 0.6 }, name: &#x27;Cloud Points (N=35)&#x27;
+};
+const traceDataRight = {
+x: [2.0, -2.0, 1.0, -1.0, 0.0], y: [1.0, -1.0, 2.0, -2.0, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#1976d2&#x27;, size: 9 }, name: &#x27;Benchmark Points (N=5)&#x27;
+};
+const traceProjRight = {
+x: [1.4999999999999998, -1.4999999999999998, 1.4999999999999998, -1.4999999999999998, 0.0], y: [1.4999999999999998, -1.4999999999999998, 1.4999999999999998, -1.4999999999999998, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#d32f2f&#x27;, size: 9, symbol: &#x27;diamond&#x27; }, name: &#x27;Shadows on PC1&#x27;
+};
+const tracePC1 = {
+x: [-4.5 * q1[0], 4.5 * q1[0]], y: [-4.5 * q1[1], 4.5 * q1[1]],
+mode: &#x27;lines&#x27;, line: { color: &#x27;#d32f2f&#x27;, width: 3 }, name: &#x27;PC1 (λ₁ = 4.50)&#x27;
+};
+const tracePC2_dash = {
+x: [-3 * q2[0], 3 * q2[0]], y: [-3 * q2[1], 3 * q2[1]],
+mode: &#x27;lines&#x27;, line: { color: &#x27;#2e7d32&#x27;, width: 1.5, dash: &#x27;dash&#x27; }, name: &#x27;PC2 (λ₂ = 0.50)&#x27;
+};
+
+Plotly.newPlot(&#x27;plot2&#x27;, [traceCloudRight, traceDataRight, traceProjRight, tracePC1, tracePC2_dash], {
+title: &#x27;Optimal Direction: PC1 Spread (Variance = 4.50)&#x27;,
+xaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27;, scaleanchor: &#x27;y&#x27; },
+yaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27; },
+margin: { l: 40, r: 20, b: 40, t: 40 }, showlegend: false
+}, {responsive: true});
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" title="Figure 3.3d Variance Comparison" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.3d: Why Maximize Variance? Worst Line (PC2 Clumping) vs. Best Line (PC1 Spread). Left: Projecting onto $\mathbf{q}_{2, 2 \times 1}$ (PC2, Green at $135^\circ$) collapses the 40 points into a dense clump ($\text{Var} = 0.50$), causing Person A and D to collide at $-0.71$, and Person B and C to collide at $+0.71$ (distinguishability destroyed with massive drop errors). Right: Projecting onto leading eigenvector $\mathbf{q}_{1, 2 \times 1}$ (PC1, Red at $45^\circ$) maximizes spread ($\text{Var} = \lambda_1 = 4.50$, retaining 90% of total variance), cleanly separating individuals across an 8.8-unit span with minimal drop errors.</em></p>
+</div>
+
+<hr />
+<h2 id="34-finding-the-optimal-direction-the-eigendecomposition-of-">3.4 Finding the Optimal Direction: The Eigendecomposition of $\mathbf{\Sigma}$</h2>
+<p>Now we can state the mathematical optimization problem of PCA with total clarity:</p>
+<p>$$\max_{\mathbf{u}_{2 \times 1}} \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} \quad \text{subject to } \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = 1$$</p>
+<ul>
+<li><strong>Why the constraint $\mathbf{u}_{1 \times 2}^T \mathbf{u}_{2 \times 1} = 1$?</strong><br />
+  If there were no constraint on the length of $\mathbf{u}_{2 \times 1}$, one could make $\mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1}$ arbitrarily huge simply by making the vector longer (e.g. setting $\|\mathbf{u}\| = 1{,}000$). We are searching purely for the <strong>best direction in space</strong>, not the longest arrow. Constraining $\mathbf{u}_{2 \times 1}$ to unit length ensures we evaluate pure orientation.</li>
+</ul>
+<hr />
+<h3 id="step-1-the-lagrangian-function">Step 1: The Lagrangian Function</h3>
+<p>To solve an optimization problem with a constraint, we combine the objective and the constraint into a single equation using a <strong>Lagrange Multiplier</strong> $\lambda$:</p>
+<p>$$\mathcal{L}(\mathbf{u}_{2 \times 1}, \lambda) = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} - \lambda (\underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} - 1)$$</p>
+<p>Think of $\lambda$ as a penalty tax:
+- If $\mathbf{u}_{2 \times 1}$ obeys the rule ($\mathbf{u}_{1 \times 2}^T \mathbf{u}_{2 \times 1} = 1$), then $(\mathbf{u}_{1 \times 2}^T \mathbf{u}_{2 \times 1} - 1) = 0$, the penalty drops to zero, and the score equals the pure variance.
+- If $\mathbf{u}_{2 \times 1}$ exceeds unit length, the penalty kicks in and subtracts from the score.</p>
+<hr />
+<h3 id="step-2-differentiating-the-lagrangian-setting-the-gradient-to-zero">Step 2: Differentiating the Lagrangian (Setting the Gradient to Zero)</h3>
+<p>To find the optimal direction that maximizes variance, we take the gradient vector of partial derivatives with respect to $\mathbf{u}_{2 \times 1}$ and set it to the zero vector $\mathbf{0}_{2 \times 1}$:</p>
+<p>$$\nabla_{\mathbf{u}} \mathcal{L} = \nabla_{\mathbf{u}} \left( \mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1} \right) - \nabla_{\mathbf{u}} \left[ \lambda (\mathbf{u}_{1 \times 2}^T \mathbf{u}_{2 \times 1} - 1) \right] = \mathbf{0}_{2 \times 1}$$</p>
+<p>Where does this derivative come from? Let us derive each term component-by-component in $\mathbb{R}^2$ with standard calculus:</p>
+<h4 id="part-a-differentiating-the-quadratic-variance-term-">Part A: Differentiating the Quadratic Variance Term $\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}$</h4>
+<p>Let the unit vector and symmetric covariance matrix be:</p>
+<p>$$\mathbf{u}_{2 \times 1} = \begin{bmatrix} u_1 \\\\ u_2 \end{bmatrix}_{2 \times 1}, \qquad \mathbf{\Sigma}_{2 \times 2} = \begin{bmatrix} s_{11} & s_{12} \\\\ s_{21} & s_{22} \end{bmatrix}_{2 \times 2} \quad (\text{where } s_{12} = s_{21} \text{ due to symmetry})$$</p>
+<ol>
+<li>First, multiply the matrix $\mathbf{\Sigma}_{2 \times 2}$ by vector $\mathbf{u}_{2 \times 1}$:</li>
+</ol>
+<p>$$\mathbf{\Sigma} \mathbf{u} = \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\\\ s_{21} u_1 + s_{22} u_2 \end{bmatrix}_{2 \times 1}$$</p>
+<ol>
+<li>Multiply on the left by row vector $\mathbf{u}_{1 \times 2}^T = [u_1, u_2]$:</li>
+</ol>
+<p>$$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = u_1 (s_{11} u_1 + s_{12} u_2) + u_2 (s_{21} u_1 + s_{22} u_2) = s_{11} u_1^2 + s_{12} u_1 u_2 + s_{21} u_1 u_2 + s_{22} u_2^2$$</p>
+<p>Because $\mathbf{\Sigma}$ is symmetric ($s_{12} = s_{21}$), the two cross terms combine:</p>
+<p>$$\mathbf{u}^T \mathbf{\Sigma} \mathbf{u} = s_{11} u_1^2 + 2 s_{12} u_1 u_2 + s_{22} u_2^2$$</p>
+<ol>
+<li>Take the partial derivative with respect to each component:</li>
+<li>Partial derivative with respect to $u_1$:</li>
+</ol>
+<p>$$\frac{\partial}{\partial u_1} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 2 s_{11} u_1 + 2 s_{12} u_2 + 0 = 2 (s_{11} u_1 + s_{12} u_2)$$</p>
+<ul>
+<li>Partial derivative with respect to $u_2$:</li>
+</ul>
+<p>$$\frac{\partial}{\partial u_2} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = 0 + 2 s_{12} u_1 + 2 s_{22} u_2 = 2 (s_{21} u_1 + s_{22} u_2) \quad (\text{since } s_{12} = s_{21})$$</p>
+<ol>
+<li>Stacking these two partial derivatives into the gradient vector:</li>
+</ol>
+<p>$$\nabla_{\mathbf{u}} (\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}) = \begin{bmatrix} \frac{\partial}{\partial u_1} \\\\ \frac{\partial}{\partial u_2} \end{bmatrix} = 2 \begin{bmatrix} s_{11} u_1 + s_{12} u_2 \\\\ s_{21} u_1 + s_{22} u_2 \end{bmatrix} = 2 \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$</p>
+<p><em>(General Matrix Calculus Rule: For any symmetric matrix $\mathbf{A} = \mathbf{A}^T$, $\nabla_{\mathbf{u}} (\mathbf{u}^T \mathbf{A} \mathbf{u}) = (\mathbf{A} + \mathbf{A}^T)\mathbf{u} = 2\mathbf{A}\mathbf{u}$.)</em></p>
+<hr />
+<h4 id="part-b-differentiating-the-constraint-term-">Part B: Differentiating the Constraint Term $\lambda (\mathbf{u}^T \mathbf{u} - 1)$</h4>
+<p>Since $\mathbf{u}^T \mathbf{u} = u_1^2 + u_2^2$:</p>
+<p>$$\lambda (\mathbf{u}^T \mathbf{u} - 1) = \lambda (u_1^2 + u_2^2 - 1)$$</p>
+<p>Taking partial derivatives with respect to $u_1$ and $u_2$:
+- $\frac{\partial}{\partial u_1} [\lambda (u_1^2 + u_2^2 - 1)] = 2 \lambda u_1$
+- $\frac{\partial}{\partial u_2} [\lambda (u_1^2 + u_2^2 - 1)] = 2 \lambda u_2$</p>
+<p>Stacking into the gradient vector:</p>
+<p>$$\nabla_{\mathbf{u}} [\lambda (\mathbf{u}^T \mathbf{u} - 1)] = 2 \lambda \begin{bmatrix} u_1 \\\\ u_2 \end{bmatrix} = 2 \lambda \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$</p>
+<hr />
+<h4 id="part-c-combining-both-halves-and-equating-to-zero">Part C: Combining Both Halves and Equating to Zero</h4>
+<p>Subtracting Part B from Part A gives the complete gradient:</p>
+<p>$$\nabla_{\mathbf{u}} \mathcal{L} = 2 \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} - 2 \lambda \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \mathbf{0}_{2 \times 1}$$</p>
+<p>Divide both sides by $2$:</p>
+<p>$$\underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} - \lambda \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \mathbf{0}_{2 \times 1} \implies \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \lambda \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1}$$</p>
+<blockquote>
+<p><strong>The Eureka Moment of PCA:</strong><br />
+Look at the equation that emerged: $\mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1} = \lambda \mathbf{u}_{2 \times 1}$.<br />
+This <strong>IS the exact Eigenvalue Equation from Section 2.3!</strong><br />
+The direction of maximum variance $\mathbf{u}_{2 \times 1}$ is an <strong>Eigenvector</strong> of the Covariance Matrix $\mathbf{\Sigma}_{2 \times 2}$!</p>
+</blockquote>
+<hr />
+<h3 id="step-3-what-is-the-variance-captured">Step 3: What is the Variance Captured?</h3>
+<p>Multiply both sides of $\mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1} = \lambda \mathbf{u}_{2 \times 1}$ on the left by $\mathbf{u}_{1 \times 2}^T$:</p>
+<p>$$\underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} (\lambda \mathbf{u}_{2 \times 1}) = \lambda (\underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1})$$</p>
+<p>Since $\mathbf{u}_{2 \times 1}$ is a unit vector ($\mathbf{u}_{1 \times 2}^T \mathbf{u}_{2 \times 1} = 1$):</p>
+<p>$$\text{Var}(\text{Projected Data})_{1 \times 1} = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \lambda$$</p>
+<ul>
+<li><strong>The Grand Result:</strong>  </li>
+<li>The variance captured along an eigenvector <strong>is exactly equal to its eigenvalue $\lambda$</strong>!</li>
+<li>To <strong>maximize</strong> the variance, we choose the eigenvector $\mathbf{q}_{1, 2 \times 1}$ corresponding to the <strong>largest eigenvalue $\lambda_1$</strong>. This is the <strong>First Principal Component (PC1)</strong>.</li>
+<li>The <strong>Second Principal Component (PC2)</strong> is the eigenvector $\mathbf{q}_{2, 2 \times 1}$ corresponding to the second eigenvalue $\lambda_2$. By Section 2.5 and 2.6, it is <strong>strictly orthogonal ($90^\circ$)</strong> to PC1 and captures the next largest variance $\lambda_2$.</li>
+</ul>
+<hr />
+<h2 id="35-solving-pca-across-the-three-simulated-cases-seeing-the-spine-tilt">3.5 Solving PCA Across the Three Simulated Cases (Seeing the Spine Tilt)</h2>
+<p>Now let's apply this exact mathematical pipeline to our three simulated datasets ($N = 40$ points each).</p>
+<p>Notice the incredible power of linear algebra:<br />
+Although each dataset contains 40 observations, <strong>$\mathbf{\Sigma}_{2 \times 2}$ is always a compact $2 \times 2$ matrix</strong>. We can solve PCA completely by hand!</p>
+<hr />
+<h3 id="case-1-positive-covariance-height-vs-weight">Case 1: Positive Covariance (Height vs. Weight)</h3>
+<p>Our positive covariance matrix was:</p>
+<p>$$\mathbf{\Sigma}_{1, 2 \times 2} = \begin{bmatrix} 2.5 & 2.0 \\\\ 2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$</p>
+<p>Using the trace-determinant formula from Section 2.4:
+1. $\text{Tr}(\mathbf{\Sigma}_{1, 2 \times 2}) = 2.5 + 2.5 = 5.0$
+2. $\det(\mathbf{\Sigma}_{1, 2 \times 2}) = (2.5)(2.5) - (2.0)(2.0) = 6.25 - 4.0 = 2.25$</p>
+<p>$$\lambda^2 - 5.0\lambda + 2.25 = 0 \implies (\lambda - 4.5)(\lambda - 0.5) = 0$$</p>
+<p>$$\lambda_1 = 4.50, \qquad \lambda_2 = 0.50$$</p>
+<p>The unit eigenvectors are vectors $\mathbf{q}_1, \mathbf{q}_2 \in \mathbb{R}^2$:</p>
+<p>$$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\\\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } 45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} -1 \\\\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 135^\circ)$$</p>
+<ul>
+<li><strong>Total Variance:</strong> $\text{Tr}(\mathbf{\Sigma}_{1, 2 \times 2}) = \lambda_1 + \lambda_2 = 4.50 + 0.50 = 5.00$</li>
+<li><strong>Explained Variance Ratio for PC1:</strong></li>
+</ul>
+<p>$$\frac{\lambda_1}{\lambda_1 + \lambda_2} = \frac{4.50}{5.00} = 0.90$$</p>
+<p>Compressing along PC1 captures <strong>90.0%</strong> of total variance.
+- <strong>The Story:</strong> The data cloud tilts upward to the right along $y = x$. Compressing 2D down to 1D along PC1 retains <strong>90% of all information</strong> across all 40 people!</p>
+<hr />
+<h3 id="case-2-negative-covariance-elevation-vs-temperature">Case 2: Negative Covariance (Elevation vs. Temperature)</h3>
+<p>Our negative covariance matrix was:</p>
+<p>$$\mathbf{\Sigma}_{2, 2 \times 2} = \begin{bmatrix} 2.5 & -2.0 \\\\ -2.0 & 2.5 \end{bmatrix}_{2 \times 2}$$</p>
+<ol>
+<li>$\text{Tr}(\mathbf{\Sigma}_{2, 2 \times 2}) = 5.0, \quad \det(\mathbf{\Sigma}_{2, 2 \times 2}) = 2.25$</li>
+<li>Eigenvalues: $\lambda_1 = 4.50, \quad \lambda_2 = 0.50$</li>
+<li>The unit eigenvectors are vectors $\mathbf{q}_1, \mathbf{q}_2 \in \mathbb{R}^2$:</li>
+</ol>
+<p>$$\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\\\ -1 \end{bmatrix}_{2 \times 1} \quad (\text{PC1, Red at } -45^\circ), \qquad \mathbf{q}_{2, 2 \times 1} = \frac{1}{\sqrt{2}}\begin{bmatrix} 1 \\\\ 1 \end{bmatrix}_{2 \times 1} \quad (\text{PC2, Green at } 45^\circ)$$</p>
+<ul>
+<li><strong>Explained Variance Ratio for PC1:</strong> $\frac{4.50}{5.00} = 0.90$ (<strong>90.0%</strong>)</li>
+<li><strong>The Story:</strong> The negative covariance tilted the spine by $90^\circ$! The dominant line of spread now slopes downward along $y = -x$.</li>
+</ul>
+<hr />
+<h3 id="case-3-zero-covariance-height-vs-shoe-brand-uncorrelated">Case 3: Zero Covariance (Height vs. Shoe Brand / Uncorrelated)</h3>
+<p>Our zero covariance matrix was:</p>
+<p>$$\mathbf{\Sigma}_{3, 2 \times 2} = \begin{bmatrix} 2.0 & 0.0 \\\\ 0.0 & 2.0 \end{bmatrix}_{2 \times 2}$$</p>
+<ol>
+<li>This matrix is already diagonal!</li>
+<li>Eigenvalues: $\lambda_1 = 2.00, \quad \lambda_2 = 2.00$</li>
+<li>Eigenvectors: Any pair of perpendicular unit vectors in $\mathbb{R}^2$ (e.g. standard axes $\mathbf{e}_{1, 2 \times 1} = [1, 0]^T$ and $\mathbf{e}_{2, 2 \times 1} = [0, 1]^T$).</li>
+<li><strong>Explained Variance Ratio:</strong> $\frac{2.00}{4.00} = 0.50$ (<strong>50.0%</strong>)</li>
+<li><strong>The Story:</strong> Both eigenvalues are identical! The cloud is circular, with equal spread in every direction. <strong>There is no single dominant spine in uncorrelated data.</strong></li>
+</ol>
+<div class="interactive-box" id="fig_card_13" ondblclick="toggleFullscreen('fig_card_13')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.5 PCA Across Three Cases</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_13')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_5_fig_pca_cases.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_13', './assets/3_5_fig_pca_cases.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_13" src="./assets/3_5_fig_pca_cases.html" title="Figure 3.5 PCA Across Three Cases" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.5: Principal Components Across the Three Covariance Cases (N=40 each). Panel 1: Positive Covariance (PC1 tilts up-right at $45^\circ$, capturing 90.0%). Panel 2: Negative Covariance (PC1 tilts down-right at $-45^\circ$, capturing 90.0%). Panel 3: Zero Covariance (Equal eigenvalues $\lambda_1 = \lambda_2 = 2.00$, circular spread with no preferred spine).</em></p>
+</div>
+
+<hr />
+<h2 id="36-dimensionality-reduction-1d-compression-2d-reconstruction">3.6 Dimensionality Reduction: 1D Compression &amp; 2D Reconstruction</h2>
+<p>Now let's see how PCA performs compression and decompression on our benchmark dataset (Case 1: Height vs. Weight).</p>
+<h3 id="step-1-1d-compression-computing-principal-component-scores">Step 1: 1D Compression (Computing Principal Component Scores)</h3>
+<p>To compress each centered observation vector $\tilde{\mathbf{r}}_{i, 2 \times 1} \in \mathbb{R}^2$ down to a single 1D number $z_{i, 1 \times 1} \in \mathbb{R}$, we project it onto the unit PC1 direction vector $\mathbf{q}_{1, 2 \times 1} \in \mathbb{R}^2$ ($\mathbf{q}_{1, 2 \times 1} = \frac{1}{\sqrt{2}}[1, 1]^T$):</p>
+<p>$$z_{i, 1 \times 1} = \underbrace{\tilde{\mathbf{r}}_{i, 1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{q}_{1, 2 \times 1}}_{2 \times 1} = \frac{\tilde{r}_{i1} + \tilde{r}_{i2}}{\sqrt{2}}$$</p>
+<p>Let's compute the 1D scores for our benchmark individuals:
+- <strong>Person A</strong> $(+2, +1) \implies z_A = \frac{2 + 1}{\sqrt{2}} = \frac{3}{\sqrt{2}} \approx \mathbf{+2.12}$
+- <strong>Person B</strong> $(-2, -1) \implies z_B = \frac{-2 - 1}{\sqrt{2}} = \frac{-3}{\sqrt{2}} \approx \mathbf{-2.12}$
+- <strong>Person C</strong> $(+1, +2) \implies z_C = \frac{1 + 2}{\sqrt{2}} = \frac{3}{\sqrt{2}} \approx \mathbf{+2.12}$
+- <strong>Person D</strong> $(-1, -2) \implies z_D = \frac{-1 - 2}{\sqrt{2}} = \frac{-3}{\sqrt{2}} \approx \mathbf{-2.12}$
+- <strong>Person E</strong> $(0, 0) \implies z_E = \mathbf{0.00}$</p>
+<hr />
+<h3 id="step-2-2d-reconstruction-decompressing-back-to-original-space">Step 2: 2D Reconstruction (Decompressing Back to Original Space)</h3>
+<p>To decompress a 1D score $z_{i, 1 \times 1}$ back into a 2D centered observation vector in $\mathbb{R}^2$, we multiply the scalar score by the PC1 direction vector $\mathbf{q}_{1, 2 \times 1} \in \mathbb{R}^2$:</p>
+<p>$$\hat{\mathbf{r}}_{i, 2 \times 1} = z_{i, 1 \times 1} \, (\mathbf{q}_1)_{2 \times 1} = (\underbrace{\tilde{\mathbf{r}}_{i, 1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{q}_{1, 2 \times 1}}_{2 \times 1}) (\mathbf{q}_1)_{2 \times 1} = \underbrace{(\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T)}_{2 \times 2} \, \underbrace{\tilde{\mathbf{r}}_{i, 2 \times 1}}_{2 \times 1} \in \mathbb{R}^2$$</p>
+<p>For <strong>Person A</strong>:</p>
+<p>$$\hat{\mathbf{r}}_{A, 2 \times 1} = \frac{3}{\sqrt{2}} \left( \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\\\ 1 \end{bmatrix}_{2 \times 1} \right) = \begin{bmatrix} 1.5 \\\\ 1.5 \end{bmatrix}_{2 \times 1}$$</p>
+<hr />
+<h3 id="step-3-the-reconstruction-error-vector">Step 3: The Reconstruction Error Vector</h3>
+<p>How much information did we lose by compressing Person A from 2D down to 1D?<br />
+The difference between the original centered point and the reconstructed point is the <strong>perpendicular error vector</strong>:</p>
+<p>$$\mathbf{e}_{i, 2 \times 1} = \tilde{\mathbf{r}}_{i, 2 \times 1} - \hat{\mathbf{r}}_{i, 2 \times 1}$$</p>
+<p>For <strong>Person A</strong>:</p>
+<p>$$\mathbf{e}_{A, 2 \times 1} = \begin{bmatrix} 2 \\\\ 1 \end{bmatrix}_{2 \times 1} - \begin{bmatrix} 1.5 \\\\ 1.5 \end{bmatrix}_{2 \times 1} = \begin{bmatrix} 0.5 \\\\ -0.5 \end{bmatrix}_{2 \times 1}$$</p>
+<p>Notice that $\mathbf{e}_{A, 2 \times 1}$ points in direction $[1, -1]^T$—it lies <strong>strictly along the dropped PC2 axis $\mathbf{q}_{2, 2 \times 1}$</strong>!</p>
+<hr />
+<h3 id="the-master-pca-verification-table">The Master PCA Verification Table</h3>
+<p>The table below shows the complete compression, reconstruction, and error metrics for our benchmark individuals, followed by the summary totals across the entire <strong>$N = 40$ point cloud</strong>:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Individual</th>
+<th style="text-align: center;">Centered Point $\tilde{\mathbf{r}}_i$</th>
+<th style="text-align: center;">Original Energy $\Vert\tilde{\mathbf{r}}_i\Vert^2$</th>
+<th style="text-align: center;">1D Score $z_i = \tilde{\mathbf{r}}_i^T \mathbf{q}_1$</th>
+<th style="text-align: center;">Shadow Energy $z_i^2$</th>
+<th style="text-align: center;">Reconstructed Point $\hat{\mathbf{r}}_i$</th>
+<th style="text-align: center;">Error Vector $\mathbf{e}_i$</th>
+<th style="text-align: center;">Error Energy $\Vert\mathbf{e}_i\Vert^2$</th>
+<th style="text-align: center;">Pythagoras Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Person A</strong></td>
+<td style="text-align: center;">$[+2, +1]^T$</td>
+<td style="text-align: center;">$4 + 1 = \mathbf{5.0}$</td>
+<td style="text-align: center;">$+3/\sqrt{2} \approx +2.12$</td>
+<td style="text-align: center;">$\mathbf{4.5}$</td>
+<td style="text-align: center;">$[+1.5, +1.5]^T$</td>
+<td style="text-align: center;">$[+0.5, -0.5]^T$</td>
+<td style="text-align: center;">$0.25 + 0.25 = \mathbf{0.5}$</td>
+<td style="text-align: center;">$4.5 + 0.5 = \mathbf{5.0}$</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>Person B</strong></td>
+<td style="text-align: center;">$[-2, -1]^T$</td>
+<td style="text-align: center;">$4 + 1 = \mathbf{5.0}$</td>
+<td style="text-align: center;">$-3/\sqrt{2} \approx -2.12$</td>
+<td style="text-align: center;">$\mathbf{4.5}$</td>
+<td style="text-align: center;">$[-1.5, -1.5]^T$</td>
+<td style="text-align: center;">$[-0.5, +0.5]^T$</td>
+<td style="text-align: center;">$0.25 + 0.25 = \mathbf{0.5}$</td>
+<td style="text-align: center;">$4.5 + 0.5 = \mathbf{5.0}$</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>Person C</strong></td>
+<td style="text-align: center;">$[+1, +2]^T$</td>
+<td style="text-align: center;">$1 + 4 = \mathbf{5.0}$</td>
+<td style="text-align: center;">$+3/\sqrt{2} \approx +2.12$</td>
+<td style="text-align: center;">$\mathbf{4.5}$</td>
+<td style="text-align: center;">$[+1.5, +1.5]^T$</td>
+<td style="text-align: center;">$[-0.5, +0.5]^T$</td>
+<td style="text-align: center;">$0.25 + 0.25 = \mathbf{0.5}$</td>
+<td style="text-align: center;">$4.5 + 0.5 = \mathbf{5.0}$</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>Person D</strong></td>
+<td style="text-align: center;">$[-1, -2]^T$</td>
+<td style="text-align: center;">$1 + 4 = \mathbf{5.0}$</td>
+<td style="text-align: center;">$-3/\sqrt{2} \approx -2.12$</td>
+<td style="text-align: center;">$\mathbf{4.5}$</td>
+<td style="text-align: center;">$[-1.5, -1.5]^T$</td>
+<td style="text-align: center;">$[+0.5, -0.5]^T$</td>
+<td style="text-align: center;">$0.25 + 0.25 = \mathbf{0.5}$</td>
+<td style="text-align: center;">$4.5 + 0.5 = \mathbf{5.0}$</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>Person E</strong></td>
+<td style="text-align: center;">$[0, 0]^T$</td>
+<td style="text-align: center;">$0 + 0 = \mathbf{0.0}$</td>
+<td style="text-align: center;">$0.00$</td>
+<td style="text-align: center;">$\mathbf{0.0}$</td>
+<td style="text-align: center;">$[0.0, 0.0]^T$</td>
+<td style="text-align: center;">$[0.0, 0.0]^T$</td>
+<td style="text-align: center;">$0.00 + 0.00 = \mathbf{0.0}$</td>
+<td style="text-align: center;">$0.0 + 0.0 = \mathbf{0.0}$</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>Summary (All $N=40$)</strong></td>
+<td style="text-align: center;">$\frac{1}{N-1}\sum$</td>
+<td style="text-align: center;">$\text{Tr}(\mathbf{\Sigma}_{1, 2 \times 2}) = \mathbf{5.00}$</td>
+<td style="text-align: center;">$\text{Mean} = 0$</td>
+<td style="text-align: center;">$\lambda_1 = \mathbf{4.50}$ (90%)</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">$\lambda_2 = \mathbf{0.50}$ (10%)</td>
+<td style="text-align: center;">$\mathbf{4.50 + 0.50 = 5.00}$</td>
+</tr>
+</tbody>
+</table></div>
+<div class="interactive-box" id="fig_card_14" ondblclick="toggleFullscreen('fig_card_14')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 3.4 PCA Reduction</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_14')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/3_4_fig_pca_reduction.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_14', './assets/3_4_fig_pca_reduction.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <iframe id="fig_frame_14" src="./assets/3_4_fig_pca_reduction.html" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;Figure 3.4: PCA Dimensionality Reduction (2D to 1D)&lt;/title&gt;
+  &lt;script src=&quot;https://cdn.plot.ly/plotly-2.29.1.min.js&quot;&gt;&lt;/script&gt;
+  &lt;style&gt;
+body {
+font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Helvetica, Arial, sans-serif;
+margin: 0; padding: 20px; background: #f8fafc; color: #1e293b;
+}
+.container {
+max-width: 1200px; margin: 0 auto; background: #ffffff;
+border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 24px;
+}
+h1 { font-size: 22px; margin-top: 0; color: #0f172a; }
+p { line-height: 1.6; color: #475569; font-size: 14px; }
+.charts-row { display: flex; gap: 15px; margin-top: 15px; }
+.chart-col { flex: 1; height: 500px; border: 1px solid #e2e8f0; border-radius: 8px; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=&quot;container&quot;&gt;
+&lt;h1&gt;Figure 3.4: PCA Dimensionality Reduction &amp; Information Retention&lt;/h1&gt;
+&lt;p&gt;
+&lt;b&gt;Left:&lt;/b&gt; The 2D data points (N=40) are projected orthogonally onto &lt;b&gt;PC1 (Red, y = x)&lt;/b&gt;. 
+The orange lines represent the reconstruction error vectors &lt;b&gt;e = (I - P)x&lt;/b&gt; (from Section 1.6).&lt;br&gt;
+&lt;b&gt;Right:&lt;/b&gt; The 1D compressed scores &lt;b&gt;z = xᵀq₁&lt;/b&gt;. 
+Retaining only this single 1D coordinate captures &lt;b&gt;90% of the total variance&lt;/b&gt; (λ₁ = 4.50 out of 5.00), while losing only 10% (λ₂ = 0.50).
+&lt;/p&gt;
+&lt;div class=&quot;charts-row&quot;&gt;
+&lt;div id=&quot;plot1&quot; class=&quot;chart-col&quot;&gt;&lt;/div&gt;
+&lt;div id=&quot;plot2&quot; class=&quot;chart-col&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script&gt;
+const q1 = [Math.SQRT1_2, Math.SQRT1_2];
+const q2 = [-Math.SQRT1_2, Math.SQRT1_2];
+
+const traceCloud2D = {
+x: [-1.113621740066637, -2.35538689600933, 0.23049212880411787, -3.552960793632614, 0.18894721527766034, 0.7704844859690567, 0.37779494641671824, 3.0499866001406426, 1.2804505036180238, 2.109851386014024, -2.7695056269886016, 0.39821685421982345, 0.5744553839616585, 1.487803197296132, 0.9100524061862605, -0.34730713818879844, 0.32540957417304733, -1.051899861731073, 0.46336216048300594, 1.9050581268829987, -1.72145432411183, 0.0610159266357264, 2.7083713293789184, -0.1288444617174227, 0.110432832021352, -0.664477557322027, 0.5138795239794826, -2.6832304265287066, 1.3407227352542062, -1.476279310980547, 0.6337509797187301, 2.332356834083104, -2.547871267914151, -0.7821411579280875, -0.5779145673948641], y: [-1.2378194271699987, -0.7952845817097002, 0.1432529216141539, -2.944728328008923, 0.9459905904315584, 0.48712713676891717, -1.5286399779250703, 2.9014601800593782, 1.903107348486983, 0.9334279810234556, -3.1639091109631177, -0.9722673353157683, 0.9005128061024386, 2.199466389765695, 0.8315716802523427, 1.7842688386200987, -0.6517053881836612, -2.3524770541444844, -1.484739321402928, 2.4653067542394607, -1.5714158304612602, -0.11726333489279725, 2.3516720077196704, 1.1569326578129726, -1.6600301905361012, -1.0110076976440057, 1.3807018722477444, -1.8042727542025823, 1.2885071587166317, -0.42170238935623733, 0.6419984414842789, 1.415512720880175, -1.1903071527682791, 0.3762020366131395, -1.1994496481541814],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#90caf9&#x27;, size: 6, opacity: 0.6 }, name: &#x27;Cloud Points (N=35)&#x27;
+};
+const trace2DPts = {
+x: [2.0, -2.0, 1.0, -1.0, 0.0], y: [1.0, -1.0, 2.0, -2.0, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#1976d2&#x27;, size: 9 }, name: &#x27;Benchmark Points (N=5)&#x27;
+};
+const traceRecon = {
+x: [1.4999999999999998, -1.4999999999999998, 1.4999999999999998, -1.4999999999999998, 0.0], y: [1.4999999999999998, -1.4999999999999998, 1.4999999999999998, -1.4999999999999998, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#d32f2f&#x27;, size: 9, symbol: &#x27;diamond&#x27; }, name: &#x27;Projected on PC1&#x27;
+};
+const tracePC1Line = {
+x: [-4.5 * q1[0], 4.5 * q1[0]], y: [-4.5 * q1[1], 4.5 * q1[1]],
+mode: &#x27;lines&#x27;, line: { color: &#x27;#d32f2f&#x27;, width: 3 }, name: &#x27;PC1 Axis (λ₁ = 4.50)&#x27;
+};
+const tracePC2Line = {
+x: [-3 * q2[0], 3 * q2[0]], y: [-3 * q2[1], 3 * q2[1]],
+mode: &#x27;lines&#x27;, line: { color: &#x27;#2e7d32&#x27;, width: 2, dash: &#x27;dash&#x27; }, name: &#x27;PC2 Axis (λ₂ = 0.50)&#x27;
+};
+
+Plotly.newPlot(&#x27;plot1&#x27;, [traceCloud2D, trace2DPts, traceRecon, tracePC1Line, tracePC2Line], {
+title: &#x27;2D Space: Projections onto PC1&#x27;,
+xaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27;, scaleanchor: &#x27;y&#x27; },
+yaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27; },
+margin: { l: 40, r: 20, b: 40, t: 40 }, showlegend: false
+}, {responsive: true});
+
+const trace1DCloud = {
+x: [-1.6627199949142355, -2.2278611671861666, 0.26427765958566807, -4.594560039954793, 0.8025222186419689, 0.8892657065370393, -0.8137703258744016, 4.208308376150279, 2.25111534552313, 2.1519234774773057, -4.195557796797862, -0.4059149879263425, 1.0429600092287714, 2.6072933290743388, 1.231514201798562, 1.0160853626803246, -0.23072598275968953, -2.407258002930551, -0.7222227166355404, 3.0903146437012303, -2.3284108158654266, -0.039772923802743, 3.5779909567602193, 0.7269681351170083, -1.0957308003145407, -1.1847469855645532, 1.3396713527821493, -3.173143929691295, 1.8591462873251667, -1.342075730876114, 0.9020910668274607, 2.650143977317142, -2.643291310549765, -0.2870423054307082, -1.2567862894530386], y: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+mode: &#x27;markers&#x27;, marker: { color: &#x27;#ef9a9a&#x27;, size: 6, opacity: 0.6, symbol: &#x27;diamond&#x27; }, name: &#x27;Cloud Scores (N=35)&#x27;
+};
+const trace1DPts = {
+x: [2.1213203435596424, -2.1213203435596424, 2.1213203435596424, -2.1213203435596424, 0.0], y: [0, 0, 0, 0, 0],
+mode: &#x27;markers+text&#x27;, text: [&#x27;A (+2.12)&#x27;, &#x27;B (-2.12)&#x27;, &#x27;C (+2.12)&#x27;, &#x27;D (-2.12)&#x27;, &#x27;E (0)&#x27;],
+textposition: &#x27;top center&#x27;, marker: { color: &#x27;#d32f2f&#x27;, size: 10, symbol: &#x27;diamond&#x27; }, name: &#x27;Benchmark Scores (N=5)&#x27;
+};
+const trace1DAxis = {
+x: [-4.5, 4.5], y: [0, 0],
+mode: &#x27;lines&#x27;, line: { color: &#x27;#d32f2f&#x27;, width: 3 }, name: &#x27;1D PC1 Axis&#x27;
+};
+
+Plotly.newPlot(&#x27;plot2&#x27;, [trace1DAxis, trace1DCloud, trace1DPts], {
+title: &#x27;1D Reduced Space (z = xᵀq₁)&#x27;,
+xaxis: { range: [-4.5, 4.5], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27; },
+yaxis: { range: [-2.0, 2.0], dtick: 1, zeroline: true, zerolinecolor: &#x27;#334155&#x27; },
+margin: { l: 40, r: 20, b: 40, t: 40 }, showlegend: false
+}, {responsive: true});
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" title="Figure 3.4 PCA Reduction" loading="lazy" style="height: 650px;"></iframe>
+  <p class="figure-caption"><em>Figure 3.4: PCA Dimensionality Reduction & Information Retention. Left: 2D original space showing 40 observations projected onto PC1 (Red), with orange error drop lines along PC2. Right: 1D compressed coordinate line retaining 90.0% of total variance.</em></p>
+</div>
+
+<hr />
+<h2 id="37-connecting-the-dots-three-foundational-insights">3.7 Connecting the Dots: Three Foundational Insights</h2>
+<p>Now that the complete PCA pipeline has been established, we can unite everything into three clean, powerful insights:</p>
+<h3 id="insight-1-the-pythagoras-bridge-variance-maximization-error-minimization">Insight 1: The Pythagoras Bridge (Variance Maximization = Error Minimization)</h3>
+<p>For every individual centered point in the dataset, the original deviation vector $\tilde{\mathbf{r}}_{i, 2 \times 1}$, projected shadow $\hat{\mathbf{r}}_{i, 2 \times 1}$, and error drop line $\mathbf{e}_{i, 2 \times 1}$ form a right triangle:</p>
+<p>$$\|\tilde{\mathbf{r}}_{i, 2 \times 1}\|^2 = \|\hat{\mathbf{r}}_{i, 2 \times 1}\|^2 + \|\mathbf{e}_{i, 2 \times 1}\|^2$$</p>
+<p>Summing across all $N = 40$ points and dividing by $(N - 1) = 39$:</p>
+<p>$$\frac{1}{N - 1}\sum_{i=1}^N \|\tilde{\mathbf{r}}_{i, 2 \times 1}\|^2 = \frac{1}{N - 1}\sum_{i=1}^N \|\hat{\mathbf{r}}_{i, 2 \times 1}\|^2 + \frac{1}{N - 1}\sum_{i=1}^N \|\mathbf{e}_{i, 2 \times 1}\|^2$$</p>
+<p>$$\text{Total Sample Variance} = \text{Captured PC1 Variance } (\lambda_1 = 4.50) + \text{Reconstruction Error Variance } (\lambda_2 = 0.50) = 5.00$$</p>
+<p>Because the centered data cloud is fixed, <strong>Total Sample Variance is a constant</strong> ($\text{Tr}(\mathbf{\Sigma}_{2 \times 2}) = 5.00$).<br />
+Therefore:</p>
+<blockquote>
+<p><strong>Maximizing projected variance automatically minimizes reconstruction error!</strong><br />
+Finding the line of widest spread is mathematically identical to finding the line of least information loss.</p>
+</blockquote>
+<hr />
+<h3 id="insight-2-the-pca-projection-operator-connecting-to-part-1">Insight 2: The PCA Projection Operator (Connecting to Part 1)</h3>
+<p>From Section 1.6, an orthogonal projection matrix must satisfy $\mathbf{P}^2 = \mathbf{P}$ and $\mathbf{P}^T = \mathbf{P}$.<br />
+The PCA reconstruction operator is:</p>
+<p>$$\mathbf{P}_{\text{PCA}, 2 \times 2} = \underbrace{\mathbf{q}_{1, 2 \times 1}}_{2 \times 1} \, \underbrace{\mathbf{q}_{1, 1 \times 2}^T}_{1 \times 2}$$</p>
+<p>$$\mathbf{P}_{\text{PCA}, 2 \times 2}^T = (\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T)^T = \mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T = \mathbf{P}_{\text{PCA}, 2 \times 2}$$</p>
+<p>$$\mathbf{P}_{\text{PCA}, 2 \times 2}^2 = (\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T)(\mathbf{q}_{1, 2 \times 1} \mathbf{q}_{1, 1 \times 2}^T) = \underbrace{\mathbf{q}_{1, 2 \times 1}}_{2 \times 1} \, \underbrace{(\mathbf{q}_{1, 1 \times 2}^T \mathbf{q}_{1, 2 \times 1})}_{1 \times 1} \, \underbrace{\mathbf{q}_{1, 1 \times 2}^T}_{1 \times 2} = \mathbf{q}_{1, 2 \times 1} (1) \mathbf{q}_{1, 1 \times 2}^T = \mathbf{P}_{\text{PCA}, 2 \times 2}$$</p>
+<p>$\mathbf{P}_{\text{PCA}, 2 \times 2}$ <strong>IS an exact orthogonal projection matrix!</strong> It drops high-dimensional centered observations directly onto the optimal principal component subspace.</p>
+<hr />
+<h3 id="insight-3-the-positive-semi-definite-guarantee-connecting-to-part-2">Insight 3: The Positive Semi-Definite Guarantee (Connecting to Part 2)</h3>
+<p>Why are eigenvalues of a covariance matrix guaranteed to be non-negative ($\lambda_i \ge 0$)?<br />
+Because variance along any direction is an average of squared distances:</p>
+<p>$$\text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1})_{1 \times 1} = \underbrace{\mathbf{u}_{1 \times 2}^T}_{1 \times 2} \, \underbrace{\mathbf{\Sigma}_{2 \times 2}}_{2 \times 2} \, \underbrace{\mathbf{u}_{2 \times 1}}_{2 \times 1} = \frac{1}{N - 1} \sum_{i=1}^N z_i^2 = \frac{1}{N - 1} \underbrace{\mathbf{z}_{1 \times 40}^T}_{1 \times 40} \underbrace{\mathbf{z}_{40 \times 1}}_{40 \times 1} \ge 0$$</p>
+<p>In linear algebra, a matrix satisfying $\mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1} \ge 0$ for all $\mathbf{u}_{2 \times 1}$ is called <strong>Positive Semi-Definite (PSD)</strong>.<br />
+- The statistical law that <em>variance cannot be negative</em> is the exact physical twin of the linear algebra property that <em>$\mathbf{\Sigma}_{2 \times 2}$ is Positive Semi-Definite</em>.
+- If an eigenvalue equals zero ($\lambda = 0$), the variance along that axis is literally zero (data points lie perfectly flat on a lower-dimensional line or plane). Dropping that dimension loses <strong>0%</strong> information!</p>
+<hr />
+<h3 id="summary-checklist-of-part-3">Summary Checklist of Part 3:</h3>
+<ol>
+<li><strong>Centering:</strong> $(\mathbf{X}_c)_{40 \times 2} = \mathbf{X}_{40 \times 2} - \mathbf{1}_{40 \times 1} \mathbf{\mu}_{1 \times 2}^T$ anchors the center of mass at $(0, 0)$ so linear operators act purely on variation.</li>
+<li><strong>Covariance:</strong> $\mathbf{\Sigma}_{2 \times 2} = \frac{1}{N-1}(\mathbf{X}_c^T)_{2 \times 40} (\mathbf{X}_c)_{40 \times 2}$ captures all feature variances on the diagonal and pairwise covariances off the diagonal.</li>
+<li><strong>The Variance Machine:</strong> $\text{Var}((\mathbf{X}_c)_{40 \times 2} \mathbf{u}_{2 \times 1})_{1 \times 1} = \mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1}$ computes the spread along any unit direction $\mathbf{u}_{2 \times 1}$.</li>
+<li><strong>Eigendecomposition:</strong> Maximizing $\mathbf{u}_{1 \times 2}^T \mathbf{\Sigma}_{2 \times 2} \mathbf{u}_{2 \times 1}$ subject to $\|\mathbf{u}\| = 1$ leads directly to $\mathbf{\Sigma}_{2 \times 2}\mathbf{u}_{2 \times 1} = \lambda\mathbf{u}_{2 \times 1}$.</li>
+<li><strong>Principal Components:</strong> PC1 is the leading eigenvector $\mathbf{q}_{1, 2 \times 1}$ capturing maximum variance $\lambda_1$; PC2 is the orthogonal eigenvector $\mathbf{q}_{2, 2 \times 1}$ capturing $\lambda_2$.</li>
+<li><strong>Information Conservation:</strong> $\text{Total Variance} = \text{Tr}(\mathbf{\Sigma}_{2 \times 2}) = \sum \lambda_i = \text{Captured Variance} + \text{Reconstruction Error}$.</li>
+</ol>
+<hr />
+<h1 id="part-4-the-visual-capstone-image-compression-via-principal-component-analysis">Part 4: The Visual Capstone — Image Compression via Principal Component Analysis</h1>
+<p>In Parts 1 through 3, we built the complete mathematical foundation of Principal Component Analysis:
+- <strong>Part 1:</strong> How orthogonal projections flatten vectors onto directional subspaces.
+- <strong>Part 2:</strong> Why symmetric matrices guarantee strictly orthogonal, real eigenvectors.
+- <strong>Part 3:</strong> How maximizing variance from the sample covariance matrix reveals the natural spine of data.</p>
+<p>Now, in Part 4, we bring all three pillars together for the ultimate visual capstone of this workshop: <strong>compressing a real-world digital image using PCA</strong>, implementing it from first principles in pure NumPy, validating it against industry-standard Scikit-Learn, and mathematically proving <strong>pixel-to-pixel parity</strong>.</p>
+<hr />
+<h2 id="41-images-as-high-dimensional-data-matrices">4.1 Images as High-Dimensional Data Matrices</h2>
+<p>A digital grayscale photograph is not merely a picture—in linear algebra, <strong>an image is a matrix</strong>.</p>
+<p>Consider Leonardo da Vinci’s <strong>Mona Lisa</strong>, represented as an $H \times W$ grayscale image matrix:</p>
+<p>$$\mathbf{X}_{H \times W} \in \mathbb{R}^{512 \times 512} \quad (H = 512 \text{ rows}, \quad W = 512 \text{ columns})$$</p>
+<p>$$\mathbf{X}_{512 \times 512} = \begin{bmatrix} (\mathbf{r}_1^T)_{1 \times 512} \\\\ (\mathbf{r}_2^T)_{1 \times 512} \\\\ \vdots \\\\ (\mathbf{r}_{512}^T)_{1 \times 512} \end{bmatrix}_{512 \times 512} = \begin{bmatrix} x_{1,1} & x_{1,2} & \cdots & x_{1,512} \\\\ x_{2,1} & x_{2,2} & \cdots & x_{2,512} \\\\ \vdots & \vdots & \ddots & \vdots \\\\ x_{512,1} & x_{512,2} & \cdots & x_{512,512} \end{bmatrix}$$</p>
+<p>Each pixel intensity is an 8-bit integer in $[0, 255]$:
+- $0 \implies$ Pure Black
+- $255 \implies$ Pure White</p>
+<h3 id="the-geometric-interpretation-for-pca">The Geometric Interpretation for PCA:</h3>
+<p>Just like our height-weight dataset in Section 3.1:
+- <strong>Number of Observations ($N = H = 512$):</strong> Every horizontal row is an individual observation vector in $\mathbb{R}^{512}$.
+- <strong>Number of Features ($D = W = 512$):</strong> Every vertical column is a physical coordinate across the horizontal scanline.
+- <strong>Total Uncompressed Storage:</strong> $512 \times 512 = \mathbf{262{,}144 \text{ numbers}}$ (floating-point pixel values).</p>
+<hr />
+<h3 id="step-1-centering-the-image-matrix">Step 1: Centering the Image Matrix</h3>
+<p>Before performing PCA, we compute the sample average intensity across all rows for each column:</p>
+<p>$$\mathbf{\mu}_{1 \times W}^T = \frac{1}{H} \sum_{i=1}^H \mathbf{r}_{i, 1 \times W}^T = \frac{1}{H} \mathbf{1}_{1 \times H}^T \mathbf{X}_{H \times W} \in \mathbb{R}^{1 \times 512}$$</p>
+<p>Physical meaning: $\mathbf{\mu}_{1 \times 512}^T$ represents the "average horizontal lighting slice" across the entire portrait.</p>
+<p>Subtracting $\mathbf{\mu}$ from every row anchors the center of mass at the origin:</p>
+<p>$$(\mathbf{X}_c)_{H \times W} = \mathbf{X}_{H \times W} - \mathbf{1}_{H \times 1} \mathbf{\mu}_{1 \times W}^T \in \mathbb{R}^{512 \times 512}$$</p>
+<hr />
+<h2 id="42-the-compression-mathematics-rank-low-dimensional-projection">4.2 The Compression Mathematics (Rank-$k$ Low-Dimensional Projection)</h2>
+<p>Just as in Section 3.3, we want to compress our 512-dimensional scanline vectors down onto a compact subspace of $k$ principal component eigenvectors ($k \ll 512$).</p>
+<h3 id="step-2-extracting-the-top-principal-components">Step 2: Extracting the Top $k$ Principal Components</h3>
+<p>Using the Singular Value Decomposition (SVD) of the centered image matrix:</p>
+<p>$$(\mathbf{X}_c)_{H \times W} = \mathbf{U}_{H \times H} \, \mathbf{S}_{H \times W} \, \mathbf{V}_{W \times W}^T$$</p>
+<p>The columns of $\mathbf{V}_{W \times W}$ are the orthonormal eigenvectors of the feature covariance matrix $\mathbf{\Sigma} = \frac{1}{H - 1}\mathbf{X}_c^T \mathbf{X}_c$.</p>
+<p>We select the leading $k$ columns of $\mathbf{V}$ corresponding to the $k$ largest singular values:</p>
+<p>$$(\mathbf{V}_k)_{W \times k} = \begin{bmatrix} (\mathbf{q}_1)_{W \times 1} & (\mathbf{q}_2)_{W \times 1} & \cdots & (\mathbf{q}_k)_{W \times 1} \end{bmatrix}_{512 \times k}$$</p>
+<hr />
+<h3 id="step-3-1d-compression-projection-into-dimensional-latent-space">Step 3: 1D Compression (Projection into $k$-Dimensional Latent Space)</h3>
+<p>To compress the entire 512-column image down to just $k$ numbers per row, we project $(\mathbf{X}_c)_{H \times W}$ onto $(\mathbf{V}_k)_{W \times k}$:</p>
+<p>$$\mathbf{Z}_{H \times k} = (\mathbf{X}_c)_{H \times W} \, (\mathbf{V}_k)_{W \times k} \in \mathbb{R}^{512 \times k}$$</p>
+<ul>
+<li><strong>Dimension Check:</strong> $(512 \times 512) \times (512 \times k) = (512 \times k)$.</li>
+<li><strong>Storage Breakthrough:</strong> Instead of storing 512 numbers per row, we now store only <strong>$k$ shadow coordinates</strong> per row!</li>
+</ul>
+<hr />
+<h3 id="step-4-2d-reconstruction-decompressing-back-to-full-pixel-space">Step 4: 2D Reconstruction (Decompressing Back to Full Pixel Space)</h3>
+<p>To view the compressed image, we decompress the low-dimensional scores $\mathbf{Z}_{H \times k}$ back into original pixel space by multiplying by the transposed principal axes $(\mathbf{V}_k^T)_{k \times W}$ and re-adding the mean row $\mathbf{\mu}_{1 \times W}^T$:</p>
+<p>$$\hat{\mathbf{X}}_{H \times W} = \underbrace{\mathbf{Z}_{H \times k}}_{512 \times k} \, \underbrace{(\mathbf{V}_k^T)_{k \times W}}_{k \times 512} + \underbrace{\mathbf{1}_{H \times 1} \mathbf{\mu}_{1 \times W}^T}_{512 \times 512} \in \mathbb{R}^{512 \times 512}$$</p>
+<p>Substituting $\mathbf{Z} = \mathbf{X}_c \mathbf{V}_k$ reveals the exact <strong>Rank-$k$ Projection Operator</strong>:</p>
+<p>$$\hat{\mathbf{X}} = (\mathbf{X}_c)_{H \times W} \underbrace{(\mathbf{V}_k \mathbf{V}_k^T)}_{W \times W \, (\mathbf{P}_k)} + \mathbf{1}_{H \times 1} \mathbf{\mu}^T$$</p>
+<p>Notice that $\mathbf{P}_k = \mathbf{V}_k \mathbf{V}_k^T = \sum_{j=1}^k \mathbf{q}_j \mathbf{q}_j^T$ is literally the multi-dimensional orthogonal projection matrix from Section 1.6!</p>
+<hr />
+<h3 id="the-storage-accounting-how-much-space-did-we-save">The Storage Accounting: How Much Space Did We Save?</h3>
+<p>To transmit or store the compressed image on disk, we only need to save:
+1. The compressed score matrix: $\mathbf{Z}_{H \times k} \implies H \times k$ numbers
+2. The principal component basis matrix: $\mathbf{V}_{k, W \times k} \implies k \times W$ numbers
+3. The mean vector: $\mathbf{\mu}_{1 \times W} \implies W$ numbers</p>
+<p>$$\text{Total Numbers Stored} = (H \cdot k) + (k \cdot W) + W$$</p>
+<p>$$\text{Storage Savings Ratio} = 1 - \frac{(H \cdot k) + (k \cdot W) + W}{H \cdot W}$$</p>
+<p>Multiplying this ratio by $100$ yields the percentage of storage space saved:</p>
+<p>$$\text{Storage Savings Percentage} = \text{Storage Savings Ratio} \times 100$$</p>
+<h4 id="the-compression-vs-information-retention-table-mona-lisa-">The Compression vs. Information Retention Table (Mona Lisa, $512 \times 512$):</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Rank $k$</th>
+<th style="text-align: center;">Stored Numbers</th>
+<th style="text-align: center;">Original Numbers</th>
+<th style="text-align: center;">Storage Saved (%)</th>
+<th style="text-align: center;">Explained Variance (%)</th>
+<th style="text-align: center;">Reconstruction RMSE</th>
+<th style="text-align: left;">Visual Quality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Original</strong></td>
+<td style="text-align: center;">$262{,}144$</td>
+<td style="text-align: center;">$262{,}144$</td>
+<td style="text-align: center;"><strong>0.00%</strong> (Baseline)</td>
+<td style="text-align: center;"><strong>100.00%</strong></td>
+<td style="text-align: center;">$0.00$</td>
+<td style="text-align: left;">Perfect Masterpiece</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>$k = 5$</strong></td>
+<td style="text-align: center;">$5{,}632$</td>
+<td style="text-align: center;">$262{,}144$</td>
+<td style="text-align: center;"><strong>97.85%</strong></td>
+<td style="text-align: center;"><strong>89.48%</strong></td>
+<td style="text-align: center;">$16.76$</td>
+<td style="text-align: left;">Coarse lighting &amp; head silhouette</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>$k = 20$</strong></td>
+<td style="text-align: center;">$20{,}992$</td>
+<td style="text-align: center;">$262{,}144$</td>
+<td style="text-align: center;"><strong>91.99%</strong></td>
+<td style="text-align: center;"><strong>96.91%</strong></td>
+<td style="text-align: center;">$9.10$</td>
+<td style="text-align: left;">Face, smile, veil, hands clearly identifiable</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>$k = 50$</strong></td>
+<td style="text-align: center;">$51{,}712$</td>
+<td style="text-align: center;">$262{,}144$</td>
+<td style="text-align: center;"><strong>80.27%</strong></td>
+<td style="text-align: center;"><strong>98.47%</strong></td>
+<td style="text-align: center;">$6.41$</td>
+<td style="text-align: left;">High-frequency landscape &amp; fabric textures emerge</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>$k = 100$</strong></td>
+<td style="text-align: center;">$102{,}912$</td>
+<td style="text-align: center;">$262{,}144$</td>
+<td style="text-align: center;"><strong>60.74%</strong></td>
+<td style="text-align: center;"><strong>99.25%</strong></td>
+<td style="text-align: center;">$4.49$</td>
+<td style="text-align: left;">Visually indistinguishable from original</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="43-multi-panel-visual-evidence">4.3 Multi-Panel Visual Evidence</h2>
+<p>The two figures below show the complete visual progression of compressing the Mona Lisa across $k = 5, 20, 50, 100$ components, accompanied by the cumulative explained variance spectrum.</p>
+<h3 id="1-pure-numpy-first-principles-implementation">1. Pure NumPy First-Principles Implementation:</h3>
+<div class="interactive-box" id="fig_card_15" ondblclick="toggleFullscreen('fig_card_15')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 4.1 Pure NumPy PCA Compression</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_15')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/4_1_fig_pca_scratch.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_15', './assets/4_1_fig_pca_scratch.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <img src="./assets/4_1_fig_pca_scratch.png" alt="Figure 4.1 Pure NumPy PCA Compression" class="workshop-img" loading="lazy">
+  <p class="figure-caption"><em>Figure 4.1: First-Principles PCA Image Compression (Pure NumPy). Top-left: Original 512x512 image. Panels 2-5: Reconstructed images at rank $k = 5, 20, 50, 100$, displaying variance captured, storage savings percentage, and RMSE. Bottom-right: The cumulative explained variance curve illustrating the rapid "elbow" saturation beyond $k = 20$.</em></p>
+</div>
+
+<hr />
+<h3 id="2-scikit-learn-production-implementation">2. Scikit-Learn Production Implementation:</h3>
+<div class="interactive-box" id="fig_card_16" ondblclick="toggleFullscreen('fig_card_16')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 4.2 Scikit-Learn PCA Compression</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_16')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/4_2_fig_pca_sklearn.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_16', './assets/4_2_fig_pca_sklearn.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <img src="./assets/4_2_fig_pca_sklearn.png" alt="Figure 4.2 Scikit-Learn PCA Compression" class="workshop-img" loading="lazy">
+  <p class="figure-caption"><em>Figure 4.2: Production Scikit-Learn PCA Image Compression (`sklearn.decomposition.PCA`). Generated using `pca.fit_transform()` and `pca.inverse_transform()`, producing identical visual and statistical metrics.</em></p>
+</div>
+
+<hr />
+<h2 id="44-the-mathematical-parity-proof-first-principles-vs-scikit-learn">4.4 The Mathematical Parity Proof (First Principles vs. Scikit-Learn)</h2>
+<p>A primary goal of this workshop is to eliminate any belief that machine learning libraries are "magical black boxes."<br />
+To prove this, we test pixel-to-pixel parity between our 4-line NumPy scratch implementation and <code>sklearn.decomposition.PCA(n_components=k, svd_solver='full')</code> across all $262{,}144$ pixels:</p>
+<p>$$\Delta(\mathbf{X}) = |\hat{\mathbf{X}}_{\text{scratch}} - \hat{\mathbf{X}}_{\text{sklearn}}|$$</p>
+<div class="interactive-box" id="fig_card_17" ondblclick="toggleFullscreen('fig_card_17')">
+
+  <div class="interactive-header">
+<div class="header-left">
+<span class="interactive-title">🎮 Figure 4.3 Pixel Parity Verification</span>
+<span class="fullscreen-tip">💡 Double-click for full screen</span>
+</div>
+<div class="header-actions">
+<button type="button" onclick="toggleFullscreen('fig_card_17')" class="btn-action btn-fullscreen" title="Full screen in this window">⛶ Full Screen</button>
+<a href="./assets/4_3_fig_pixel_parity.html" target="_blank" onclick="return openNewTab(event, 'fig_frame_17', './assets/4_3_fig_pixel_parity.html')" class="btn-action" title="Open in new browser tab">↗ New Tab</a>
+</div>
+  </div>
+  <img src="./assets/4_3_fig_pixel_parity.png" alt="Figure 4.3 Pixel Parity Verification" class="workshop-img" loading="lazy">
+  <p class="figure-caption"><em>Figure 4.3: Pixel-to-Pixel Parity Verification. Row 1: Pure NumPy scratch reconstructions. Row 2: Scikit-Learn PCA reconstructions. Row 3: Absolute difference heatmap $|\hat{\mathbf{X}}_{\text{scratch}} - \hat{\mathbf{X}}_{\text{sklearn}}|$. The difference is pure floating-point machine noise ($< 1.17 \times 10^{-12}$), mathematically proving 100% equivalence.</em></p>
+</div>
+
+<hr />
+<h3 id="the-master-parity-verification-table">The Master Parity Verification Table:</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align: center;">Rank $k$</th>
+<th style="text-align: center;">Maximum Absolute Difference $\max(\Delta)$</th>
+<th style="text-align: center;">Mean Absolute Difference $\text{mean}(\Delta)$</th>
+<th style="text-align: center;">Frobenius Norm $\Vert\hat{\mathbf{X}}_{\text{scratch}} - \hat{\mathbf{X}}_{\text{sklearn}}\Vert_F$</th>
+<th style="text-align: center;">Variance Discrepancy</th>
+<th style="text-align: center;"><code>np.allclose(atol=1e-10)</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>$k = 5$</strong></td>
+<td style="text-align: center;">$\mathbf{9.95 \times 10^{-13}}$</td>
+<td style="text-align: center;">$7.74 \times 10^{-14}$</td>
+<td style="text-align: center;">$6.40 \times 10^{-11}$</td>
+<td style="text-align: center;">$2.84 \times 10^{-14}$%</td>
+<td style="text-align: center;"><strong>PASS (True)</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>$k = 20$</strong></td>
+<td style="text-align: center;">$\mathbf{1.11 \times 10^{-12}}$</td>
+<td style="text-align: center;">$8.61 \times 10^{-14}$</td>
+<td style="text-align: center;">$6.77 \times 10^{-11}$</td>
+<td style="text-align: center;">$0.00 \times 10^{0}$%</td>
+<td style="text-align: center;"><strong>PASS (True)</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>$k = 50$</strong></td>
+<td style="text-align: center;">$\mathbf{1.17 \times 10^{-12}}$</td>
+<td style="text-align: center;">$9.05 \times 10^{-14}$</td>
+<td style="text-align: center;">$6.98 \times 10^{-11}$</td>
+<td style="text-align: center;">$1.42 \times 10^{-14}$%</td>
+<td style="text-align: center;"><strong>PASS (True)</strong></td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>$k = 100$</strong></td>
+<td style="text-align: center;">$\mathbf{1.17 \times 10^{-12}}$</td>
+<td style="text-align: center;">$9.57 \times 10^{-14}$</td>
+<td style="text-align: center;">$7.23 \times 10^{-11}$</td>
+<td style="text-align: center;">$2.84 \times 10^{-14}$%</td>
+<td style="text-align: center;"><strong>PASS (True)</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>Pedagogical Finding for MSc Big Data Students:</strong><br />
+In <code>sklearn.decomposition.PCA</code>, setting <code>svd_solver='auto'</code> automatically defaults to a randomized approximation algorithm (<code>Halko et al.</code>) when image dimensions exceed 500 pixels. This achieves great speed on massive web-scale datasets at the cost of slight approximation error.<br />
+However, when <code>svd_solver='full'</code> is specified, Scikit-Learn executes the exact analytical SVD, matching our first-principles NumPy linear algebra <strong>down to machine precision ($10^{-12}$)</strong>!</p>
+</blockquote>
+<hr />
+<h2 id="45-the-three-standalone-scripts-how-to-run-them">4.5 The Three Standalone Scripts &amp; How to Run Them</h2>
+<p>Every experiment, table, and figure in Part 4 is 100% reproducible via dedicated Python CLI scripts with argument parsing. Students can run them on the provided Mona Lisa image or supply any custom photograph:</p>
+<h3 id="1-pure-numpy-scratch-pca">1. Pure NumPy Scratch PCA:</h3>
+<p><pre><code class="language-bash">python3 assets/4_1_pca_scratch.py --image-path assets/4_monalisa.png --components 5,20,50,100
+</code></pre>
+- Dumps individual images: <code>assets/4_monalisa_scratch_k5.png</code>, <code>assets/4_monalisa_scratch_k20.png</code>, etc.
+- Generates: <code>assets/4_1_fig_pca_scratch.png</code> and <code>assets/4_1_fig_pca_scratch.html</code>.</p>
+<h3 id="2-scikit-learn-production-pca">2. Scikit-Learn Production PCA:</h3>
+<p><pre><code class="language-bash">python3 assets/4_2_pca_sklearn.py --image-path assets/4_monalisa.png --components 5,20,50,100 --svd-solver full
+</code></pre>
+- Dumps individual images: <code>assets/4_monalisa_sklearn_k5.png</code>, <code>assets/4_monalisa_sklearn_k20.png</code>, etc.
+- Generates: <code>assets/4_2_fig_pca_sklearn.png</code> and <code>assets/4_2_fig_pca_sklearn.html</code>.</p>
+<h3 id="3-pixel-to-pixel-parity-verifier">3. Pixel-to-Pixel Parity Verifier:</h3>
+<p><pre><code class="language-bash">python3 assets/4_3_pixel_parity.py --image-path assets/4_monalisa.png --components 5,20,50,100
+</code></pre>
+- Runs both algorithms side-by-side on the exact same pixel matrix.
+- Prints the formatted verification table to terminal and asserts <code>np.allclose(atol=1e-10)</code>.
+- Generates: <code>assets/4_3_fig_pixel_parity.png</code> and <code>assets/4_3_fig_pixel_parity.html</code>.</p>
+<hr />
+<h2 id="46-epilogue-the-grand-unified-journey">4.6 Epilogue: The Grand Unified Journey</h2>
+<p>Across this workshop, we progressed from high-school geometry to the forefront of modern data analytics:</p>
+<p><pre><code>[Part 1: Geometric Projections]
+      p = (a^T b / ||a||^2) a  ---&gt;  Orthogonal Projector P = u u^T
+               |
+               v
+[Part 2: Symmetric Transformations]
+      A = A^T  ---&gt;  Spectral Theorem A = Q Lambda Q^T (Rigid 90-degree axes)
+               |
+               v
+[Part 3: The Variance Machine &amp; Eigendecomposition]
+      Var(X_c u) = u^T Sigma u  ---&gt;  Lagrangian Gradient  ---&gt;  Sigma u = lambda u
+               |
+               v
+[Part 4: Real-World Image Compression]
+      X_hat = Z V_k^T + 1 mu^T  ---&gt;  92% Data Compression with 97% Information Preserved
+</code></pre></p>
+<h3 id="the-three-eternal-truths-of-pca">The Three Eternal Truths of PCA:</h3>
+<ol>
+<li><strong>Variance is Information:</strong> The direction of maximum variance is the line that preserves the greatest differences between observations and minimizes reconstruction error.</li>
+<li><strong>The Covariance Matrix is a Geometric Predictor:</strong> You never need to project raw high-dimensional points repeatedly; evaluating $\mathbf{u}^T \mathbf{\Sigma} \mathbf{u}$ predicts data spread in any orientation instantly.</li>
+<li><strong>Linear Algebra Powers Modern Data Science:</strong> Whether compressing a 2D height-weight table or a 262,144-pixel masterpiece like the Mona Lisa, the mathematical engine is identical: <strong>centering, covariance, and eigendecomposition</strong>.</li>
+</ol>
+  </div>
+</body>
+</html>
