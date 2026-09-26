@@ -1012,7 +1012,9 @@ $$\bar{z}_{1 \times 1} = \frac{1}{N} \sum_{i=1}^N z_{i, 1 \times 1} = \frac{1}{N
 Because our data was centered in Section 3.1, the average shadow coordinate is strictly zero ($\bar{z} = 0$).  
 Therefore, the sample variance of $\mathbf{z}_{40 \times 1}$ is simply the average of the squared scores:
 
-$$\text{Var}(\mathbf{z})_{1 \times 1} = \frac{1}{N - 1} \sum_{i=1}^N (z_i - \bar{z})^2 = \frac{1}{N - 1} \sum_{i=1}^N z_i^2 = \frac{1}{N - 1} \underbrace{\mathbf{z}_{1 \times 40}^T}_{1 \times 40} \, \underbrace{\mathbf{z}_{40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar (Variance)}$$
+```math
+\text{Var}(\mathbf{z})_{1 \times 1} = \frac{1}{N - 1} \sum_{i=1}^N (z_i - \bar{z})^2 = \frac{1}{N - 1} \sum_{i=1}^N z_i^2 = \frac{1}{N - 1} \underbrace{\mathbf{z}_{1 \times 40}^T}_{1 \times 40} \underbrace{\mathbf{z}_{40 \times 1}}_{40 \times 1} = (1 \times 1) \text{ Scalar (Variance)}
+```
 
 For our test direction at $\theta = 15^\circ$, the sum of squared scores is $\mathbf{z}_{1 \times 40}^T \mathbf{z}_{40 \times 1} = 136.50$, yielding sample variance:
 
